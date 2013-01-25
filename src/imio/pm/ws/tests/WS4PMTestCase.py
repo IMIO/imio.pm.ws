@@ -20,22 +20,17 @@
 # 02110-1301, USA.
 #
 
-
-from Testing import ZopeTestCase
-from Products.PloneTestCase import PloneTestCase
 from Products.PloneMeeting.tests.PloneMeetingTestCase import PloneMeetingTestCase
-
-# Initialize Zope & Plone test systems.
-ZopeTestCase.installProduct('PloneMeeting')
-PloneTestCase.setupPloneSite(products=['PloneMeeting', 'communesplone.ws4plonemeeting'])
+from imio.pm.ws.testing import WS4PM_PM_TEST_PROFILE_FUNCTIONAL
 
 class WS4PMTestCase(PloneMeetingTestCase):
     '''Base class for defining WS4PM test cases.'''
 
-    def afterSetUp(self):
-        """
-        """
-        PloneMeetingTestCase.afterSetUp(self)
+    layer = WS4PM_PM_TEST_PROFILE_FUNCTIONAL
+
+    def setUp(self):
+        """ """
+        PloneMeetingTestCase.setUp(self)
 
 
 from lxml import etree

@@ -8,14 +8,14 @@ from WS4PM_services_types import *
 from ZSI.ServiceContainer import ServiceSOAPBinding
 
 # Messages  
-getConfigInfosRequest = GED("http://ws4pm.communesplone.org", "getConfigInfosRequest").pyclass
-getConfigInfosResponse = GED("http://ws4pm.communesplone.org", "getConfigInfosResponse").pyclass
-getItemInfosRequest = GED("http://ws4pm.communesplone.org", "getItemInfosRequest").pyclass
-getItemInfosResponse = GED("http://ws4pm.communesplone.org", "getItemInfosResponse").pyclass
-searchItemsRequest = GED("http://ws4pm.communesplone.org", "searchItemsRequest").pyclass
-searchItemsResponse = GED("http://ws4pm.communesplone.org", "searchItemsResponse").pyclass
-createItemRequest = GED("http://ws4pm.communesplone.org", "createItemRequest").pyclass
-createItemResponse = GED("http://ws4pm.communesplone.org", "createItemResponse").pyclass
+getConfigInfosRequest = GED("http://ws4pm.imio.be", "getConfigInfosRequest").pyclass
+getConfigInfosResponse = GED("http://ws4pm.imio.be", "getConfigInfosResponse").pyclass
+getItemInfosRequest = GED("http://ws4pm.imio.be", "getItemInfosRequest").pyclass
+getItemInfosResponse = GED("http://ws4pm.imio.be", "getItemInfosResponse").pyclass
+searchItemsRequest = GED("http://ws4pm.imio.be", "searchItemsRequest").pyclass
+searchItemsResponse = GED("http://ws4pm.imio.be", "searchItemsResponse").pyclass
+createItemRequest = GED("http://ws4pm.imio.be", "createItemRequest").pyclass
+createItemResponse = GED("http://ws4pm.imio.be", "createItemResponse").pyclass
 
 # Service Skeletons
 class WS4PM(ServiceSOAPBinding):
@@ -41,14 +41,14 @@ class WS4PM(ServiceSOAPBinding):
         request = ps.Parse(createItemRequest.typecode)
         return request,createItemResponse()
 
-    soapAction['http://ws4pm.communesplone.org/getConfigInfos'] = 'soap_getConfigInfos'
+    soapAction['http://ws4pm.imio.be/getConfigInfos'] = 'soap_getConfigInfos'
     root[(getConfigInfosRequest.typecode.nspname,getConfigInfosRequest.typecode.pname)] = 'soap_getConfigInfos'
 
-    soapAction['http://ws4pm.communesplone.org/getItemInfos'] = 'soap_getItemInfos'
+    soapAction['http://ws4pm.imio.be/getItemInfos'] = 'soap_getItemInfos'
     root[(getItemInfosRequest.typecode.nspname,getItemInfosRequest.typecode.pname)] = 'soap_getItemInfos'
 
-    soapAction['http://ws4pm.communesplone.org/searchItems'] = 'soap_searchItems'
+    soapAction['http://ws4pm.imio.be/searchItems'] = 'soap_searchItems'
     root[(searchItemsRequest.typecode.nspname,searchItemsRequest.typecode.pname)] = 'soap_searchItems'
 
-    soapAction['http://ws4pm.communesplone.org/createItem'] = 'soap_createItem'
+    soapAction['http://ws4pm.imio.be/createItem'] = 'soap_createItem'
     root[(createItemRequest.typecode.nspname,createItemRequest.typecode.pname)] = 'soap_createItem'

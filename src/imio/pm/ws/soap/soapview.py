@@ -2,8 +2,8 @@ import ZSI
 from Products.Five import BrowserView
 import logging
 logger = logging.getLogger('WS4PM')
-from communesplone.ws4plonemeeting.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo
-from communesplone.ws4plonemeeting.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
+from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo
+from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
                                                  SHOW_EXTRA_INFOS_EXPLANATION_MESSAGE, \
                                                  MAIN_DATA_FROM_ITEM_SCHEMA
 from time import localtime
@@ -295,10 +295,12 @@ class SOAPView(BrowserView):
                 #we have the file extension, generate a filename
                 annex_filename = "annex.%s" % mr_mimetype[0].extensions[0]
             #now that we have everything we need, proceed with annex creation
-            item.addAnnex(annex_filename, annex_type, annex_title, annex_file, False, annex_type)
+            kwargs = {}
+            kwargs['filename'] = annex_filename
+            item.addAnnex(annex_filename, annex_type, annex_title, annex_file, False, annex_type, **kwargs)
             itemAnnexes = item.objectValues('MeetingFile')
             lastInsertedAnnex = itemAnnexes[-1]
-            lastInsertedAnnex.setContentType(annex_mimetype)
+            lastInsertedAnnex.getFile().setContentType(annex_mimetype)
 
         #make sure we have html here, and as clean as possible...
         from BeautifulSoup import BeautifulSoup

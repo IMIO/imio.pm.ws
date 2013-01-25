@@ -2,6 +2,6 @@
 <!-- Register the package-specific browser layer, so that it will be activated
 when this product is installed. -->
 <layers>
-    <layer name="communesplone.ws4plonemeeting.layer" 
-           interface="communesplone.ws4plonemeeting.interfaces.IWS4PMLayer" />
+    <layer name="imio.pm.ws.layer" 
+           interface="imio.pm.ws.interfaces.IWS4PMLayer" />
 </layers>

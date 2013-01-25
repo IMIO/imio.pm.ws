@@ -11,14 +11,14 @@ from ZSI.generate.pyclass import pyclass_type
 
 ##############################
 # targetNamespace
-# http://ws4pm.communesplone.org
+# http://ws4pm.imio.be
 ##############################
 
 class ns0:
-    targetNamespace = "http://ws4pm.communesplone.org"
+    targetNamespace = "http://ws4pm.imio.be"
 
     class ConfigInfosRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         type = (schema, "ConfigInfosRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ConfigInfosRequest_Def.schema
@@ -38,7 +38,7 @@ class ns0:
             self.pyclass = Holder
 
     class ItemInfosRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         type = (schema, "ItemInfosRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ItemInfosRequest_Def.schema
@@ -60,7 +60,7 @@ class ns0:
             self.pyclass = Holder
 
     class SearchItemsRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         type = (schema, "SearchItemsRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.SearchItemsRequest_Def.schema
@@ -91,11 +91,11 @@ class ns0:
             self.pyclass = Holder
 
     class CreateItemRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         type = (schema, "CreateItemRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.CreateItemRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="meetingConfigId", aname="_meetingConfigId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="proposingGroupId", aname="_proposingGroupId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.communesplone.org","CreationData",lazy=False)(pname="creationData", aname="_creationData", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="meetingConfigId", aname="_meetingConfigId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="proposingGroupId", aname="_proposingGroupId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","CreationData",lazy=False)(pname="creationData", aname="_creationData", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -113,7 +113,7 @@ class ns0:
             self.pyclass = Holder
 
     class ConfigInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         type = (schema, "ConfigInfo")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ConfigInfo_Def.schema
@@ -137,11 +137,11 @@ class ns0:
             self.pyclass = Holder
 
     class CreationData_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         type = (schema, "CreationData")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.CreationData_Def.schema
-            TClist = [ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="category", aname="_category", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="decision", aname="_decision", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="externalIdentifier", aname="_externalIdentifier", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.communesplone.org","AnnexInfo",lazy=False)(pname="annexes", aname="_annexes", minOccurs=0, maxOccurs=10, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="category", aname="_category", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="decision", aname="_decision", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="externalIdentifier", aname="_externalIdentifier", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","AnnexInfo",lazy=False)(pname="annexes", aname="_annexes", minOccurs=0, maxOccurs=10, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -162,7 +162,7 @@ class ns0:
             self.pyclass = Holder
 
     class AnnexInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         type = (schema, "AnnexInfo")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.AnnexInfo_Def.schema
@@ -185,11 +185,11 @@ class ns0:
             self.pyclass = Holder
 
     class ItemInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         type = (schema, "ItemInfo")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ItemInfo_Def.schema
-            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="category", aname="_category", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="decision", aname="_decision", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="review_state", aname="_review_state", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TCtimes.gDateTime(pname="meeting_date", aname="_meeting_date", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="absolute_url", aname="_absolute_url", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="externalIdentifier", aname="_externalIdentifier", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.AnyType(pname="extraInfos", aname="_extraInfos", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.communesplone.org","AnnexInfo",lazy=False)(pname="annexes", aname="_annexes", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="category", aname="_category", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="decision", aname="_decision", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="review_state", aname="_review_state", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TCtimes.gDateTime(pname="meeting_date", aname="_meeting_date", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="absolute_url", aname="_absolute_url", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="externalIdentifier", aname="_externalIdentifier", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.AnyType(pname="extraInfos", aname="_extraInfos", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","AnnexInfo",lazy=False)(pname="annexes", aname="_annexes", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -217,9 +217,9 @@ class ns0:
 
     class getConfigInfosRequest_Dec(ElementDeclaration):
         literal = "getConfigInfosRequest"
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
-            kw["pname"] = ("http://ws4pm.communesplone.org","getConfigInfosRequest")
+            kw["pname"] = ("http://ws4pm.imio.be","getConfigInfosRequest")
             kw["aname"] = "_getConfigInfosRequest"
             if ns0.ConfigInfosRequest_Def not in ns0.getConfigInfosRequest_Dec.__bases__:
                 bases = list(ns0.getConfigInfosRequest_Dec.__bases__)
@@ -231,11 +231,11 @@ class ns0:
 
     class getConfigInfosResponse_Dec(ZSI.TCcompound.ComplexType, ElementDeclaration):
         literal = "getConfigInfosResponse"
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
             ns = ns0.getConfigInfosResponse_Dec.schema
-            TClist = [GTD("http://ws4pm.communesplone.org","ConfigInfo",lazy=False)(pname="configInfo", aname="_configInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
-            kw["pname"] = ("http://ws4pm.communesplone.org","getConfigInfosResponse")
+            TClist = [GTD("http://ws4pm.imio.be","ConfigInfo",lazy=False)(pname="configInfo", aname="_configInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            kw["pname"] = ("http://ws4pm.imio.be","getConfigInfosResponse")
             kw["aname"] = "_getConfigInfosResponse"
             self.attribute_typecode_dict = {}
             ZSI.TCcompound.ComplexType.__init__(self,None,TClist,inorder=0,**kw)
@@ -251,9 +251,9 @@ class ns0:
 
     class getItemInfosRequest_Dec(ElementDeclaration):
         literal = "getItemInfosRequest"
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
-            kw["pname"] = ("http://ws4pm.communesplone.org","getItemInfosRequest")
+            kw["pname"] = ("http://ws4pm.imio.be","getItemInfosRequest")
             kw["aname"] = "_getItemInfosRequest"
             if ns0.ItemInfosRequest_Def not in ns0.getItemInfosRequest_Dec.__bases__:
                 bases = list(ns0.getItemInfosRequest_Dec.__bases__)
@@ -265,11 +265,11 @@ class ns0:
 
     class getItemInfosResponse_Dec(ZSI.TCcompound.ComplexType, ElementDeclaration):
         literal = "getItemInfosResponse"
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
             ns = ns0.getItemInfosResponse_Dec.schema
-            TClist = [GTD("http://ws4pm.communesplone.org","ItemInfo",lazy=False)(pname="itemInfo", aname="_itemInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
-            kw["pname"] = ("http://ws4pm.communesplone.org","getItemInfosResponse")
+            TClist = [GTD("http://ws4pm.imio.be","ItemInfo",lazy=False)(pname="itemInfo", aname="_itemInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            kw["pname"] = ("http://ws4pm.imio.be","getItemInfosResponse")
             kw["aname"] = "_getItemInfosResponse"
             self.attribute_typecode_dict = {}
             ZSI.TCcompound.ComplexType.__init__(self,None,TClist,inorder=0,**kw)
@@ -285,9 +285,9 @@ class ns0:
 
     class searchItemsRequest_Dec(ElementDeclaration):
         literal = "searchItemsRequest"
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
-            kw["pname"] = ("http://ws4pm.communesplone.org","searchItemsRequest")
+            kw["pname"] = ("http://ws4pm.imio.be","searchItemsRequest")
             kw["aname"] = "_searchItemsRequest"
             if ns0.SearchItemsRequest_Def not in ns0.searchItemsRequest_Dec.__bases__:
                 bases = list(ns0.searchItemsRequest_Dec.__bases__)
@@ -299,11 +299,11 @@ class ns0:
 
     class searchItemsResponse_Dec(ZSI.TCcompound.ComplexType, ElementDeclaration):
         literal = "searchItemsResponse"
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
             ns = ns0.searchItemsResponse_Dec.schema
-            TClist = [GTD("http://ws4pm.communesplone.org","ItemInfo",lazy=False)(pname="itemInfo", aname="_itemInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
-            kw["pname"] = ("http://ws4pm.communesplone.org","searchItemsResponse")
+            TClist = [GTD("http://ws4pm.imio.be","ItemInfo",lazy=False)(pname="itemInfo", aname="_itemInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            kw["pname"] = ("http://ws4pm.imio.be","searchItemsResponse")
             kw["aname"] = "_searchItemsResponse"
             self.attribute_typecode_dict = {}
             ZSI.TCcompound.ComplexType.__init__(self,None,TClist,inorder=0,**kw)
@@ -319,9 +319,9 @@ class ns0:
 
     class createItemRequest_Dec(ElementDeclaration):
         literal = "createItemRequest"
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
-            kw["pname"] = ("http://ws4pm.communesplone.org","createItemRequest")
+            kw["pname"] = ("http://ws4pm.imio.be","createItemRequest")
             kw["aname"] = "_createItemRequest"
             if ns0.CreateItemRequest_Def not in ns0.createItemRequest_Dec.__bases__:
                 bases = list(ns0.createItemRequest_Dec.__bases__)
@@ -333,11 +333,11 @@ class ns0:
 
     class createItemResponse_Dec(ZSI.TCcompound.ComplexType, ElementDeclaration):
         literal = "createItemResponse"
-        schema = "http://ws4pm.communesplone.org"
+        schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
             ns = ns0.createItemResponse_Dec.schema
             TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="warnings", aname="_warnings", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
-            kw["pname"] = ("http://ws4pm.communesplone.org","createItemResponse")
+            kw["pname"] = ("http://ws4pm.imio.be","createItemResponse")
             kw["aname"] = "_createItemResponse"
             self.attribute_typecode_dict = {}
             ZSI.TCcompound.ComplexType.__init__(self,None,TClist,inorder=0,**kw)
@@ -352,4 +352,4 @@ class ns0:
             Holder.__name__ = "createItemResponse_Holder"
             self.pyclass = Holder
 
-# end class ns0 (tns: http://ws4pm.communesplone.org)
+# end class ns0 (tns: http://ws4pm.imio.be)

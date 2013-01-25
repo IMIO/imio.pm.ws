@@ -2,14 +2,14 @@
 <wsdl:definitions xmlns:tal="http://xml.zope.org/namespaces/tal"
                   xmlns:metal="http://xml.zope.org/namespaces/metal"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  xmlns:tns="http://ws4pm.communesplone.org"
+                  xmlns:tns="http://ws4pm.imio.be"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                   name="WS4PM"
-                  targetNamespace="http://ws4pm.communesplone.org"
+                  targetNamespace="http://ws4pm.imio.be"
                   tal:define="portal_url context/@@plone_portal_state/portal_url">
     <wsdl:types>
-        <xsd:schema targetNamespace="http://ws4pm.communesplone.org">
+        <xsd:schema targetNamespace="http://ws4pm.imio.be">
             <xsd:element name="getConfigInfosRequest" type="tns:ConfigInfosRequest"/>
             <xsd:complexType name="ConfigInfosRequest">
                 <xsd:sequence>

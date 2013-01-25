@@ -4,11 +4,13 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:soap="http://namespaces.zope.org/soap"
     xmlns:browser="http://namespaces.zope.org/browser"
-    i18n_domain="communesplone.ws4plonemeeting">
+    i18n_domain="imio.pm.ws">
 
   <five:registerPackage package="." initialize=".initialize" />
 
   <include package="archetypes.schemaextender" />
+  <include package="Products.CMFPlacefulWorkflow"/>
+  <include package="Products.PloneMeeting"/>
 
   <!-- include the soap namespace for the soap:view directive -->
   <include package="z3c.soap" file="meta.zcml" />
@@ -25,7 +27,7 @@
   <adapter factory=".extender.ExternalIdentifierExtender"
            for=".interfaces.IExternalIdentifierable"
            provides="archetypes.schemaextender.interfaces.ISchemaExtender"
-           name="communesplone.ws4plonemeeting.externalidentifier" />
+           name="imio.pm.ws.externalidentifier" />
 
   <five:implements
     class=".WS4PM_server.getConfigInfosRequest"
@@ -56,7 +58,7 @@
   <browser:page
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       name="ws4pm.wsdl"
-      layer="communesplone.ws4plonemeeting.interfaces.IWS4PMLayer"
+      layer="imio.pm.ws.interfaces.IWS4PMLayer"
       class=".soap.soapview.WS4PMWSDL"
       template="soap/ws4pmwsdl.pt"
       permission="zope2.Public"
@@ -112,9 +114,9 @@
 
   <genericsetup:registerProfile
     name="default"
-    title="Webservices PloneMeeting"
+    title="Webservices for PloneMeeting"
     directory="profiles/default"
-    description="Registration of the webservice for PloneMeeting"
+    description="Registration of the Webservices for PloneMeeting"
     provides="Products.GenericSetup.interfaces.EXTENSION"
   />
 

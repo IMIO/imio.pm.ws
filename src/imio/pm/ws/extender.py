@@ -10,8 +10,8 @@ from Products.PloneMeeting.interfaces import IMeetingItem
 
 from Products.Archetypes.public import StringWidget, StringField
 
-from communesplone.ws4plonemeeting.interfaces import IWS4PMLayer
-from communesplone.ws4plonemeeting.config import EXTERNAL_IDENTIFIER_FIELD_NAME
+from imio.pm.ws.interfaces import IWS4PMLayer
+from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
 
 
 class ExternalIdentifierStringField(ExtensionField, StringField):

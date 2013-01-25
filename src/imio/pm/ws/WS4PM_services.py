@@ -13,7 +13,7 @@ from ZSI.generate.pyclass import pyclass_type
 
 # Locator
 class WS4PMLocator:
-    WS4PM_address = "http://ws4pm.communesplone.org"
+    WS4PM_address = "http://ws4pm.imio.be"
     def getWS4PMAddress(self):
         return WS4PMLocator.WS4PM_address
     def getWS4PM(self, url=None, **kw):
@@ -34,7 +34,7 @@ class WS4PMSOAPSOAP:
             raise TypeError, "%s incorrect request type" % (request.__class__)
         kw = {}
         # no input wsaction
-        self.binding.Send(None, None, request, soapaction="http://ws4pm.communesplone.org/getConfigInfos", **kw)
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getConfigInfos", **kw)
         # no output wsaction
         response = self.binding.Receive(getConfigInfosResponse.typecode)
         return response
@@ -45,7 +45,7 @@ class WS4PMSOAPSOAP:
             raise TypeError, "%s incorrect request type" % (request.__class__)
         kw = {}
         # no input wsaction
-        self.binding.Send(None, None, request, soapaction="http://ws4pm.communesplone.org/getItemInfos", **kw)
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getItemInfos", **kw)
         # no output wsaction
         response = self.binding.Receive(getItemInfosResponse.typecode)
         return response
@@ -56,7 +56,7 @@ class WS4PMSOAPSOAP:
             raise TypeError, "%s incorrect request type" % (request.__class__)
         kw = {}
         # no input wsaction
-        self.binding.Send(None, None, request, soapaction="http://ws4pm.communesplone.org/searchItems", **kw)
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/searchItems", **kw)
         # no output wsaction
         response = self.binding.Receive(searchItemsResponse.typecode)
         return response
@@ -67,7 +67,7 @@ class WS4PMSOAPSOAP:
             raise TypeError, "%s incorrect request type" % (request.__class__)
         kw = {}
         # no input wsaction
-        self.binding.Send(None, None, request, soapaction="http://ws4pm.communesplone.org/createItem", **kw)
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/createItem", **kw)
         # no output wsaction
         response = self.binding.Receive(createItemResponse.typecode)
         return response
