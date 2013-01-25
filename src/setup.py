@@ -3,23 +3,24 @@ import os
 
 version = '1.0'
 
-setup(name='communesplone.ws4plonemeeting',
+setup(name='imio.pm.ws',
       version=version,
-      description="WebService for PloneMeeting",
+      description="WebServices for PloneMeeting",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
         "Programming Language :: Python",
+        "Framework :: Plone",
         ],
       keywords='',
       author='',
       author_email='',
-      url='http://svn.communesplone.org/svn/communesplone.ws4plonemeeting/',
+      url='http://svn.communesplone.org/svn/imio.pm.ws/',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['communesplone', 'communesplone.ws4plonemeeting'],
+      namespace_packages=['imio', 'imio.pm', 'imio.pm.ws'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
