@@ -28,15 +28,16 @@ setup(name='imio.pm.ws',
           # -*- Extra requirements: -*-
           'lxml',
           'z3c.soap',
+          'BeautifulSoup',
+          'python-magic',
           'ZSI',
           'archetypes.schemaextender',
-          'BeautifulSoup',
-          'ctypes',
-          'python-magic'
+          'Products.PloneMeeting'
           # -*- optional SOAP clients for tests (see docs/README.txt) -*-
           #'SOAPpy',
           #'suds',
       ],
+      dependency_links = ['http://sourceforge.net/projects/pywebsvcs/files/ZSI/ZSI-2.0/ZSI-2.0.tar.gz/download'],
       entry_points="""
       # -*- Entry points: -*-
       """,
