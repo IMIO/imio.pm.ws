@@ -1,0 +1,121 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:soap="http://namespaces.zope.org/soap"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="communesplone.ws4plonemeeting">
+
+  <five:registerPackage package="." initialize=".initialize" />
+
+  <include package="archetypes.schemaextender" />
+
+  <!-- include the soap namespace for the soap:view directive -->
+  <include package="z3c.soap" file="meta.zcml" />
+
+  <permission
+    id="ws4pm.SOAPAccess"
+    title="SOAP Access"
+  />
+
+  <class class="Products.PloneMeeting.MeetingItem.MeetingItem">
+    <implements interface=".interfaces.IExternalIdentifierable" />
+  </class>
+
+  <adapter factory=".extender.ExternalIdentifierExtender"
+           for=".interfaces.IExternalIdentifierable"
+           provides="archetypes.schemaextender.interfaces.ISchemaExtender"
+           name="communesplone.ws4plonemeeting.externalidentifier" />
+
+  <five:implements
+    class=".WS4PM_server.getConfigInfosRequest"
+    interface=".interfaces.IConfigInfosRequest"
+  />
+
+  <five:implements
+    class=".WS4PM_server.getItemInfosRequest"
+    interface=".interfaces.IItemInfosRequest"
+  />
+
+  <five:implements
+    class=".WS4PM_server.searchItemsRequest"
+    interface=".interfaces.ISearchItemsRequest"
+  />
+  <five:implements
+    class=".WS4PM_server.createItemRequest"
+    interface=".interfaces.ICreateItemRequest"
+  />
+
+  <soap:view
+    for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+    methods="getConfigInfosRequest getItemInfosRequest searchItemsRequest createItemRequest"
+    class=".soap.soapview.SOAPView"
+    permission="ws4pm.SOAPAccess"
+  />
+
+  <browser:page
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      name="ws4pm.wsdl"
+      layer="communesplone.ws4plonemeeting.interfaces.IWS4PMLayer"
+      class=".soap.soapview.WS4PMWSDL"
+      template="soap/ws4pmwsdl.pt"
+      permission="zope2.Public"
+      />
+
+  <utility
+    factory=".WS4PM_server.getConfigInfosRequest"
+    name="getConfigInfosRequest"
+    provides="z3c.soap.interfaces.IZSIRequestType"
+  />
+
+  <utility
+    factory=".WS4PM_server.getConfigInfosResponse"
+    name="getConfigInfosRequest"
+    provides="z3c.soap.interfaces.IZSIResponseType"
+  />
+
+  <utility
+    factory=".WS4PM_server.getItemInfosRequest"
+    name="getItemInfosRequest"
+    provides="z3c.soap.interfaces.IZSIRequestType"
+  />
+
+  <utility
+    factory=".WS4PM_server.getItemInfosResponse"
+    name="getItemInfosRequest"
+    provides="z3c.soap.interfaces.IZSIResponseType"
+  />
+
+  <utility
+    factory=".WS4PM_server.searchItemsRequest"
+    name="searchItemsRequest"
+    provides="z3c.soap.interfaces.IZSIRequestType"
+  />
+
+  <utility
+    factory=".WS4PM_server.searchItemsResponse"
+    name="searchItemsRequest"
+    provides="z3c.soap.interfaces.IZSIResponseType"
+  />
+
+  <utility
+    factory=".WS4PM_server.createItemRequest"
+    name="createItemRequest"
+    provides="z3c.soap.interfaces.IZSIRequestType"
+  />
+
+  <utility
+    factory=".WS4PM_server.createItemResponse"
+    name="createItemRequest"
+    provides="z3c.soap.interfaces.IZSIResponseType"
+  />
+
+  <genericsetup:registerProfile
+    name="default"
+    title="Webservices PloneMeeting"
+    directory="profiles/default"
+    description="Registration of the webservice for PloneMeeting"
+    provides="Products.GenericSetup.interfaces.EXTENSION"
+  />
+
+</configure>
