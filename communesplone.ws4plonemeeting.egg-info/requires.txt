@@ -1,8 +1,0 @@
-setuptools
-lxml
-z3c.soap
-ZSI
-archetypes.schemaextender
-BeautifulSoup
-ctypes
-python-magic
