@@ -154,13 +154,14 @@ class SOAPView(BrowserView):
             else:
                 itemInfo._extraInfos['message'] = SHOW_EXTRA_INFOS_EXPLANATION_MESSAGE
             if showAnnexes:
-                for annex in item.getAnnexes():
-                    annexInfo = AnnexInfo()
-                    annexInfo._title = annex.Title()
-                    annexInfo._annexTypeId = annex.getMeetingFileType().getId()
-                    annexInfo._filename = annex.getId()
-                    annexInfo._file = annex.getFile().data
-                    itemInfo._annexes.append(annexInfo)
+                for groupOfAnnexesByType in item.getAnnexesByType(realAnnexes=True):
+                    for annex in groupOfAnnexesByType :
+                        annexInfo = AnnexInfo()
+                        annexInfo._title = annex.Title()
+                        annexInfo._annexTypeId = annex.getMeetingFileType().getId()
+                        annexInfo._filename = annex.getFile().filename
+                        annexInfo._file = annex.getFile().data
+                        itemInfo._annexes.append(annexInfo)
             logger.info('Item at %s SOAP accessed by "%s".' % \
                         (item.absolute_url_path(), memberId))
             res.append(itemInfo,)
