@@ -19,7 +19,7 @@
             <xsd:element name="getConfigInfosResponse">
                 <xsd:complexType>
                     <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-                        <xsd:element name="configInfo" type="tns:ConfigInfo" />
+                        <xsd:element name="configInfo" type="tns:ConfigInfo"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>            
@@ -34,7 +34,7 @@
             <xsd:element name="getItemInfosResponse">
                 <xsd:complexType>
                     <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-                        <xsd:element name="itemInfo" type="tns:ItemInfo" />
+                        <xsd:element name="itemInfo" type="tns:ItemInfo"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -58,7 +58,7 @@
             <xsd:element name="searchItemsResponse">
                 <xsd:complexType>
                     <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-                        <xsd:element name="itemInfo" type="tns:ItemInfo" />
+                        <xsd:element name="itemInfo" type="tns:ItemInfo"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>

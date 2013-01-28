@@ -631,8 +631,9 @@ SOAPAction: /
           Check that the rendered WSDL correspond to what we expect
         """
         from renderedWSDL import renderedWSDL
-        #BrowserLayer not available in tests?
-        #self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), renderedWSDL)
+        #set self.maxDiff to None to show diffs
+        #self.maxDiff=None
+        self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), renderedWSDL)
 
     def test_soap_WS4PMBrowserLayer(self):
         """

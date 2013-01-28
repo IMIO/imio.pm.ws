@@ -1,10 +1,5 @@
-renderedWSDL = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  xmlns:tns="http://ws4pm.imio.be"
-                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                  name="WS4PM"
-                  targetNamespace="http://ws4pm.imio.be">
+renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws4pm.imio.be" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="WS4PM" targetNamespace="http://ws4pm.imio.be">
     <wsdl:types>
         <xsd:schema targetNamespace="http://ws4pm.imio.be">
             <xsd:element name="getConfigInfosRequest" type="tns:ConfigInfosRequest"/>
@@ -24,6 +19,8 @@ renderedWSDL = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <xsd:complexType name="ItemInfosRequest">
                 <xsd:sequence>
                     <xsd:element name="UID" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                    <xsd:element name="showExtraInfos" type="xsd:boolean" maxOccurs="1" minOccurs="0"/>
+                    <xsd:element name="showAnnexes" type="xsd:boolean" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getItemInfosResponse">
@@ -69,6 +66,7 @@ renderedWSDL = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="UID" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                        <xsd:element name="warnings" type="xsd:string" maxOccurs="unbounded" minOccurs="0"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -88,11 +86,21 @@ renderedWSDL = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="decision" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="10"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="AnnexInfo">
+                <xsd:sequence>
+                    <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="annexTypeId" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="filename" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="file" type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:complexType name="ItemInfo">
                 <xsd:sequence>
                     <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="category" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
@@ -101,6 +109,8 @@ renderedWSDL = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="absolute_url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="extraInfos" type="xsd:anyType"/>
+                    <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>
         </xsd:schema>
@@ -186,6 +196,9 @@ renderedWSDL = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="createItem">
+            <xsd:annotation>
+                <xsd:documentation> Method for creating an item with annexes </xsd:documentation>
+            </xsd:annotation>
             <soap:operation soapAction="http://nohost/plone/createItem"/>
             <wsdl:input>
                 <soap:body use="literal"/>
@@ -200,5 +213,4 @@ renderedWSDL = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <soap:address location="http://nohost/plone"/>
         </wsdl:port>
     </wsdl:service>
-</wsdl:definitions>
-"""
+</wsdl:definitions>"""
