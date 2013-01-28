@@ -287,7 +287,7 @@ SOAPAction: /
         self.meetingConfig = self.meetingConfig2
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
-        itemInMeeting = meeting.getItems()[0]
+        itemInMeeting = meeting.getItemsInOrder()[0]
         #by default, PloneMeeting creates item without title/description/decision...
         itemInMeeting.setTitle('My new item title')
         itemInMeeting.setDescription('<p>Description</p>', mimetype='text/x-html-safe')
@@ -298,14 +298,14 @@ SOAPAction: /
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
-    <id>o2</id>
+    <id>o3</id>
     <title>My new item title</title>
-    <category>research</category>
+    <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
     <review_state>presented</review_state>
     <meeting_date>%s</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o2</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
     <externalIdentifier/>
     <extraInfos>
       <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
@@ -418,7 +418,8 @@ SOAPAction: /
         afile = open(os.path.join(os.path.dirname(__file__), 'mediumTestFile.odt'))
         annex_file = afile.read()
         afile.close()
-        newItem.addAnnex('myBeautifulTestFile.odt', '', 'My BeautifulTestFile title', annex_file, False, annex_type)
+        kwargs = {'filename': 'myBeautifulTestFile.odt'}
+        newItem.addAnnex('myBeautifulTestFile.odt', '', 'My BeautifulTestFile title', annex_file, False, annex_type, **kwargs)
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
         message_tag_id = re.search('<message id="(.*)" xsi', resp).group(1)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -452,7 +453,7 @@ SOAPAction: /
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID, message_tag_id, base64.encodestring(newItem.getAnnexes()[0].getFile().data), base64.encodestring(newItem.getAnnexes()[1].getFile().data))
+""" % (newItemUID, message_tag_id, base64.encodestring(newItem.getAnnexesByType(realAnnexes=True)[0][0].getFile().data), base64.encodestring(newItem.getAnnexesByType(realAnnexes=True)[1][0].getFile().data))
         #2 annexes are shown
         self.assertEquals(expected, resp)
 
@@ -543,7 +544,7 @@ SOAPAction: /
         self.meetingConfig = self.meetingConfig2
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
-        itemInMeeting = meeting.getItems()[0]
+        itemInMeeting = meeting.getItemsInOrder()[0]
         #by default, PloneMeeting creates item without title/description/decision...
         itemInMeeting.setTitle('My new item title')
         itemInMeeting.setDescription('<p>Description</p>', mimetype='text/x-html-safe')
@@ -562,14 +563,14 @@ SOAPAction: /
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
-    <id>o2</id>
+    <id>o3</id>
     <title>My new item title</title>
-    <category>research</category>
+    <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
     <review_state>presented</review_state>
     <meeting_date>%s</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o2</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
     <externalIdentifier/>
     <extraInfos>
       <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
