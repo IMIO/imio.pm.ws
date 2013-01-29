@@ -142,7 +142,7 @@ class SOAPView(BrowserView):
             itemInfo._description = item.getRawDescription()
             itemInfo._decision = item.getRawDecision()
             itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
-            itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or DateTime('1950/01/01'))
+            itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or DateTime('1950/01/01 00:00:00 UTC'))
             itemInfo._absolute_url = item.absolute_url()
             itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
             itemInfo._extraInfos = {}

@@ -22,7 +22,6 @@
 # 02110-1301, USA.
 #
 
-import re
 import base64
 import os
 from time import localtime
@@ -31,10 +30,10 @@ from ZSI.schema import GTD
 from ZSI.TCtimes import gDateTime
 from Products.PloneMeeting.tests.testMeeting import testMeeting
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_services import createItemRequest, createItemResponse, \
-                                                         searchItemsRequest, searchItemsResponse, \
-                                                         getItemInfosRequest, getItemInfosResponse, \
-                                                         getConfigInfosRequest, getConfigInfosResponse
+from imio.pm.ws.WS4PM_client import createItemRequest, createItemResponse, \
+                                    searchItemsRequest, searchItemsResponse, \
+                                    getItemInfosRequest, getItemInfosResponse, \
+                                    getConfigInfosRequest, getConfigInfosResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
 from imio.pm.ws.soap.soapview import SOAPView
 from imio.pm.ws.soap.soapview import DEFAULT_NO_WARNING_MESSAGE
@@ -66,7 +65,7 @@ Authorization: Basic %s:%s
 Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
-<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest xsi:type="ns1:CreateItemRequest"><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting')
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting')
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
@@ -117,7 +116,7 @@ Authorization: Basic %s:%s
 Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
-<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest xsi:type="ns1:CreateItemRequest"><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision><annexes xsi:type="ns1:AnnexInfo"><title>%s</title><annexTypeId>%s</annexTypeId><filename>%s</filename><file>
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision><annexes xsi:type="ns1:AnnexInfo"><title>%s</title><annexTypeId>%s</annexTypeId><filename>%s</filename><file>
 %s</file></annexes></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting', annex._title, annex._annexTypeId, annex._filename, base64.encodestring(annex._file))
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
@@ -173,7 +172,7 @@ Authorization: Basic %s:%s
 Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
-<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest xsi:type="ns1:CreateItemRequest"><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision>%s</creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting', annexesEnveloppePart)
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision>%s</creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting', annexesEnveloppePart)
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
@@ -255,13 +254,11 @@ SOAPAction: /
         #Serialize the request so it can be easily tested
         request = serializeRequest(req)
         #This is what the sent enveloppe should looks like
-        expected =  """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getItemInfosRequest xsi:type="ns1:ItemInfosRequest"><UID>%s</UID></ns1:getItemInfosRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
+        expected =  """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getItemInfosRequest><UID>%s</UID><showExtraInfos>false</showExtraInfos><showAnnexes>false</showAnnexes></ns1:getItemInfosRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
         result = """%s""" % request
         self.assertEquals(expected, result)
         #now really use the SOAP method to get informations about the item
         resp = self._getItemInfos(newItemUID)
-        #while generating the response, it generates an id for the <message id='xxx'> tag, retrieve it...
-        message_tag_id = re.search('<message id="(.*)" xsi', resp).group(1)
         #the item is not in a meeting so the meeting date is 1950-01-01
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
@@ -276,11 +273,11 @@ SOAPAction: /
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier/>
     <extraInfos>
-      <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
+      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
     </extraInfos>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID, message_tag_id)
+""" % (newItemUID)
         self.assertEquals(expected, resp)
         #if the item is in a meeting, the result is a bit different because we have valid informations about the meeting_date
         #use the 'plonegov-assembly' MeetingConfig that use real categories, not useGroupsAsCategories
@@ -294,7 +291,6 @@ SOAPAction: /
         itemInMeeting.setDecision('<p>Decision</p>', mimetype='text/x-html-safe')
         resp = self._getItemInfos(itemInMeeting.UID())
         meetingDate = gDateTime.get_formatted_content(gDateTime(), localtime(meeting.getDate()))
-        message_tag_id = re.search('<message id="(.*)" xsi', resp).group(1)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
@@ -308,11 +304,11 @@ SOAPAction: /
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
     <externalIdentifier/>
     <extraInfos>
-      <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
+      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
     </extraInfos>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (itemInMeeting.UID(), meetingDate, message_tag_id)
+""" % (itemInMeeting.UID(), meetingDate)
         self.assertEquals(expected, resp)
         #if the item with this UID has not been found (user can not access or item does not exists), an empty response is returned
         #unexisting item UID
@@ -362,7 +358,6 @@ SOAPAction: /
         newItemUID = newItem.UID()
         #get informations about the item, by default 'showAnnexes' is False
         resp = self._getItemInfos(newItemUID)
-        message_tag_id = re.search('<message id="(.*)" xsi', resp).group(1)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
@@ -376,16 +371,15 @@ SOAPAction: /
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier/>
     <extraInfos>
-      <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
+      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
     </extraInfos>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID, message_tag_id)
+""" % (newItemUID)
         #annexes are not shown by default
         self.assertEquals(expected, resp)
         #now with 'showAnnexes=True'
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
-        message_tag_id = re.search('<message id="(.*)" xsi', resp).group(1)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
@@ -399,7 +393,7 @@ SOAPAction: /
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier/>
     <extraInfos>
-      <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
+      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
     </extraInfos>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My annex 1</title>
@@ -410,7 +404,7 @@ SOAPAction: /
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID, message_tag_id, base64.encodestring(newItem.getAnnexes()[0].getFile().data))
+""" % (newItemUID, base64.encodestring(newItem.getAnnexes()[0].getFile().data))
         #one annex is shown
         self.assertEquals(expected, resp)
         #now check with several (2) annexes...
@@ -421,7 +415,6 @@ SOAPAction: /
         kwargs = {'filename': 'myBeautifulTestFile.odt'}
         newItem.addAnnex('myBeautifulTestFile.odt', '', 'My BeautifulTestFile title', annex_file, False, annex_type, **kwargs)
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
-        message_tag_id = re.search('<message id="(.*)" xsi', resp).group(1)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
@@ -435,7 +428,7 @@ SOAPAction: /
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier/>
     <extraInfos>
-      <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
+      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
     </extraInfos>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My annex 1</title>
@@ -453,7 +446,7 @@ SOAPAction: /
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID, message_tag_id, base64.encodestring(newItem.getAnnexesByType(realAnnexes=True)[0][0].getFile().data), base64.encodestring(newItem.getAnnexesByType(realAnnexes=True)[1][0].getFile().data))
+""" % (newItemUID, base64.encodestring(newItem.getAnnexesByType(realAnnexes=True)[0][0].getFile().data), base64.encodestring(newItem.getAnnexesByType(realAnnexes=True)[1][0].getFile().data))
         #2 annexes are shown
         self.assertEquals(expected, resp)
 
@@ -467,7 +460,7 @@ SOAPAction: /
         #Serialize the request so it can be easily tested
         request = serializeRequest(req)
         #This is what the sent enveloppe should looks like
-        expected =  """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getConfigInfosRequest xsi:type="ns1:ConfigInfosRequest"></ns1:getConfigInfosRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>"""
+        expected =  """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getConfigInfosRequest></ns1:getConfigInfosRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>"""
         result = """%s""" % request
         self.assertEquals(expected, result)
         #now really use the SOAP method to get informations about the configuration
@@ -512,13 +505,11 @@ SOAPAction: /
         #Serialize the request so it can be easily tested
         request = serializeRequest(req)
         #This is what the sent enveloppe should looks like
-        expected =  """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:searchItemsRequest xsi:type="ns1:SearchItemsRequest"><Title>%s</Title><getCategory>%s</getCategory></ns1:searchItemsRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % (req._Title, req._getCategory)
+        expected =  """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:searchItemsRequest><Title>%s</Title><getCategory>%s</getCategory></ns1:searchItemsRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % (req._Title, req._getCategory)
         result = """%s""" % request
         self.assertEquals(expected, result)
         #now really use the SOAP method to get informations about the item
         resp = self._searchItems(req)
-        #while generating the response, it generates an id for the <message id='xxx'> tag, retrieve it...
-        message_tag_id = re.search('<message id="(.*)" xsi', resp).group(1)
         #the item is not in a meeting so the meeting date is 1950-01-01
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
@@ -533,11 +524,11 @@ SOAPAction: /
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier>my_external_app_identifier</externalIdentifier>
     <extraInfos>
-      <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
+      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
     </extraInfos>
   </itemInfo>
 </ns1:searchItemsResponse>
-""" % (newItemUID, message_tag_id)
+""" % (newItemUID)
         self.assertEquals(expected, resp)
         #if the item is in a meeting, the result is a bit different because we have valid informations about the meeting_date
         #use the 'plonegov-assembly' MeetingConfig that use real categories, not useGroupsAsCategories
@@ -555,9 +546,6 @@ SOAPAction: /
         resp = self._searchItems(req)
         itemInMeetingUID = itemInMeeting.UID()
         meetingDate = gDateTime.get_formatted_content(gDateTime(), localtime(meeting.getDate()))
-        #while generating the response, it generates an id for the <message id='xxx'> tag, retrieve it...
-        re_search = re.search('<message id="(.*)" xsi', resp)
-        message_tag_id = re_search.group(1)
         #searching for items can returns several items
         #for example here, searching for 'item title' in existing items title will returns 2 items...
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -573,7 +561,7 @@ SOAPAction: /
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
     <externalIdentifier/>
     <extraInfos>
-      <message id="%s" xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
+      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
     </extraInfos>
   </itemInfo>
   <itemInfo xsi:type="ns1:ItemInfo">
@@ -588,11 +576,11 @@ SOAPAction: /
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier>my_external_app_identifier</externalIdentifier>
     <extraInfos>
-      <message href="#%s"/>
+      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
     </extraInfos>
   </itemInfo>
 </ns1:searchItemsResponse>
-""" % (itemInMeetingUID, meetingDate, message_tag_id, newItemUID, message_tag_id)
+""" % (itemInMeetingUID, meetingDate, newItemUID)
         self.assertEquals(expected, resp)
         #if the search params do not return an existing UID, the response is empty
         req._Title = 'aWrongTitle'
@@ -632,7 +620,7 @@ SOAPAction: /
         """
         from renderedWSDL import renderedWSDL
         #set self.maxDiff to None to show diffs
-        #self.maxDiff=None
+        self.maxDiff=None
         self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), renderedWSDL)
 
     def test_soap_WS4PMBrowserLayer(self):
