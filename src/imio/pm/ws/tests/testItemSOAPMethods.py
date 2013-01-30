@@ -36,9 +36,7 @@ from imio.pm.ws.WS4PM_client import createItemRequest, createItemResponse, \
                                     getConfigInfosRequest, getConfigInfosResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
 from imio.pm.ws.soap.soapview import SOAPView
-from imio.pm.ws.soap.soapview import DEFAULT_NO_WARNING_MESSAGE
-from imio.pm.ws.soap.soapview import WRONG_HTML_WARNING
-from imio.pm.ws.soap.soapview import MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING
+from imio.pm.ws.soap.soapview import WRONG_HTML_WARNING, MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING
 
 validMeetingConfigId = 'plonegov-assembly'
 
@@ -83,7 +81,7 @@ SOAPAction: /
   <UID>%s</UID>
   <warnings>%s</warnings>
 </ns1:createItemResponse>
-""" % (newItemUID, DEFAULT_NO_WARNING_MESSAGE)
+""" % (newItemUID, WRONG_HTML_WARNING % ('/'.join(newItem.getPhysicalPath()), self.portal.portal_membership.getAuthenticatedMember().getId()))
         self.assertEquals(expected, resp)
         #the item is actually created
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemUID)) == 1)
