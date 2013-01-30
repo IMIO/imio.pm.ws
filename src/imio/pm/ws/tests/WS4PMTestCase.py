@@ -50,4 +50,4 @@ def deserialize(objectToDeserialize):
     deserializedObject = sw.serialize(objectToDeserialize, tc).body
     root = etree.XML(str(deserializedObject))
     body = root[0]
-    return etree.tostring(body, pretty_print=True)
+    return etree.tostring(body, encoding='utf-8', pretty_print=True)

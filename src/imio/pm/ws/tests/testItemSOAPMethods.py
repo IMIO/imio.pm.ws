@@ -57,15 +57,17 @@ class testItemSOAPMethods(WS4PMTestCase, testMeeting):
         self.changeUser('pmCreator1')
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga')) == 0)
         req = self._prepareCreationData()
+        #This is what the sent enveloppe should looks like, note that the decision is "Décision"
+        #instead of '<p>Décision</p>' so we check accents and missing <p></p>
+        req._creationData._decision = 'Décision'
         #Serialize the request so it can be easily tested
         request = serializeRequest(req)
-        #This is what the sent enveloppe should looks like
         expected =  """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
-<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting')
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>D\xc3\xa9cision</decision></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting')
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
@@ -123,7 +125,7 @@ Authorization: Basic %s:%s
 Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
-<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision><annexes xsi:type="ns1:AnnexInfo"><title>%s</title><annexTypeId>%s</annexTypeId><filename>%s</filename><file>
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Décision&lt;/p&gt;</decision><annexes xsi:type="ns1:AnnexInfo"><title>%s</title><annexTypeId>%s</annexTypeId><filename>%s</filename><file>
 %s</file></annexes></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting', annex._title, annex._annexTypeId, annex._filename, base64.encodestring(annex._file))
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
@@ -179,7 +181,7 @@ Authorization: Basic %s:%s
 Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
-<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Decision&lt;/p&gt;</decision>%s</creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting', annexesEnveloppePart)
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Décision&lt;/p&gt;</decision>%s</creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting', annexesEnveloppePart)
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
@@ -274,7 +276,7 @@ SOAPAction: /
     <title>My new item title</title>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -295,7 +297,7 @@ SOAPAction: /
         #by default, PloneMeeting creates item without title/description/decision...
         itemInMeeting.setTitle('My new item title')
         itemInMeeting.setDescription('<p>Description</p>', mimetype='text/x-html-safe')
-        itemInMeeting.setDecision('<p>Decision</p>', mimetype='text/x-html-safe')
+        itemInMeeting.setDecision('<p>Décision</p>', mimetype='text/x-html-safe')
         resp = self._getItemInfos(itemInMeeting.UID())
         meetingDate = gDateTime.get_formatted_content(gDateTime(), localtime(meeting.getDate()))
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -305,7 +307,7 @@ SOAPAction: /
     <title>My new item title</title>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>presented</review_state>
     <meeting_date>%s</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
@@ -372,7 +374,7 @@ SOAPAction: /
     <title>My new item title</title>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -394,7 +396,7 @@ SOAPAction: /
     <title>My new item title</title>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -429,7 +431,7 @@ SOAPAction: /
     <title>My new item title</title>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -525,7 +527,7 @@ SOAPAction: /
     <title>My new item title</title>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -546,7 +548,7 @@ SOAPAction: /
         #by default, PloneMeeting creates item without title/description/decision...
         itemInMeeting.setTitle('My new item title')
         itemInMeeting.setDescription('<p>Description</p>', mimetype='text/x-html-safe')
-        itemInMeeting.setDecision('<p>Decision</p>', mimetype='text/x-html-safe')
+        itemInMeeting.setDecision('<p>Décision</p>', mimetype='text/x-html-safe')
         itemInMeeting.reindexObject()
         req._Title = 'item title'
         req._getCategory = ''
@@ -562,7 +564,7 @@ SOAPAction: /
     <title>My new item title</title>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>presented</review_state>
     <meeting_date>%s</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
@@ -577,7 +579,7 @@ SOAPAction: /
     <title>My new item title</title>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <decision>&lt;p&gt;Decision&lt;/p&gt;</decision>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -659,7 +661,7 @@ SOAPAction: /
         CreationData._title = 'My new item title'
         CreationData._category = 'development'
         CreationData._description = '<p>Description</p>'
-        CreationData._decision = '<p>Decision</p>'
+        CreationData._decision = '<p>Décision</p>'
         req._creationData = CreationData
         return req
 
