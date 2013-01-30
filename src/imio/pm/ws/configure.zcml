@@ -14,11 +14,13 @@
 
   <!-- include the soap namespace for the soap:view directive -->
   <include package="z3c.soap" file="meta.zcml" />
+  <!-- include the zope2.SOAPAccess permission -->
+  <include package="z3c.soap" file="configure.zcml" />
 
-  <permission
+  <!--permission
     id="ws4pm.SOAPAccess"
     title="SOAP Access"
-  />
+  /-->
 
   <class class="Products.PloneMeeting.MeetingItem.MeetingItem">
     <implements interface=".interfaces.IExternalIdentifierable" />
@@ -52,7 +54,7 @@
     for="Products.CMFPlone.interfaces.IPloneSiteRoot"
     methods="getConfigInfosRequest getItemInfosRequest searchItemsRequest createItemRequest"
     class=".soap.soapview.SOAPView"
-    permission="ws4pm.SOAPAccess"
+    permission="zope2.SOAPAccess"
   />
 
   <browser:page
