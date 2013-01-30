@@ -6,8 +6,6 @@ from archetypes.schemaextender.field import ExtensionField
 
 from interfaces import IExternalIdentifierable
 
-from Products.PloneMeeting.interfaces import IMeetingItem
-
 from Products.Archetypes.public import StringWidget, StringField
 
 from imio.pm.ws.interfaces import IWS4PMLayer
@@ -15,7 +13,7 @@ from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
 
 
 class ExternalIdentifierStringField(ExtensionField, StringField):
-    """A trivial field."""
+    """A string field that will contain an eventual external identifier."""
 
 
 class ExternalIdentifierExtender(object):
