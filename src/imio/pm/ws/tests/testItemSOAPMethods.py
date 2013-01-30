@@ -505,6 +505,8 @@ SOAPAction: /
         #use the SOAP service to create one
         newItem, response = self._createItem(req)
         newItemUID = newItem.UID()
+        #externalIdentifier is actually set
+        self.assertEquals(newItem.externalIdentifier, 'my_external_app_identifier')
         #now an item exists, get informations about it
         req = searchItemsRequest()
         req._Title = 'item'
