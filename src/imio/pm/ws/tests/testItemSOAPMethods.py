@@ -105,7 +105,6 @@ SOAPAction: /
         req._category = 'wrong-category-id'
         self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).createItemRequest, req, responseHolder)
 
-
     def test_soap_createItemWithOneAnnexRequest(self):
         """
           Test SOAP service behaviour when creating items with one annex
