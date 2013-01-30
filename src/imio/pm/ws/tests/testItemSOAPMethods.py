@@ -85,9 +85,16 @@ SOAPAction: /
         self.assertEquals(expected, resp)
         #the item is actually created
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemUID)) == 1)
+        #responseHolder for tests here above
+        responseHolder = createItemResponse()
+        #check that we can create an item with an empty HTML field
+        req._creationData._decision = ''
+        newItemWithEmptyDecisionUID = SOAPView(self.portal, req).createItemRequest(req, responseHolder)._UID
+        self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)) == 1)
+        #No matter how the item is created, with or without a decision, every HTML fields are surrounded by <p></p>
+        self.failIf(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)[0].getObject().getDecision() != "<p></p>")
         #if the user can not create the item, a ZSI.Fault is returned
         #the meetingConfigId must exists
-        responseHolder = createItemResponse()
         req._meetingConfigId = 'wrong-meeting-config-id'
         self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).createItemRequest, req, responseHolder)
         req._meetingConfigId = validMeetingConfigId
@@ -97,6 +104,7 @@ SOAPAction: /
         #the connected user must be able to create an item with the given category
         req._category = 'wrong-category-id'
         self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).createItemRequest, req, responseHolder)
+
 
     def test_soap_createItemWithOneAnnexRequest(self):
         """
