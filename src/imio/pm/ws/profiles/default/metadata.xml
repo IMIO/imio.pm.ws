@@ -1,8 +1,4 @@
 <?xml version="1.0"?>
 <metadata>
- <version>0.1dev</version>
-  <dependencies>
-    <dependency>profile-Products.CMFPlacefulWorkflow:CMFPlacefulWorkflow</dependency>
-    <dependency>profile-Products.PloneMeeting:default</dependency>
-  </dependencies>
+ <version>1.0dev</version>
 </metadata>
