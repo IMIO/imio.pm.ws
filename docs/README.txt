@@ -113,10 +113,14 @@ The sent SOAP enveloppe should looks like this :
 <SOAP-ENV:Body>
       <ws4:getItemInfosRequest>
          <itemUID>anUidOfAnExistingItemHopefully</itemUID>
+         <showExtraInfos>0</showExtraInfos>
+         <showAnnexes>0</showAnnexes>
       </ws4:getItemInfosRequest>
 </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 ************************************************************************
+
+If 'showExtraInfos' is '1', every available fields are returned, if 'showAnnexes' is '1', item annexes are returned too.
 
 If something is wrong, a SOAP envelope containing the error message is returned :
 
@@ -136,7 +140,7 @@ If something is wrong, a SOAP envelope containing the error message is returned 
 </SOAP-ENV:Envelope>
 ************************************************************************
 
-If everything is right, the freshly created item UID is returned :
+If everything is right, the basic informations about the searched item are returned :
 
 *** Incoming SOAP ******************************************************
 <SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
@@ -148,12 +152,20 @@ If everything is right, the freshly created item UID is returned :
    <SOAP-ENV:Body xmlns:ns1="http://ws4pm.communesplone.org">
       <ns1:getItemInfosResponse>
          <itemInfo xsi:type="ns1:ItemInfo">
+            <UID>37be48be730f1b9e94c322a571e9d0f7</UID>
+            <id>title-of-my-item</id>
             <title>Title of my item</title>
+            <category>item-category</category>
             <description>&lt;p>Description with escaped HTML special characters&lt;/p></description>
             <decision>&lt;p>Decision with esacepd HTML special characters&lt;/p></decision>
             <review_state>accepted_but_modified</review_state>
-            <meeting_date>2012-05-25T00:00:00.004Z</meeting_date>
+            <meeting_date>2013-02-01T00:00:00.004Z</meeting_date>
             <absolute_url>http://my_site_url/Members/secretaire/mymeetings/meeting-config-college/point-a-envoyer-vers-le-conseil-communal</absolute_url>
+            <externalIdentifier>ext_003</externalIdentifier>
+            <extraInfos>
+               <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
+            </extraInfos>
+         </itemInfo>
          </itemInfo>
       </ns1:getItemInfosResponse>
    </SOAP-ENV:Body>
@@ -161,11 +173,12 @@ If everything is right, the freshly created item UID is returned :
 ************************************************************************
 
 Returned informations about the item are :
-'title', 'description', 'decision', 'review_state', 'meeting_date', 'absolute_url'
+'UID', 'id', 'title', 'category', 'description', 'decision', 'review_state', 'meeting_date', 'absolute_url', 'externalIdentifier', 'extraInfos'
 
+Every available informations can be retrieved by setting 'showExtraInfos' to '1'.  Annexes can be retrieved by setting 'showAnnexes' to '1'
 
 3) Search for items
---------------------------------------
+-------------------
 
 The 'searchItems(structType:SearchItems)' method can be accessed to search items in the application.
 
@@ -185,7 +198,7 @@ string: review_state
 string: meetingConfigId
 string: externalIdentifier
 
-Ths UID is something like : 37be48be730f1b9e94c322a571e9d0f7
+The UID is something like : 37be48be730f1b9e94c322a571e9d0f7
 The 'externalIdentifier' only exists if this item was created from an external application
 
 The sent SOAP enveloppe should looks like this :
@@ -222,9 +235,9 @@ The sent SOAP enveloppe should looks like this :
          <!--Optional:-->
          <review_state/>
          <!--Optional:-->
-         <meetingConfigId>?</meetingConfigId>
+         <meetingConfigId></meetingConfigId>
          <!--Optional:-->
-         <externalIdentifier>?</externalIdentifier>
+         <externalIdentifier></externalIdentifier>
       </ws4:searchItemsRequest>
 </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
@@ -237,10 +250,12 @@ Here above are presented 2 ways to test : the first directly accessing the SOAP 
 
 A successfull test has also been realized with soapUI, a SOAP client written in Java (www.soapui.org)
 
-With a default test PloneMeeting 2.1 site, you can :
+With a default test PloneMeeting 3.0 site, you can :
 - createItem : create an item for 'pmCreator1' from group 'developers' with some data
 - getItemInfos : get informations about the freshly created item or any created item in the application you know the UID of.
                  The connected user must also have the permission to access the item
+- searchItems : search for existing items in the PloneMeeting application
+- getConfigInfos : retrieve informations on the current PloneMeeting configuration : existing groups (MeetingGroups) and meeting configurations (MeetingConfigs)
 
 In any case, you have to be connected to access theses methods
 
