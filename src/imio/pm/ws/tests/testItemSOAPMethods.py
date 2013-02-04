@@ -28,7 +28,6 @@ from time import localtime
 import ZSI
 from ZSI.schema import GTD
 from ZSI.TCtimes import gDateTime
-from Products.PloneMeeting.tests.testMeeting import testMeeting
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import createItemRequest, createItemResponse, \
                                     searchItemsRequest, searchItemsResponse, \
@@ -40,13 +39,11 @@ from imio.pm.ws.soap.soapview import WRONG_HTML_WARNING, MULTIPLE_EXTENSION_FOR_
 
 validMeetingConfigId = 'plonegov-assembly'
 
-class testItemSOAPMethods(WS4PMTestCase, testMeeting):
+class testItemSOAPMethods(WS4PMTestCase):
     """
         Tests the soap.soapview methods by accessing the real SOAP service
-        Add the 'test_soap_' prefix to the test methods to avoid launching every testMeeting tests
-        We heritate from testMeeting to get the _createMeetingWithItems method
     """ 
-    def test_soap_createItemRequest(self):
+    def test_createItemRequest(self):
         """
           In the default test configuration, the user 'pmCreator1' can create an item for
           proposingGroup 'developers' in the MeetingConfig 'plonegov-assembly'
@@ -105,7 +102,7 @@ SOAPAction: /
         req._category = 'wrong-category-id'
         self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).createItemRequest, req, responseHolder)
 
-    def test_soap_createItemWithOneAnnexRequest(self):
+    def test_createItemWithOneAnnexRequest(self):
         """
           Test SOAP service behaviour when creating items with one annex
         """
@@ -143,7 +140,7 @@ SOAPAction: /
         #the annex metadata are ok
         self.failUnless(annex.Title() == 'My annex 1' and annex.getMeetingFileType().getId() == 'financial-analysis')
 
-    def test_soap_createItemWithSeveralAnnexesRequest(self):
+    def test_createItemWithSeveralAnnexesRequest(self):
         """
           Test SOAP service behaviour when creating items with several annexes of different types
         """
@@ -209,7 +206,7 @@ SOAPAction: /
         self.failUnless(annexes[2].getFile().filename == 'largeTestFile.doc')
         self.failUnless(annexes[3].getFile().filename == 'validExtension.bin')
 
-    def test_soap_createItemWithWarnings(self):
+    def test_createItemWithWarnings(self):
         """
           Test that during item creation, if non blocker errors occur (warnings), it is displayed in the response
         """
@@ -244,7 +241,7 @@ SOAPAction: /
        WRONG_HTML_WARNING % (newItem.absolute_url_path(), 'pmCreator1'),)
         self.assertEquals(expected, resp)
 
-    def test_soap_getItemInfosRequest(self):
+    def test_getItemInfosRequest(self):
         """
           Test that getting an item with a given UID returns valuable informations
         """
@@ -328,7 +325,7 @@ SOAPAction: /
         resp = self._getItemInfos(newItemUID)
         self.assertEquals(expected, resp)
 
-    def test_soap_getItemInfosWithExtraInfosRequest(self):
+    def test_getItemInfosWithExtraInfosRequest(self):
         """
           Test that getting an item with a given UID and specifying that we want extraInfos returns every available informations of the item
         """
@@ -349,7 +346,7 @@ SOAPAction: /
         for extraInfosField in extraInfosFields:
             self.failUnless(extraInfosField.getName() in resp)
 
-    def test_soap_getItemInfosWithAnnexesRequest(self):
+    def test_getItemInfosWithAnnexesRequest(self):
         """
           Test that getting an item with a given UID returns valuable informations and linked annexes
         """
@@ -457,7 +454,7 @@ SOAPAction: /
         #2 annexes are shown
         self.assertEquals(expected, resp)
 
-    def test_soap_getConfigInfosRequest(self):
+    def test_getConfigInfosRequest(self):
         """
           Test that getting informations about the configuration returns valuable informations
         """
@@ -492,7 +489,7 @@ SOAPAction: /
         expected = expected.replace('<description></description>', '<description/>') + "\n</ns1:getConfigInfosResponse>\n"
         self.assertEquals(expected, resp)
 
-    def test_soap_searchItemsRequest(self):
+    def test_searchItemsRequest(self):
         """
           Test that searching with given parameters returns valuable informations
         """
@@ -623,7 +620,7 @@ SOAPAction: /
         req._meetingConfigId = 'wrongMeetingConfigId'
         self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).searchItemsRequest, req, responseHolder)
 
-    def test_soap_renderedWSDL(self):
+    def test_renderedWSDL(self):
         """
           Check that the rendered WSDL correspond to what we expect
         """
@@ -632,7 +629,7 @@ SOAPAction: /
         self.maxDiff=None
         self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), renderedWSDL)
 
-    def test_soap_WS4PMBrowserLayer(self):
+    def test_WS4PMBrowserLayer(self):
         """
           Test that soap methods and schemaextender is not available until
           the imio.pm.ws.layer BrowserLayer is available
@@ -718,5 +715,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testItemSOAPMethods, prefix='test_soap_'))
+    suite.addTest(makeSuite(testItemSOAPMethods, prefix='test_'))
     return suite
