@@ -4,7 +4,6 @@ import logging
 logger = logging.getLogger('WS4PM')
 from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
-                                                 SHOW_EXTRA_INFOS_EXPLANATION_MESSAGE, \
                                                  MAIN_DATA_FROM_ITEM_SCHEMA
 from time import localtime
 from DateTime import DateTime
@@ -151,8 +150,6 @@ class SOAPView(BrowserView):
                 #store every other informations in the 'extraInfos' dict
                 for field in extraInfosFields:
                     itemInfo._extraInfos[field.getName()] = field.getRaw(item)
-            else:
-                itemInfo._extraInfos['message'] = SHOW_EXTRA_INFOS_EXPLANATION_MESSAGE
             if showAnnexes:
                 for groupOfAnnexesByType in item.getAnnexesByType(realAnnexes=True):
                     for annex in groupOfAnnexesByType :

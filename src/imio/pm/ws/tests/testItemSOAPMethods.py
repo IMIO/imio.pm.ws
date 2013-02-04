@@ -276,9 +276,7 @@ SOAPAction: /
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier/>
-    <extraInfos>
-      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
-    </extraInfos>
+    <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
 """ % (newItemUID)
@@ -307,9 +305,7 @@ SOAPAction: /
     <meeting_date>%s</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
     <externalIdentifier/>
-    <extraInfos>
-      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
-    </extraInfos>
+    <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
 """ % (itemInMeeting.UID(), meetingDate)
@@ -374,9 +370,7 @@ SOAPAction: /
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier/>
-    <extraInfos>
-      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
-    </extraInfos>
+    <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
 """ % (newItemUID)
@@ -396,9 +390,7 @@ SOAPAction: /
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier/>
-    <extraInfos>
-      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
-    </extraInfos>
+    <extraInfos/>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My annex 1</title>
       <annexTypeId>financial-analysis</annexTypeId>
@@ -431,9 +423,7 @@ SOAPAction: /
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier/>
-    <extraInfos>
-      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
-    </extraInfos>
+    <extraInfos/>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My annex 1</title>
       <annexTypeId>financial-analysis</annexTypeId>
@@ -529,9 +519,7 @@ SOAPAction: /
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier>my_external_app_identifier</externalIdentifier>
-    <extraInfos>
-      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
-    </extraInfos>
+    <extraInfos/>
   </itemInfo>
 </ns1:searchItemsResponse>
 """ % (newItemUID)
@@ -566,9 +554,7 @@ SOAPAction: /
     <meeting_date>%s</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
     <externalIdentifier/>
-    <extraInfos>
-      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
-    </extraInfos>
+    <extraInfos/>
   </itemInfo>
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
@@ -581,9 +567,7 @@ SOAPAction: /
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
     <externalIdentifier>my_external_app_identifier</externalIdentifier>
-    <extraInfos>
-      <message xsi:type="xsd:string">If you want extra informations about this item, set 'showExtraInfos' to 1.</message>
-    </extraInfos>
+    <extraInfos/>
   </itemInfo>
 </ns1:searchItemsResponse>
 """ % (itemInMeetingUID, meetingDate, newItemUID)
