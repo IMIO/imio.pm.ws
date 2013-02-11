@@ -1,7 +1,8 @@
 import ZSI
-from Products.Five import BrowserView
 import logging
 logger = logging.getLogger('WS4PM')
+from AccessControl import Unauthorized
+from Products.Five import BrowserView
 from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
                                                  MAIN_DATA_FROM_ITEM_SCHEMA
@@ -20,6 +21,14 @@ class SOAPView(BrowserView):
     """
       class delivering SOAP methods for Products.PloneMeeting
     """
+
+    def testConnectionRequest(self, request, response):
+        '''
+          This is the accessed SOAP method for testing the connection to the webservices
+          This method is usefull for SOAP clients
+        '''
+        response._connectionState = self._testConnection()
+        return response
 
     def getConfigInfosRequest(self, request, response):
         '''
@@ -54,6 +63,20 @@ class SOAPView(BrowserView):
             pass
         response._itemInfo = self._getItemInfos(params, request.__dict__.get('_showExtraInfos', False), request.__dict__.get('_showAnnexes', False))
         return response
+
+    def _testConnection(self):
+        '''
+          Test current connection state
+        '''
+        portal = self.context
+        isAnon = portal.portal_membership.isAnonymousUser()
+
+        # in case this method is accessed without valid credrentials, raise Unauthorized
+        if isAnon:
+            raise Unauthorized
+
+        logger.info('Test connection SOAP made at "%s".' % portal.absolute_url_path())
+        return True
 
     def _getConfigInfos(self):
         '''

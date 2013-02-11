@@ -2,10 +2,23 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws4pm.imio.be" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="WS4PM" targetNamespace="http://ws4pm.imio.be">
     <wsdl:types>
         <xsd:schema targetNamespace="http://ws4pm.imio.be">
+            <xsd:element name="testConnectionRequest" type="tns:TestConnectionRequest"/>
+            <xsd:complexType name="TestConnectionRequest">
+                <xsd:sequence>
+                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="1" default="dummy"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="testConnectionResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="connectionState" type="xsd:boolean" maxOccurs="1" minOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="getConfigInfosRequest" type="tns:ConfigInfosRequest"/>
             <xsd:complexType name="ConfigInfosRequest">
                 <xsd:sequence>
-                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="1" default="dummy"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getConfigInfosResponse">
@@ -14,7 +27,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                         <xsd:element name="configInfo" type="tns:ConfigInfo"/>
                     </xsd:sequence>
                 </xsd:complexType>
-            </xsd:element>            
+            </xsd:element>
             <xsd:element name="getItemInfosRequest" type="tns:ItemInfosRequest"/>
             <xsd:complexType name="ItemInfosRequest">
                 <xsd:sequence>
@@ -115,6 +128,12 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             </xsd:complexType>
         </xsd:schema>
     </wsdl:types>
+    <wsdl:message name="testConnectionRequest">
+        <wsdl:part name="parameters" element="tns:testConnectionRequest"/>
+    </wsdl:message>
+    <wsdl:message name="testConnectionResponse">
+        <wsdl:part name="parameters" element="tns:testConnectionResponse"/>
+    </wsdl:message>
     <wsdl:message name="getConfigInfosRequest">
         <wsdl:part name="parameters" element="tns:getConfigInfosRequest"/>
     </wsdl:message>
@@ -140,6 +159,10 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
         <wsdl:part name="parameters" element="tns:createItemResponse"/>
     </wsdl:message>
     <wsdl:portType name="WS4PM">
+        <wsdl:operation name="testConnection">
+            <wsdl:input message="tns:testConnectionRequest"/>
+            <wsdl:output message="tns:testConnectionResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="getConfigInfos">
             <wsdl:input message="tns:getConfigInfosRequest"/>
             <wsdl:output message="tns:getConfigInfosResponse"/>
@@ -159,6 +182,18 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </wsdl:portType>
     <wsdl:binding name="WS4PMSOAP" type="tns:WS4PM">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="testConnection">
+            <xsd:annotation>
+                <xsd:documentation> Method for testing the connection to the server Webservice </xsd:documentation>
+            </xsd:annotation>
+            <soap:operation soapAction="http://ws4pm.imio.be/testConnection"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getConfigInfos">
             <xsd:annotation>
                 <xsd:documentation> Method for getting informations about the configuration </xsd:documentation>

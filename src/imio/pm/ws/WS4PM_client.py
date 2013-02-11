@@ -31,6 +31,16 @@ class WS4PMSOAPSOAP:
         self.binding = client.Binding(url=url, **kw)
         # no ws-addressing
 
+    # op: testConnection
+    def testConnection(self, request, **kw):
+        if isinstance(request, testConnectionRequest) is False:
+            raise TypeError, "%s incorrect request type" % (request.__class__)
+        # no input wsaction
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/testConnection", **kw)
+        # no output wsaction
+        response = self.binding.Receive(testConnectionResponse.typecode)
+        return response
+
     # op: getConfigInfos
     def getConfigInfos(self, request, **kw):
         if isinstance(request, getConfigInfosRequest) is False:
@@ -70,6 +80,10 @@ class WS4PMSOAPSOAP:
         # no output wsaction
         response = self.binding.Receive(createItemResponse.typecode)
         return response
+
+testConnectionRequest = GED("http://ws4pm.imio.be", "testConnectionRequest").pyclass
+
+testConnectionResponse = GED("http://ws4pm.imio.be", "testConnectionResponse").pyclass
 
 getConfigInfosRequest = GED("http://ws4pm.imio.be", "getConfigInfosRequest").pyclass
 

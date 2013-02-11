@@ -28,8 +28,11 @@ from time import localtime
 import ZSI
 from ZSI.schema import GTD
 from ZSI.TCtimes import gDateTime
+from AccessControl import Unauthorized
+from plone.app.testing import logout
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_client import createItemRequest, createItemResponse, \
+from imio.pm.ws.WS4PM_client import testConnectionRequest, testConnectionResponse, \
+                                    createItemRequest, createItemResponse, \
                                     searchItemsRequest, searchItemsResponse, \
                                     getItemInfosRequest, getItemInfosResponse, \
                                     getConfigInfosRequest, getConfigInfosResponse
@@ -42,7 +45,20 @@ validMeetingConfigId = 'plonegov-assembly'
 class testItemSOAPMethods(WS4PMTestCase):
     """
         Tests the soap.soapview methods by accessing the real SOAP service
-    """ 
+    """
+
+    def test_testConnectionRequest(self):
+        """ """
+        # try without being connected
+        logout()
+        req = testConnectionRequest()
+        responseHolder = testConnectionResponse()
+        self.assertRaises(Unauthorized, SOAPView(self.portal, req).testConnectionRequest, req, responseHolder)
+        # now try with a connected user
+        self.changeUser('pmManager')
+        response = SOAPView(self.portal, req).testConnectionRequest(req, responseHolder)
+        self.assertEquals(response._connectionState, True)
+
     def test_createItemRequest(self):
         """
           In the default test configuration, the user 'pmCreator1' can create an item for
@@ -454,7 +470,7 @@ SOAPAction: /
         #Serialize the request so it can be easily tested
         request = serializeRequest(req)
         #This is what the sent enveloppe should looks like
-        expected =  """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getConfigInfosRequest></ns1:getConfigInfosRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>"""
+        expected =  """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getConfigInfosRequest><dummy>dummy</dummy></ns1:getConfigInfosRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>"""
         result = """%s""" % request
         self.assertEquals(expected, result)
         #now really use the SOAP method to get informations about the configuration

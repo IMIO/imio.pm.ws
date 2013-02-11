@@ -12,6 +12,10 @@ from WS4PM_types import *
 from ZSI.ServiceContainer import ServiceSOAPBinding
 
 # Messages  
+testConnectionRequest = GED("http://ws4pm.imio.be", "testConnectionRequest").pyclass
+
+testConnectionResponse = GED("http://ws4pm.imio.be", "testConnectionResponse").pyclass
+
 getConfigInfosRequest = GED("http://ws4pm.imio.be", "getConfigInfosRequest").pyclass
 
 getConfigInfosResponse = GED("http://ws4pm.imio.be", "getConfigInfosResponse").pyclass
@@ -36,6 +40,13 @@ class WS4PM(ServiceSOAPBinding):
 
     def __init__(self, post='', **kw):
         ServiceSOAPBinding.__init__(self, post)
+
+    def soap_testConnection(self, ps, **kw):
+        request = ps.Parse(testConnectionRequest.typecode)
+        return request,testConnectionResponse()
+
+    soapAction['http://ws4pm.imio.be/testConnection'] = 'soap_testConnection'
+    root[(testConnectionRequest.typecode.nspname,testConnectionRequest.typecode.pname)] = 'soap_testConnection'
 
     def soap_getConfigInfos(self, ps, **kw):
         request = ps.Parse(getConfigInfosRequest.typecode)

@@ -9,6 +9,11 @@ class IWS4PMLayer(IBrowserRequest):
       Define a layer so the WDSL and schemaextender are only available when the BrowserLayer is installed
     """
 
+class ITestConnectionRequest(Interface):
+    """
+    Marker interface for change request
+    """
+
 class IConfigInfosRequest(Interface):
     """
     Marker interface for change request
