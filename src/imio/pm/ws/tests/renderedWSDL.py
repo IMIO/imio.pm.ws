@@ -23,8 +23,8 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             </xsd:complexType>
             <xsd:element name="getConfigInfosResponse">
                 <xsd:complexType>
-                    <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-                        <xsd:element name="configInfo" type="tns:ConfigInfo"/>
+                    <xsd:sequence>
+                        <xsd:element name="configInfo" type="tns:ConfigInfo" maxOccurs="unbounded" minOccurs="0"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -62,8 +62,8 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             </xsd:complexType>
             <xsd:element name="searchItemsResponse">
                 <xsd:complexType>
-                    <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-                        <xsd:element name="itemInfo" type="tns:ItemInfo"/>
+                    <xsd:sequence>
+                        <xsd:element name="itemInfo" type="tns:ItemInfo" maxOccurs="unbounded" minOccurs="0"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
