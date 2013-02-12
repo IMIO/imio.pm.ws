@@ -5,7 +5,7 @@
             <xsd:element name="testConnectionRequest" type="tns:TestConnectionRequest"/>
             <xsd:complexType name="TestConnectionRequest">
                 <xsd:sequence>
-                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="1" default="dummy"/>
+                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="0" default="dummy"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="testConnectionResponse">
@@ -38,8 +38,8 @@
             </xsd:complexType>
             <xsd:element name="getItemInfosResponse">
                 <xsd:complexType>
-                    <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-                        <xsd:element name="itemInfo" type="tns:ItemInfo"/>
+                    <xsd:sequence>
+                        <xsd:element name="itemInfo" type="tns:ItemInfo" maxOccurs="unbounded" minOccurs="0"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>

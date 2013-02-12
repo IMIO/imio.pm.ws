@@ -38,8 +38,8 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             </xsd:complexType>
             <xsd:element name="getItemInfosResponse">
                 <xsd:complexType>
-                    <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-                        <xsd:element name="itemInfo" type="tns:ItemInfo"/>
+                    <xsd:sequence>
+                        <xsd:element name="itemInfo" type="tns:ItemInfo" maxOccurs="unbounded" minOccurs="0"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
