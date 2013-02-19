@@ -253,8 +253,9 @@ SOAPAction: /
   <warnings>%s</warnings>
 </ns1:createItemResponse>
 """ % (newItem.UID(),
+       WRONG_HTML_WARNING % (newItem.absolute_url_path(), 'pmCreator1'),
        MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % ('application/octet-stream', 'notValidFileNameNoExtension', newItem.absolute_url_path()),
-       WRONG_HTML_WARNING % (newItem.absolute_url_path(), 'pmCreator1'),)
+       )
         self.assertEquals(expected, resp)
 
     def test_getItemInfosRequest(self):

@@ -51,12 +51,12 @@ class SOAPView(BrowserView):
           This is an helper method when you just need to access an item you know the UID of
         '''
         params = dict(request.__dict__)
-        #remove the '_showExtraInfos' from searchParams as it is not a search parameter
+        # remove the '_showExtraInfos' from searchParams as it is not a search parameter
         try:
             params.pop('_showExtraInfos')
         except KeyError:
             pass
-        #remove the '_showAnnexes' from searchParams as it is not a search parameter
+        # remove the '_showAnnexes' from searchParams as it is not a search parameter
         try:
             params.pop('_showAnnexes')
         except KeyError:
@@ -90,7 +90,7 @@ class SOAPView(BrowserView):
         tool = portal.portal_plonemeeting
 
         res = []
-        #MeetingConfigs
+        # MeetingConfigs
         for config in tool.getActiveConfigs():
             configInfo = ConfigInfo()
             configInfo._UID = config.UID()
@@ -100,7 +100,7 @@ class SOAPView(BrowserView):
             configInfo._type = config.portal_type
             res.append(configInfo)
 
-        #MeetingGroups
+        # MeetingGroups
         for group in tool.getActiveGroups():
             configInfo = ConfigInfo()
             configInfo._UID = group.UID()
@@ -124,7 +124,7 @@ class SOAPView(BrowserView):
         memberId = member.getId()
 
         params = {}
-        #remove leading '_' in searchParams
+        # remove leading '_' in searchParams
         for elt in searchParams.keys():
             #one given searchParams is not a search parameter: '_showExtraInfos' will return every available infos of the item
             if elt == '_showExtraInfos':
@@ -133,21 +133,21 @@ class SOAPView(BrowserView):
             if searchParam:
                 params[elt[1:]] = searchParam
 
-        #check if we received at least one search parameter because calling the portal_catalog without search parameter
-        #will return the entire catalog (even if we subforce using 'MeetingItem' meta_type here above)
+        # check if we received at least one search parameter because calling the portal_catalog without search parameter
+        # will return the entire catalog (even if we subforce using 'MeetingItem' meta_type here above)
         if not params:
             raise ZSI.Fault(ZSI.Fault.Client, "Define at least one search parameter!")
 
+        tool = portal.portal_plonemeeting
         if 'meetingConfigId' in params and not 'portal_type' in params:
             #check that the given meetingConfigId exists
-            tool = portal.portal_plonemeeting
             meetingConfigId = params['meetingConfigId']
             mc = getattr(tool, meetingConfigId, None)
             if not mc or not mc.meta_type == 'MeetingConfig':
                 raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
             params['portal_type'] = mc.getItemTypeName()
 
-        #force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
+        # force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
         params['meta_type'] = 'MeetingItem'
         brains = portal.portal_catalog(**params)
         if not brains:
@@ -155,6 +155,9 @@ class SOAPView(BrowserView):
 
         res = []
         for brain in brains:
+            # XXX for now we still need to wake up the item because we do not have the meeting's date
+            # on the brain, this could be great to manage ticket http://trac.imio.be/trac/ticket/4176 so
+            # we could avoid waking up the item
             item = brain.getObject()
             itemInfo = ItemInfo()
             itemInfo._UID = item.UID()
@@ -170,9 +173,13 @@ class SOAPView(BrowserView):
             itemInfo._extraInfos = {}
             if showExtraInfos:
                 extraInfosFields = self._getExtraInfosFields(item)
-                #store every other informations in the 'extraInfos' dict
+                # store every other informations in the 'extraInfos' dict
                 for field in extraInfosFields:
                     itemInfo._extraInfos[field.getName()] = field.getRaw(item)
+                # also add informations about the linked MeetingConfig
+                meetingConfig = tool.getMeetingConfig(item)
+                itemInfo._extraInfos['meeting_config_id'] = meetingConfig.getId()
+                itemInfo._extraInfos['meeting_config_title'] = meetingConfig.Title()
             if showAnnexes:
                 for groupOfAnnexesByType in item.getAnnexesByType(realAnnexes=True):
                     for annex in groupOfAnnexesByType :
@@ -216,28 +223,28 @@ class SOAPView(BrowserView):
         member = portal.portal_membership.getAuthenticatedMember()
         memberId = member.getId()
 
-        #check that the given meetingConfigId exists
+        # check that the given meetingConfigId exists
         mc = getattr(tool, meetingConfigId, None)
         if not mc or not mc.meta_type == 'MeetingConfig':
             raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
 
-        #get or create the meetingFolder the item will be created in
-        #if the user does not have a memberArea
-        #(never connected, then we raise an error)
+        # get or create the meetingFolder the item will be created in
+        # if the user does not have a memberArea
+        # (never connected, then we raise an error)
         destFolder = tool.getPloneMeetingFolder(meetingConfigId, memberId)
         if destFolder.meta_type == 'Plone Site':
             raise ZSI.Fault(ZSI.Fault.Client, \
             "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
 
-        #check that the user is a creator for given proposingGroupId
-        #get the MeetingGroups for wich memberId is creator
+        # check that the user is a creator for given proposingGroupId
+        # get the MeetingGroups for wich memberId is creator
         userGroups = tool.getGroups(userId=memberId, suffix="creators")
         proposingGroup = [group for group in userGroups if group.getId() == proposingGroupId]
         if not proposingGroup:
             raise ZSI.Fault(ZSI.Fault.Client, "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
 
-        #now that every checks pass, we can create the item
-        #creationData keys begin with an '_' (_title, _description, ...) so tranform them
+        # now that every checks pass, we can create the item
+        # creationData keys begin with an '_' (_title, _description, ...) so tranform them
         data = {}
         for elt in creationData.__dict__.keys():
             #do not take annexes into account
@@ -252,22 +259,22 @@ class SOAPView(BrowserView):
                     }
                    )
 
-        #we create the item to be able to check the category here above...
+        # we create the item to be able to check the category here above...
         itemId = destFolder.invokeFactory(type_name, **data)
         item = getattr(destFolder, itemId)
-        #processForm calls at_post_create_script too
-        #this is necessary before adding annexes
+        # processForm calls at_post_create_script too
+        # this is necessary before adding annexes
         item.at_post_create_script()
-        #check that the given category is really available
+        # check that the given category is really available
         if not mc.getUseGroupsAsCategories() and not data['category'] in item.listCategories().keys():
             #if the category is not available, delete the created item and raise an error
             item.aq_inner.aq_parent.manage_delObjects(ids=[itemId, ])
             raise ZSI.Fault(ZSI.Fault.Client, "In this config, category is mandatory.  '%s' is not available for the '%s' group!" % (data['category'], proposingGroupId))
         item.setCategory(data['category'])
 
-        #make sure we have html here, and as clean as possible...
+        # make sure we have html here, and as clean as possible...
         from BeautifulSoup import BeautifulSoup
-        #find htmlFieldIds we will have to check/clean
+        # find htmlFieldIds we will have to check/clean
         htmlFieldIds = []
         managedFieldIds = data.keys()
         for field in item.Schema().fields():
@@ -277,21 +284,21 @@ class SOAPView(BrowserView):
         warnWrongHTML = False
         for htmlFieldId in htmlFieldIds:
             soup = BeautifulSoup(data[htmlFieldId])
-            #we need a surrounding <p></p> or the content is not generated by appy.pod
+            # we need a surrounding <p></p> or the content is not generated by appy.pod
             data[htmlFieldId] = unicode('<p>%s</p>' % data[htmlFieldId], 'utf-8')
             if not soup.contents or not getattr(soup.contents[0], 'name', None) == u'p':
                 soup = BeautifulSoup(data[htmlFieldId])
-            #check that we have valid HTML or we use the transformed HTML by BeautifulSoup
-            #compare unicode as data[htmlFieldId] is unicode...
+            # check that we have valid HTML or we use the transformed HTML by BeautifulSoup
+            # compare unicode as data[htmlFieldId] is unicode...
             renderedSoupContents = unicode(soup.renderContents(), 'utf-8')
             if not renderedSoupContents == data[htmlFieldId]:
                 warnWrongHTML = True
                 data[htmlFieldId] = renderedSoupContents
-            #use 'text/x-html-safe' mimetype when creating the item
+            # use 'text/x-html-safe' mimetype when creating the item
             field = item.getField(htmlFieldId)
             field.getMutator(item)(data[htmlFieldId], mimetype='text/x-html-safe')
 
-        #manage externalIdentifier
+        # manage externalIdentifier
         externalIdentifier = False
         field = item.getField(EXTERNAL_IDENTIFIER_FIELD_NAME)
         if data['externalIdentifier']:
@@ -301,11 +308,16 @@ class SOAPView(BrowserView):
         else:
             field.getMutator(item)(field.default)
 
-        #manage annexes
-        #call processForm before adding annexes because it calls at_post_create_script
-        #where we set some usefull values regarding annexes
+        # manage annexes
+        # call processForm before adding annexes because it calls at_post_create_script
+        # where we set some usefull values regarding annexes
         item.processForm()
-        #existing annex types
+        # add warning message after processForm because the id of the item may be changed
+        if warnWrongHTML:
+            warning_message = WRONG_HTML_WARNING % (item.absolute_url_path(), memberId)
+            logger.warning(warning_message)
+            warnings.append(warning_message)
+        # existing annex types
         fileTypes = mc.getFileTypes()
         for annex in creationData._annexes:
             annex_title = annex._title
@@ -313,27 +325,27 @@ class SOAPView(BrowserView):
             annex_filename = annex._filename
             validFileName = annex_filename and len(annex_filename.split('.')) == 2
             annex_file = annex._file
-            #we have an annex_type_id, find relevant MeetingFileType object
+            # we have an annex_type_id, find relevant MeetingFileType object
             if not annex_type_id or not annex_type_id in [fileType.id for fileType in fileTypes]:
                 # take the first available annex fileType that is the default one
                 annex_type = fileTypes[0]
             else:
                 annex_type = getattr(mc.meetingfiletypes, annex_type_id)
-            #manage mimetype manually
-            #as we receive base64 encoded binary, mimetypes registry can not handle this correctly...
+            # manage mimetype manually
+            # as we receive base64 encoded binary, mimetypes registry can not handle this correctly...
             mime = magic.Magic(mime=True)
             mr = self.context.mimetypes_registry
             annex_mimetype = mime.from_buffer(annex_file)
             if annex_mimetype:
                 mr_mimetype = mr.lookup(annex_mimetype)
             else:
-                #if libmagic could not determine file mimetype (like in version 5.09 of the command 'file'
-                #where MS mimetypes (doc, xls, ...) are not recognized...), we use the file extension...
+                # if libmagic could not determine file mimetype (like in version 5.09 of the command 'file'
+                # where MS mimetypes (doc, xls, ...) are not recognized...), we use the file extension...
                 mr_mimetype = ()
                 if validFileName:
-                    #mr.lookup here above returns a tuple so we build a tuple also...
+                    # mr.lookup here above returns a tuple so we build a tuple also...
                     mr_mimetype = (mr.lookupExtension(annex_filename.split('.')[1]),)
-            #check if a mimetype has been found and if a file extension was defined for it
+            # check if a mimetype has been found and if a file extension was defined for it
             if not mr_mimetype:
                 warning_message = MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING % ((annex_filename or annex_title), item.absolute_url_path())
                 logger.warning(warning_message)
@@ -346,16 +358,16 @@ class SOAPView(BrowserView):
                 continue
             elif len(mr_mimetype[0].extensions) > 1:
                 if not validFileName:
-                    #several extensions are proposed by mimetypes_registry and we have nothing to find out what is the extension to use
+                    # several extensions are proposed by mimetypes_registry and we have nothing to find out what is the extension to use
                     warning_message = MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % (mr_mimetype[0].normalized(), (annex_filename or annex_title), item.absolute_url_path())
                     logger.warning(warning_message)
                     warnings.append(warning_message)
                     continue
-            #now that we have the correct mimetype, we can handle the filename if necessary
+            # now that we have the correct mimetype, we can handle the filename if necessary
             if not validFileName:
-                #we have the file extension, generate a filename
+                # we have the file extension, generate a filename
                 annex_filename = "annex.%s" % mr_mimetype[0].extensions[0]
-            #now that we have everything we need, proceed with annex creation
+            # now that we have everything we need, proceed with annex creation
             kwargs = {}
             kwargs['filename'] = annex_filename
             item.addAnnex(annex_filename, annex_type, annex_title, annex_file, False, annex_type, **kwargs)
@@ -363,14 +375,10 @@ class SOAPView(BrowserView):
             lastInsertedAnnex = itemAnnexes[-1]
             lastInsertedAnnex.getFile().setContentType(annex_mimetype)
 
-        if warnWrongHTML:
-            warning_message = WRONG_HTML_WARNING % (item.absolute_url_path(), memberId)
-            logger.warning(warning_message)
-            warnings.append(warning_message)
         logger.info('Item at "%s"%s SOAP created by "%s".' % \
                     (item.absolute_url_path(), (externalIdentifier and ' with externalIdentifier "%s"' % item.externalIdentifier or ''), memberId))
         if not warnings:
-            #make the user aware that warnings are displayed in the response
+            # make the user aware that warnings are displayed in the response
             warnings.append(DEFAULT_NO_WARNING_MESSAGE)
         return item.UID(), warnings
 
