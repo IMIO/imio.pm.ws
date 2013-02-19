@@ -64,14 +64,14 @@ class testItemSOAPMethods(WS4PMTestCase):
           In the default test configuration, the user 'pmCreator1' can create an item for
           proposingGroup 'developers' in the MeetingConfig 'plonegov-assembly'
         """
-        #by default no item exists
+        # by default no item exists
         self.changeUser('pmCreator1')
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga')) == 0)
         req = self._prepareCreationData()
-        #This is what the sent enveloppe should looks like, note that the decision is "Décision"
-        #instead of '<p>Décision</p>' so we check accents and missing <p></p>
+        # This is what the sent enveloppe should looks like, note that the decision is "Décision"
+        # instead of '<p>Décision</p>' so we check accents and missing <p></p>
         req._creationData._decision = 'Décision'
-        #Serialize the request so it can be easily tested
+        # Serialize the request so it can be easily tested
         request = serializeRequest(req)
         expected =  """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
@@ -86,7 +86,7 @@ Content-Type: text/xml
 SOAPAction: /
 %s""" % ('pmCreator1', 'meeting', request)
         self.assertEquals(expected, result)
-        #now really use the SOAP method to create an item
+        # now really use the SOAP method to create an item
         newItem, response = self._createItem(req)
         newItemUID = newItem.UID()
         resp = deserialize(response)
@@ -96,35 +96,48 @@ SOAPAction: /
 </ns1:createItemResponse>
 """ % (newItemUID, WRONG_HTML_WARNING % ('/'.join(newItem.getPhysicalPath()), self.portal.portal_membership.getAuthenticatedMember().getId()))
         self.assertEquals(expected, resp)
-        #the item is actually created
+        # the item is actually created
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemUID)) == 1)
-        #responseHolder for tests here above
+        # responseHolder for tests here above
         responseHolder = createItemResponse()
-        #check that we can create an item with an empty HTML field
+        # check that we can create an item with an empty HTML field
         req._creationData._decision = ''
         newItemWithEmptyDecisionUID = SOAPView(self.portal, req).createItemRequest(req, responseHolder)._UID
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)) == 1)
-        #No matter how the item is created, with or without a decision, every HTML fields are surrounded by <p></p>
+        # No matter how the item is created, with or without a decision, every HTML fields are surrounded by <p></p>
         self.failIf(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)[0].getObject().getDecision() != "<p></p>")
-        #if the user can not create the item, a ZSI.Fault is returned
-        #the meetingConfigId must exists
+        # if the user can not create the item, a ZSI.Fault is returned
+        # the meetingConfigId must exists
         req._meetingConfigId = 'wrongMeetingConfigId'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
         req._meetingConfigId = validMeetingConfigId
-        #the connected user must be able to create an item for the given proposingGroupId
+        # the connected user must be able to create an item for the given proposingGroupId
         req._proposingGroupId = 'vendors'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "'pmCreator1' can not create items for the 'vendors' group!")
-        #the connected user must be able to create an item with the given category
+        # the connected user must be able to create an item with the given category
+        # set back correct proposingGroup
         req._proposingGroupId = 'developers'
         self.meetingConfig.setUseGroupsAsCategories(False)
         req._creationData._category = 'wrongCategoryId'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "In this config, category is mandatory.  'wrongCategoryId' is not available for the 'developers' group!")
+        # if the user trying to create an item as no member area, a ZSI.Fault is raised
+        # remove the 'pmCreator2' personal area
+        self.changeUser('admin')
+        self.portal.Members.manage_delObjects(ids=['pmCreator2'])
+        self.meetingConfig.setUseGroupsAsCategories(True)
+        req._proposingGroupId = 'vendors'
+        self.changeUser('pmCreator2')
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
+        
+
 
     def test_createItemWithOneAnnexRequest(self):
         """
