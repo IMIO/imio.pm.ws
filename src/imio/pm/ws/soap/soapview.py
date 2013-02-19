@@ -2,6 +2,7 @@ import ZSI
 import logging
 logger = logging.getLogger('WS4PM')
 from AccessControl import Unauthorized
+from AccessControl.SecurityManagement import newSecurityManager
 from Products.Five import BrowserView
 from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
@@ -208,10 +209,11 @@ class SOAPView(BrowserView):
         '''
           This is the accessed SOAP method for creating an item
         '''
-        response._UID, response._warnings = self._createItem(request._meetingConfigId, request._proposingGroupId, request._creationData)
+        response._UID, response._warnings = self._createItem(request._meetingConfigId, request._proposingGroupId, \
+                                                             request._creationData, request._inTheNameOf)
         return response
 
-    def _createItem(self, meetingConfigId, proposingGroupId, creationData):
+    def _createItem(self, meetingConfigId, proposingGroupId, creationData, inTheNameOf=None):
         '''
           Create an item with given parameters
         '''
@@ -219,14 +221,36 @@ class SOAPView(BrowserView):
         tool = portal.portal_plonemeeting
 
         warnings = []
-
         member = portal.portal_membership.getAuthenticatedMember()
+
+        # if we specify in the request that we want to create an item
+        # for another user, we need to check that :
+        # - user creating for another is 'MeetingManager' or 'Manager'
+        # - the user we want to create an item for can actually create the item for given proposingGroup
+        if inTheNameOf:
+            if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+                raise ZSI.Fault(ZSI.Fault.Client, "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
+            # change considered member to inTheNameOf given userid
+            member = portal.portal_membership.getMemberById(inTheNameOf)
+            if not member:
+                raise ZSI.Fault(ZSI.Fault.Client, "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
         memberId = member.getId()
 
         # check that the given meetingConfigId exists
         mc = getattr(tool, meetingConfigId, None)
         if not mc or not mc.meta_type == 'MeetingConfig':
             raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
+
+        # check that the user is a creator for given proposingGroupId
+        # get the MeetingGroups for wich memberId is creator
+        userGroups = tool.getGroups(userId=memberId, suffix="creators")
+        proposingGroup = [group for group in userGroups if group.getId() == proposingGroupId]
+        if not proposingGroup:
+            raise ZSI.Fault(ZSI.Fault.Client, "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
+
+        # if we are creating an item inTheNameOf, use this user for the rest of the process
+        if inTheNameOf:
+            newSecurityManager(None, member)
 
         # get or create the meetingFolder the item will be created in
         # if the user does not have a memberArea
@@ -236,12 +260,6 @@ class SOAPView(BrowserView):
             raise ZSI.Fault(ZSI.Fault.Client, \
             "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
 
-        # check that the user is a creator for given proposingGroupId
-        # get the MeetingGroups for wich memberId is creator
-        userGroups = tool.getGroups(userId=memberId, suffix="creators")
-        proposingGroup = [group for group in userGroups if group.getId() == proposingGroupId]
-        if not proposingGroup:
-            raise ZSI.Fault(ZSI.Fault.Client, "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
 
         # now that every checks pass, we can create the item
         # creationData keys begin with an '_' (_title, _description, ...) so tranform them
@@ -265,6 +283,7 @@ class SOAPView(BrowserView):
         # processForm calls at_post_create_script too
         # this is necessary before adding annexes
         item.at_post_create_script()
+
         # check that the given category is really available
         if not mc.getUseGroupsAsCategories() and not data['category'] in item.listCategories().keys():
             #if the category is not available, delete the created item and raise an error
@@ -380,6 +399,7 @@ class SOAPView(BrowserView):
         if not warnings:
             # make the user aware that warnings are displayed in the response
             warnings.append(DEFAULT_NO_WARNING_MESSAGE)
+
         return item.UID(), warnings
 
 

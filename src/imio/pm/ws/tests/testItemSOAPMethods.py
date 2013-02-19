@@ -108,15 +108,23 @@ SOAPAction: /
         self.failIf(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)[0].getObject().getDecision() != "<p></p>")
         #if the user can not create the item, a ZSI.Fault is returned
         #the meetingConfigId must exists
-        req._meetingConfigId = 'wrong-meeting-config-id'
-        self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).createItemRequest, req, responseHolder)
+        req._meetingConfigId = 'wrongMeetingConfigId'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
         req._meetingConfigId = validMeetingConfigId
         #the connected user must be able to create an item for the given proposingGroupId
         req._proposingGroupId = 'vendors'
-        self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).createItemRequest, req, responseHolder)
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "'pmCreator1' can not create items for the 'vendors' group!")
         #the connected user must be able to create an item with the given category
-        req._category = 'wrong-category-id'
-        self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).createItemRequest, req, responseHolder)
+        req._proposingGroupId = 'developers'
+        self.meetingConfig.setUseGroupsAsCategories(False)
+        req._creationData._category = 'wrongCategoryId'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "In this config, category is mandatory.  'wrongCategoryId' is not available for the 'developers' group!")
 
     def test_createItemWithOneAnnexRequest(self):
         """
@@ -257,6 +265,37 @@ SOAPAction: /
        MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % ('application/octet-stream', 'notValidFileNameNoExtension', newItem.absolute_url_path()),
        )
         self.assertEquals(expected, resp)
+
+    def test_createItemInTheNameOf(self):
+        """
+          It is possible for Managers and MeetingManagers to create an item inTheNameOf another user
+          Every other checks are made except that for using the inTheNameOf functionnality :
+          - the calling user must be 'Manager' or 'MeetingManager'
+          - the created item is finally like if created by the inTheNameOf user
+        """
+        # check first a working example the degrades it...
+        # and every related informations (creator, ownership, ...) are corretly linked to inTheNameOf user
+        self.changeUser('pmManager')
+        req = self._prepareCreationData()
+        req._inTheNameOf = 'pmCreator2'
+        req._proposingGroupId = 'vendors'
+        responseHolder = createItemResponse()
+        response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        newItem = self.portal.uid_catalog(UID=response._UID)[0].getObject()
+        # as the item is really created by the inTheNameOf user, everything is correct
+        self.assertEquals(newItem.Creator(), 'pmCreator2')
+        self.assertEquals(newItem.owner_info()['id'], 'pmCreator2')
+        # with those data but with a non 'Manager'/'MeetingManager', it fails
+        self.changeUser('pmCreator1')
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
+        # now use the MeetingManager but specify a proposingGroup the inTheNameOf user can not create for
+        self.changeUser('pmManager')
+        req._proposingGroupId = 'developers'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "'pmCreator2' can not create items for the 'developers' group!")
 
     def test_getItemInfosRequest(self):
         """
@@ -598,7 +637,9 @@ SOAPAction: /
         #if not search params is pass, a ZSI.Fault is raised
         req._Title = ''
         responseHolder = searchItemsResponse()
-        self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).searchItemsRequest, req, responseHolder)
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, 'Define at least one search parameter!')
         #if a 'meetingConfigId' is passed, items of this meetingConfig are taken into account
         #create an item for 'plonemeeting-assembly' with same data as one created for 'plonegov-assembly' here above
         req = self._prepareCreationData()
@@ -617,9 +658,11 @@ SOAPAction: /
         response = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         resp = deserialize(response)
         self.failUnless(itemInMeetingUID not in resp and newItemUID not in resp and pmItemUID in resp)
-        #passing a wrong meetingConfigId will raise an ZSI.Fault
+        # passing a wrong meetingConfigId will raise a ZSI.Fault
         req._meetingConfigId = 'wrongMeetingConfigId'
-        self.assertRaises(ZSI.Fault, SOAPView(self.portal, req).searchItemsRequest, req, responseHolder)
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
 
     def test_renderedWSDL(self):
         """

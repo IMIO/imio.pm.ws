@@ -117,7 +117,7 @@ class ns0:
         type = (schema, "CreateItemRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.CreateItemRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="meetingConfigId", aname="_meetingConfigId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="proposingGroupId", aname="_proposingGroupId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","CreationData",lazy=False)(pname="creationData", aname="_creationData", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="meetingConfigId", aname="_meetingConfigId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="proposingGroupId", aname="_proposingGroupId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","CreationData",lazy=False)(pname="creationData", aname="_creationData", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -129,6 +129,7 @@ class ns0:
                     # pyclass
                     self._meetingConfigId = None
                     self._proposingGroupId = None
+                    self._inTheNameOf = None
                     self._creationData = None
                     return
             Holder.__name__ = "CreateItemRequest_Holder"

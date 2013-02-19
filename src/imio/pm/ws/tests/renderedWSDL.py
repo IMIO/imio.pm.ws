@@ -5,7 +5,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <xsd:element name="testConnectionRequest" type="tns:TestConnectionRequest"/>
             <xsd:complexType name="TestConnectionRequest">
                 <xsd:sequence>
-                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="1" default="dummy"/>
+                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="0" default="dummy"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="testConnectionResponse">
@@ -18,7 +18,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <xsd:element name="getConfigInfosRequest" type="tns:ConfigInfosRequest"/>
             <xsd:complexType name="ConfigInfosRequest">
                 <xsd:sequence>
-                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="1" default="dummy"/>
+                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="0" default="dummy"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getConfigInfosResponse">
@@ -72,6 +72,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                 <xsd:sequence>
                     <xsd:element name="meetingConfigId" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                     <xsd:element name="proposingGroupId" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                    <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="creationData" type="tns:CreationData"/>
                 </xsd:sequence>
             </xsd:complexType>
