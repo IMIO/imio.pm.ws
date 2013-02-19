@@ -68,9 +68,9 @@ class testItemSOAPMethods(WS4PMTestCase):
         self.changeUser('pmCreator1')
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga')) == 0)
         req = self._prepareCreationData()
-        # This is what the sent enveloppe should looks like, note that the decision is "Décision"
+        # This is what the sent enveloppe should looks like, note that the decision is "Décision<strong>wrongTagd</span>"
         # instead of '<p>Décision</p>' so we check accents and missing <p></p>
-        req._creationData._decision = 'Décision'
+        req._creationData._decision = 'Décision<strong>wrongTagd</span>'
         # Serialize the request so it can be easily tested
         request = serializeRequest(req)
         expected =  """POST /plone/createItemRequest HTTP/1.0
@@ -78,7 +78,7 @@ Authorization: Basic %s:%s
 Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
-<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>D\xc3\xa9cision</decision></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting')
+<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category><description>&lt;p&gt;Description&lt;/p&gt;</description><decision>D\xc3\xa9cision&lt;strong&gt;wrongTagd&lt;/span&gt;</decision></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting')
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
@@ -136,8 +136,6 @@ SOAPAction: /
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
-        
-
 
     def test_createItemWithOneAnnexRequest(self):
         """
@@ -206,7 +204,6 @@ SOAPAction: /
         for annex in req._creationData._annexes:
             annexesEnveloppePart = annexesEnveloppePart + """<annexes xsi:type="ns1:AnnexInfo"><title>%s</title><annexTypeId>%s</annexTypeId><filename>%s</filename><file>
 %s</file></annexes>""" % (annex._title, annex._annexTypeId, annex._filename, base64.encodestring(annex._file))
-        
         #This is what the sent enveloppe should looks like
         expected =  """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
@@ -309,6 +306,11 @@ SOAPAction: /
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "'pmCreator2' can not create items for the 'developers' group!")
+        # now for an unexisting inTheNameOf userid
+        req._inTheNameOf = 'unexistingUserId'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "Trying to create an item 'inTheNameOf' an unexisting user 'unexistingUserId'!")
 
     def test_getItemInfosRequest(self):
         """
