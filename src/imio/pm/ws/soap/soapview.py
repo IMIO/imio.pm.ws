@@ -13,9 +13,13 @@ import magic
 
 DEFAULT_NO_WARNING_MESSAGE = 'There was NO WARNING message during item creation.'
 WRONG_HTML_WARNING = 'HTML used for creating item at "%s" by "%s" was not valid.  Used BeautifulSoup corrected HTML.'
-MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING = 'Mimetype could not be determined correctly for annex "%s" of item "%s", this annex was not added.'
-NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = 'No extensions available in mimetypes_registry for mimetype "%s" for annex "%s" of item "%s", this annex was not added.'
-MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "Could not determine an extension to use for mimetype '%s', too many available, for annex '%s' of item '%s', this annex was not added."
+MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING = 'Mimetype could not be determined correctly for annex "%s" of item "%s", ' \
+                                      'this annex was not added.'
+NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = 'No extensions available in mimetypes_registry for mimetype "%s" ' \
+                                             'for annex "%s" of item "%s", this annex was not added.'
+MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "Could not determine an extension to use for mimetype '%s', ' \
+                                                  'too many available, for annex '%s' of item '%s', ' \
+                                                  'this annex was not added."
 
 
 class SOAPView(BrowserView):
@@ -62,7 +66,9 @@ class SOAPView(BrowserView):
             params.pop('_showAnnexes')
         except KeyError:
             pass
-        response._itemInfo = self._getItemInfos(params, request.__dict__.get('_showExtraInfos', False), request.__dict__.get('_showAnnexes', False))
+        response._itemInfo = self._getItemInfos(params,
+                                                request.__dict__.get('_showExtraInfos', False),
+                                                request.__dict__.get('_showAnnexes', False))
         return response
 
     def _testConnection(self):
@@ -127,7 +133,8 @@ class SOAPView(BrowserView):
         params = {}
         # remove leading '_' in searchParams
         for elt in searchParams.keys():
-            #one given searchParams is not a search parameter: '_showExtraInfos' will return every available infos of the item
+            # one given searchParams is not a search parameter: '_showExtraInfos'
+            # will return every available infos of the item
             if elt == '_showExtraInfos':
                 continue
             searchParam = searchParams[elt]
@@ -168,7 +175,8 @@ class SOAPView(BrowserView):
             itemInfo._description = item.getRawDescription()
             itemInfo._decision = item.getRawDecision()
             itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
-            itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or DateTime('1950/01/01 00:00:00 UTC'))
+            itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or \
+                                     DateTime('1950/01/01 00:00:00 UTC'))
             itemInfo._absolute_url = item.absolute_url()
             itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
             itemInfo._extraInfos = {}
@@ -229,11 +237,13 @@ class SOAPView(BrowserView):
         # - the user we want to create an item for can actually create the item for given proposingGroup
         if inTheNameOf:
             if not member.has_role('Manager') and not member.has_role('MeetingManager'):
-                raise ZSI.Fault(ZSI.Fault.Client, "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.portal_membership.getMemberById(inTheNameOf)
             if not member:
-                raise ZSI.Fault(ZSI.Fault.Client, "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
         memberId = member.getId()
 
         # check that the given meetingConfigId exists
@@ -246,7 +256,8 @@ class SOAPView(BrowserView):
         userGroups = tool.getGroups(userId=memberId, suffix="creators")
         proposingGroup = [group for group in userGroups if group.getId() == proposingGroupId]
         if not proposingGroup:
-            raise ZSI.Fault(ZSI.Fault.Client, "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
+            raise ZSI.Fault(ZSI.Fault.Client,
+                            "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
 
         # if we are creating an item inTheNameOf, use this user for the rest of the process
         if inTheNameOf:
@@ -259,7 +270,6 @@ class SOAPView(BrowserView):
         if destFolder.meta_type == 'Plone Site':
             raise ZSI.Fault(ZSI.Fault.Client, \
             "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
-
 
         # now that every checks pass, we can create the item
         # creationData keys begin with an '_' (_title, _description, ...) so tranform them
@@ -288,7 +298,9 @@ class SOAPView(BrowserView):
         if not mc.getUseGroupsAsCategories() and not data['category'] in item.listCategories().keys():
             #if the category is not available, delete the created item and raise an error
             item.aq_inner.aq_parent.manage_delObjects(ids=[itemId, ])
-            raise ZSI.Fault(ZSI.Fault.Client, "In this config, category is mandatory.  '%s' is not available for the '%s' group!" % (data['category'], proposingGroupId))
+            raise ZSI.Fault(ZSI.Fault.Client,
+                            "In this config, category is mandatory.  '%s' is not available for the '%s' group!" %
+                            (data['category'], proposingGroupId))
         item.setCategory(data['category'])
 
         # make sure we have html here, and as clean as possible...
@@ -298,7 +310,7 @@ class SOAPView(BrowserView):
         managedFieldIds = data.keys()
         for field in item.Schema().fields():
             fieldName = field.getName()
-            if fieldName in managedFieldIds and field.widget.getName() in ['RichWidget', 'VisualWidget',]:
+            if fieldName in managedFieldIds and field.widget.getName() in ['RichWidget', 'VisualWidget', ]:
                     htmlFieldIds.append(fieldName)
         warnWrongHTML = False
         for htmlFieldId in htmlFieldIds:
@@ -369,19 +381,26 @@ class SOAPView(BrowserView):
                     mr_mimetype = (mr.lookupExtension(annex_filename.split('.')[1]),)
             # check if a mimetype has been found and if a file extension was defined for it
             if not mr_mimetype:
-                warning_message = MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING % ((annex_filename or annex_title), item.absolute_url_path())
+                warning_message = MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING % ((annex_filename or annex_title),
+                                                                          item.absolute_url_path())
                 logger.warning(warning_message)
                 warnings.append(warning_message)
                 continue
             elif not mr_mimetype[0].extensions:
-                warning_message = NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % (mr_mimetype[0].normalized(), (annex_filename or annex_title), item.absolute_url_path())
+                warning_message = NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % (mr_mimetype[0].normalized(),
+                                                                                (annex_filename or annex_title),
+                                                                                item.absolute_url_path())
                 logger.warning(warning_message)
                 warnings.append(warning_message)
                 continue
             elif len(mr_mimetype[0].extensions) > 1:
                 if not validFileName:
-                    # several extensions are proposed by mimetypes_registry and we have nothing to find out what is the extension to use
-                    warning_message = MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % (mr_mimetype[0].normalized(), (annex_filename or annex_title), item.absolute_url_path())
+                    # several extensions are proposed by mimetypes_registry
+                    # and we have nothing to find out what is the extension to use
+                    warning_message = MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % \
+                                                    (mr_mimetype[0].normalized(),
+                                                    (annex_filename or annex_title),
+                                                    item.absolute_url_path())
                     logger.warning(warning_message)
                     warnings.append(warning_message)
                     continue
@@ -398,7 +417,9 @@ class SOAPView(BrowserView):
             lastInsertedAnnex.getFile().setContentType(annex_mimetype)
 
         logger.info('Item at "%s"%s SOAP created by "%s".' % \
-                    (item.absolute_url_path(), (externalIdentifier and ' with externalIdentifier "%s"' % item.externalIdentifier or ''), memberId))
+                    (item.absolute_url_path(),
+                     (externalIdentifier and ' with externalIdentifier "%s"' \
+                      % item.externalIdentifier or ''), memberId))
         if not warnings:
             # make the user aware that warnings are displayed in the response
             warnings.append(DEFAULT_NO_WARNING_MESSAGE)

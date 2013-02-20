@@ -135,7 +135,15 @@
     name="default"
     title="Webservices for PloneMeeting"
     directory="profiles/default"
-    description="Registration of the Webservices for PloneMeeting"
+    description="Registration of the Webservices for PloneMeeting (imio.pm.ws)"
+    provides="Products.GenericSetup.interfaces.EXTENSION"
+  />
+
+  <genericsetup:registerProfile
+    name="uninstall"
+    title="Uninstall of the Webservices for PloneMeeting (imio.pm.ws)"
+    directory="profiles/uninstall"
+    description=""
     provides="Products.GenericSetup.interfaces.EXTENSION"
   />
 

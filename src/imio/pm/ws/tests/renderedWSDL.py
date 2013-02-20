@@ -72,8 +72,8 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                 <xsd:sequence>
                     <xsd:element name="meetingConfigId" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                     <xsd:element name="proposingGroupId" type="xsd:string" maxOccurs="1" minOccurs="1"/>
-                    <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="creationData" type="tns:CreationData"/>
+                    <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="createItemResponse">
