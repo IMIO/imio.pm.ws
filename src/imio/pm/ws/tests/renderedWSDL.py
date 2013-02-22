@@ -34,6 +34,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="UID" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                     <xsd:element name="showExtraInfos" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="showAnnexes" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getItemInfosResponse">
@@ -58,6 +59,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="review_state" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="meetingConfigId" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="searchItemsResponse">

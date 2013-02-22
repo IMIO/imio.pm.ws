@@ -619,6 +619,46 @@ SOAPAction: /
         #2 annexes are shown
         self.assertEquals(expected, resp)
 
+    def test_getItemInfosInTheNameOf(self):
+        """
+          Test that getting an item inTheNameOf antother user works
+          Create an item by 'pmCreator1', member of the 'developers' group
+          Item will be viewable :
+          - by 'pmManager'
+          - while getting informations in the name of 'pmCreator1'
+          Item will NOT be viewable :
+          - while getting informations in the name of 'pmCreator2'
+            that is not in the 'developers' group
+        """
+        # create an item by 'pmCreator1'
+        self.changeUser('pmCreator1')
+        item = self.create('MeetingItem')
+        # check first a working example the degrades it...
+        req = getItemInfosRequest()
+        req._inTheNameOf = None
+        req._UID = item.UID()
+        responseHolder = getItemInfosResponse()
+        # 'pmCreator1' can get infos about the item
+        result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        self.assertTrue(result._itemInfo[0].UID == item.UID())
+        # now begin, we need to be a 'MeetingManager' or 'Manager' to
+        # getItemInfos(inTheNameOf)
+        req._inTheNameOf = 'pmCreator1'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+                          "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+        # now has a 'MeetingManager'
+        self.changeUser('pmManager')
+        # a MeetingManager can get informations inTheNameOf 'pmCreator1'
+        # and it will return relevant result as 'pmCreator1' can see the item
+        result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        self.assertTrue(result._itemInfo[0].UID == item.UID())
+        # as 'pmCreator2', we can not get item informations
+        req._inTheNameOf = 'pmCreator2'
+        result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        self.assertTrue(result._itemInfo == [])
+
     def test_getConfigInfosRequest(self):
         """
           Test that getting informations about the configuration returns valuable informations
@@ -811,6 +851,84 @@ SOAPAction: /
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
 
+    def test_searchItemsInTheNameOf(self):
+        """
+          Test that searching items inTheNameOf antother user works
+          Create 2 items, one by 'pmCreator1', member of the 'developers' group
+          and one by 'pmCreator2', member of the 'vendors' group
+          Item 1 will be viewable :
+          - by 'pmManager' and 'pmCreator1'
+          Item 1 will NOT be viewable :
+          - while getting informations in the name of 'pmCreator2'
+            that is not in the 'developers' group
+          Item 2 will be viewable :
+          - by 'pmManager' and 'pmCreator2'
+          Item 2 will NOT be viewable :
+          - while getting informations in the name of 'pmCreator1'
+            that is not in the 'vendors' group
+        """
+        # put pmManager in the 'vendors_creators' so he can have
+        # access to itemcreated items of 'pmCreator2'
+        self.portal.portal_groups.addPrincipalToGroup('pmManager', 'vendors_creators')
+        SAME_TITLE = 'sameTitleForBothItems'
+        # create an item by 'pmCreator1'
+        self.changeUser('pmCreator1')
+        item1 = self.create('MeetingItem')
+        item1.setTitle(SAME_TITLE)
+        item1.reindexObject(idxs=['Title', ])
+        # create an item by 'pmCreator2'
+        self.changeUser('pmCreator2')
+        item2 = self.create('MeetingItem')
+        item2.setTitle(SAME_TITLE)
+        item2.reindexObject(idxs=['Title', ])
+        req = searchItemsRequest()
+        req._inTheNameOf = None
+        req._Title = SAME_TITLE
+        responseHolder = searchItemsResponse()
+        # 'pmCreator1' can get infos about item1
+        self.changeUser('pmCreator1')
+        result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        # only one result and about item1
+        self.assertTrue(result._itemInfo[0].UID == item1.UID() and len(result._itemInfo) == 1)
+        # 'pmCreator2' can get infos about item2
+        self.changeUser('pmCreator2')
+        result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        # only one result and about item2
+        self.assertTrue(result._itemInfo[0].UID == item2.UID() and len(result._itemInfo) == 1)
+        # None of 'pmCreatorx' can searchItems inTheNameOf
+        req._inTheNameOf = 'pmCreator1'
+        self.changeUser('pmCreator1')
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+                          "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+        req._inTheNameOf = 'pmCreator2'
+        self.changeUser('pmCreator2')
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+                          "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+        # now working examples with a 'Manager'
+        self.changeUser('pmManager')
+        req._inTheNameOf = None
+        result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        # both items are returned
+        self.assertTrue(len(result._itemInfo) == 2)
+        # returned items are item1 and item2
+        createdItemsUids = set((item1.UID(), item2.UID()))
+        resultUids = set((result._itemInfo[0].UID, result._itemInfo[1].UID))
+        self.assertTrue(createdItemsUids == resultUids)
+        # now searchItems inTheNameOf 'pmCreator1'
+        req._inTheNameOf = 'pmCreator1'
+        result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        self.assertTrue(len(result._itemInfo) == 1)
+        self.assertTrue(result._itemInfo[0].UID == item1.UID())
+        # now searchItems inTheNameOf 'pmCreator2'
+        req._inTheNameOf = 'pmCreator2'
+        result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        self.assertTrue(len(result._itemInfo) == 1)
+        self.assertTrue(result._itemInfo[0].UID == item2.UID())
+
     def test_renderedWSDL(self):
         """
           Check that the rendered WSDL correspond to what we expect
@@ -892,7 +1010,7 @@ SOAPAction: /
         newItem = self.portal.uid_catalog(UID=response._UID)[0].getObject()
         return newItem, response
 
-    def _getItemInfos(self, itemUID, showAnnexes=False, showExtraInfos=False):
+    def _getItemInfos(self, itemUID, showAnnexes=False, showExtraInfos=False, inTheNameOf=None):
         """
           Call getItemInfos SOAP method with given itemUID parameter
         """
@@ -902,6 +1020,8 @@ SOAPAction: /
             req._showAnnexes = True
         if showExtraInfos:
             req._showExtraInfos = True
+        if inTheNameOf:
+            req._inTheNameOf = inTheNameOf
         responseHolder = getItemInfosResponse()
         response = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         return deserialize(response)

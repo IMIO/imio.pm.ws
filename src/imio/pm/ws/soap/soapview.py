@@ -2,7 +2,7 @@ import ZSI
 import logging
 logger = logging.getLogger('WS4PM')
 from AccessControl import Unauthorized
-from AccessControl.SecurityManagement import newSecurityManager
+from AccessControl.SecurityManagement import getSecurityManager, setSecurityManager, newSecurityManager
 from Products.Five import BrowserView
 from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
@@ -47,7 +47,13 @@ class SOAPView(BrowserView):
         '''
           This is the accessed SOAP method for searching items
         '''
-        response._itemInfo = self._getItemInfos(request.__dict__)
+        params = dict(request.__dict__)
+        # remove the '_inTheNameOf' from searchParams as it is not a search parameter
+        inTheNameOf = None
+        if '_inTheNameOf' in params:
+            inTheNameOf = params['_inTheNameOf']
+            params.pop('_inTheNameOf')
+        response._itemInfo = self._getItemInfos(params, inTheNameOf=inTheNameOf)
         return response
 
     def getItemInfosRequest(self, request, response):
@@ -57,18 +63,21 @@ class SOAPView(BrowserView):
         '''
         params = dict(request.__dict__)
         # remove the '_showExtraInfos' from searchParams as it is not a search parameter
-        try:
+        if '_showExtraInfos' in params:
             params.pop('_showExtraInfos')
-        except KeyError:
-            pass
         # remove the '_showAnnexes' from searchParams as it is not a search parameter
-        try:
+        if '_showAnnexes' in params:
             params.pop('_showAnnexes')
-        except KeyError:
-            pass
+        # remove the '_inTheNameOf' from searchParams as it is not a search parameter
+        inTheNameOf = None
+        if '_inTheNameOf' in params:
+            inTheNameOf = params['_inTheNameOf']
+            params.pop('_inTheNameOf')
+
         response._itemInfo = self._getItemInfos(params,
                                                 request.__dict__.get('_showExtraInfos', False),
-                                                request.__dict__.get('_showAnnexes', False))
+                                                request.__dict__.get('_showAnnexes', False),
+                                                inTheNameOf)
         return response
 
     def _testConnection(self):
@@ -121,22 +130,17 @@ class SOAPView(BrowserView):
                         (tool.absolute_url_path(), memberId))
         return res
 
-    def _getItemInfos(self, searchParams, showExtraInfos=False, showAnnexes=False):
+    def _getItemInfos(self, searchParams, showExtraInfos=False, showAnnexes=False, inTheNameOf=None):
         '''
           Get an item with given searchParams dict.  As the user is connected, the security in portal_catalog do the job
         '''
         portal = self.context
 
         member = portal.portal_membership.getAuthenticatedMember()
-        memberId = member.getId()
 
         params = {}
         # remove leading '_' in searchParams
         for elt in searchParams.keys():
-            # one given searchParams is not a search parameter: '_showExtraInfos'
-            # will return every available infos of the item
-            if elt == '_showExtraInfos':
-                continue
             searchParam = searchParams[elt]
             if searchParam:
                 params[elt[1:]] = searchParam
@@ -145,6 +149,22 @@ class SOAPView(BrowserView):
         # will return the entire catalog (even if we subforce using 'MeetingItem' meta_type here above)
         if not params:
             raise ZSI.Fault(ZSI.Fault.Client, "Define at least one search parameter!")
+
+        # if we specify in the request that we want to get infos about an item
+        # for another user, we need to check that :
+        # - user getting infos for another is 'MeetingManager' or 'Manager'
+        # - the user we want to get informations for exists
+        if inTheNameOf:
+            if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+            # change considered member to inTheNameOf given userid
+            member = portal.acl_users.getUserById(inTheNameOf)
+            if not member:
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "Trying to get item informations 'inTheNameOf' an unexisting user '%s'!"
+                                % inTheNameOf)
+        memberId = member.getId()
 
         tool = portal.portal_plonemeeting
         if 'meetingConfigId' in params and not 'portal_type' in params:
@@ -155,12 +175,14 @@ class SOAPView(BrowserView):
                 raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
             params['portal_type'] = mc.getItemTypeName()
 
+        # if we are getting item informations inTheNameOf, use this user for the rest of the process
+        if inTheNameOf:
+            oldsm = getSecurityManager()
+            newSecurityManager(portal.REQUEST, member)
+
         # force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
         params['meta_type'] = 'MeetingItem'
         brains = portal.portal_catalog(**params)
-        if not brains:
-            return []
-
         res = []
         for brain in brains:
             # XXX for now we still need to wake up the item because we do not have the meeting's date
@@ -201,6 +223,9 @@ class SOAPView(BrowserView):
             logger.info('Item at %s SOAP accessed by "%s".' % \
                         (item.absolute_url_path(), memberId))
             res.append(itemInfo,)
+        # fallback to original user calling the SOAP method
+        if inTheNameOf:
+            setSecurityManager(oldsm)
         return res
 
     def _getExtraInfosFields(self, item):
@@ -234,13 +259,13 @@ class SOAPView(BrowserView):
         # if we specify in the request that we want to create an item
         # for another user, we need to check that :
         # - user creating for another is 'MeetingManager' or 'Manager'
-        # - the user we want to create an item for can actually create the item for given proposingGroup
+        # - the user we want to create an item for exists
         if inTheNameOf:
             if not member.has_role('Manager') and not member.has_role('MeetingManager'):
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
-            member = portal.portal_membership.getMemberById(inTheNameOf)
+            member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
@@ -252,7 +277,7 @@ class SOAPView(BrowserView):
             raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
 
         # check that the user is a creator for given proposingGroupId
-        # get the MeetingGroups for wich memberId is creator
+        # get the MeetingGroups for wich inTheNameOfMemberId is creator
         userGroups = tool.getGroups(userId=memberId, suffix="creators")
         proposingGroup = [group for group in userGroups if group.getId() == proposingGroupId]
         if not proposingGroup:
@@ -261,13 +286,17 @@ class SOAPView(BrowserView):
 
         # if we are creating an item inTheNameOf, use this user for the rest of the process
         if inTheNameOf:
-            newSecurityManager(None, member)
+            oldsm = getSecurityManager()
+            newSecurityManager(portal.REQUEST, member)
 
         # get or create the meetingFolder the item will be created in
         # if the user does not have a memberArea
         # (never connected, then we raise an error)
         destFolder = tool.getPloneMeetingFolder(meetingConfigId, memberId)
         if destFolder.meta_type == 'Plone Site':
+            # fallback to original user calling the SOAP method
+            if inTheNameOf:
+                setSecurityManager(oldsm)
             raise ZSI.Fault(ZSI.Fault.Client, \
             "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
 
@@ -298,6 +327,9 @@ class SOAPView(BrowserView):
         if not mc.getUseGroupsAsCategories() and not data['category'] in item.listCategories().keys():
             #if the category is not available, delete the created item and raise an error
             item.aq_inner.aq_parent.manage_delObjects(ids=[itemId, ])
+            # fallback to original user calling the SOAP method
+            if inTheNameOf:
+                setSecurityManager(oldsm)
             raise ZSI.Fault(ZSI.Fault.Client,
                             "In this config, category is mandatory.  '%s' is not available for the '%s' group!" %
                             (data['category'], proposingGroupId))
@@ -424,6 +456,9 @@ class SOAPView(BrowserView):
             # make the user aware that warnings are displayed in the response
             warnings.append(DEFAULT_NO_WARNING_MESSAGE)
 
+        # fallback to original user calling the SOAP method
+        if inTheNameOf:
+            setSecurityManager(oldsm)
         return item.UID(), warnings
 
 
