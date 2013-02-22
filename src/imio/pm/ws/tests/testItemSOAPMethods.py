@@ -658,6 +658,12 @@ SOAPAction: /
         req._inTheNameOf = 'pmCreator2'
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertTrue(result._itemInfo == [])
+        # now for an unexisting inTheNameOf userid
+        req._inTheNameOf = 'unexistingUserId'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+                          "Trying to get item informations 'inTheNameOf' an unexisting user 'unexistingUserId'!")
 
     def test_getConfigInfosRequest(self):
         """
@@ -1010,7 +1016,7 @@ SOAPAction: /
         newItem = self.portal.uid_catalog(UID=response._UID)[0].getObject()
         return newItem, response
 
-    def _getItemInfos(self, itemUID, showAnnexes=False, showExtraInfos=False, inTheNameOf=None):
+    def _getItemInfos(self, itemUID, showAnnexes=False, showExtraInfos=False):
         """
           Call getItemInfos SOAP method with given itemUID parameter
         """
@@ -1020,8 +1026,6 @@ SOAPAction: /
             req._showAnnexes = True
         if showExtraInfos:
             req._showExtraInfos = True
-        if inTheNameOf:
-            req._inTheNameOf = inTheNameOf
         responseHolder = getItemInfosResponse()
         response = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         return deserialize(response)
