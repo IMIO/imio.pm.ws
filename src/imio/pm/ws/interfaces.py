@@ -14,6 +14,11 @@ class ITestConnectionRequest(Interface):
     Marker interface for change request
     """
 
+class ICheckIsLinkedRequest(Interface):
+    """
+    Marker interface for change request
+    """
+
 class IConfigInfosRequest(Interface):
     """
     Marker interface for change request

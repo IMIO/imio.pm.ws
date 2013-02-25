@@ -39,6 +39,27 @@ class ns0:
             Holder.__name__ = "TestConnectionRequest_Holder"
             self.pyclass = Holder
 
+    class CheckIsLinkedRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+        schema = "http://ws4pm.imio.be"
+        type = (schema, "CheckIsLinkedRequest")
+        def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
+            ns = ns0.CheckIsLinkedRequest_Def.schema
+            TClist = [ZSI.TC.String(pname="meetingConfigId", aname="_meetingConfigId", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="externalIdentifier", aname="_externalIdentifier", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            self.attribute_typecode_dict = attributes or {}
+            if extend: TClist += ofwhat
+            if restrict: TClist = ofwhat
+            ZSI.TCcompound.ComplexType.__init__(self, None, TClist, pname=pname, inorder=0, **kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._meetingConfigId = None
+                    self._externalIdentifier = None
+                    return
+            Holder.__name__ = "CheckIsLinkedRequest_Holder"
+            self.pyclass = Holder
+
     class ConfigInfosRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
         schema = "http://ws4pm.imio.be"
         type = (schema, "ConfigInfosRequest")
@@ -119,7 +140,7 @@ class ns0:
         type = (schema, "CreateItemRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.CreateItemRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="meetingConfigId", aname="_meetingConfigId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="proposingGroupId", aname="_proposingGroupId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","CreationData",lazy=False)(pname="creationData", aname="_creationData", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="meetingConfigId", aname="_meetingConfigId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="proposingGroupId", aname="_proposingGroupId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","CreationData",lazy=False)(pname="creationData", aname="_creationData", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -131,8 +152,8 @@ class ns0:
                     # pyclass
                     self._meetingConfigId = None
                     self._proposingGroupId = None
-                    self._inTheNameOf = None
                     self._creationData = None
+                    self._inTheNameOf = None
                     return
             Holder.__name__ = "CreateItemRequest_Holder"
             self.pyclass = Holder
@@ -273,6 +294,41 @@ class ns0:
                     self._connectionState = None
                     return
             Holder.__name__ = "testConnectionResponse_Holder"
+            self.pyclass = Holder
+
+    class checkIsLinkedRequest_Dec(ElementDeclaration):
+        literal = "checkIsLinkedRequest"
+        schema = "http://ws4pm.imio.be"
+        substitutionGroup = None
+        def __init__(self, **kw):
+            kw["pname"] = (u'http://ws4pm.imio.be', u'checkIsLinkedRequest')
+            kw["aname"] = "_checkIsLinkedRequest"
+            if ns0.CheckIsLinkedRequest_Def not in ns0.checkIsLinkedRequest_Dec.__bases__:
+                bases = list(ns0.checkIsLinkedRequest_Dec.__bases__)
+                bases.insert(0, ns0.CheckIsLinkedRequest_Def)
+                ns0.checkIsLinkedRequest_Dec.__bases__ = tuple(bases)
+
+            ns0.CheckIsLinkedRequest_Def.__init__(self, **kw)
+            if self.pyclass is not None: self.pyclass.__name__ = "checkIsLinkedRequest_Dec_Holder"
+
+    class checkIsLinkedResponse_Dec(ZSI.TCcompound.ComplexType, ElementDeclaration):
+        literal = "checkIsLinkedResponse"
+        schema = "http://ws4pm.imio.be"
+        def __init__(self, **kw):
+            ns = ns0.checkIsLinkedResponse_Dec.schema
+            TClist = [ZSI.TC.Boolean(pname="isLinked", aname="_isLinked", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            kw["pname"] = (u'http://ws4pm.imio.be', u'checkIsLinkedResponse')
+            kw["aname"] = "_checkIsLinkedResponse"
+            self.attribute_typecode_dict = {}
+            ZSI.TCcompound.ComplexType.__init__(self,None,TClist,inorder=0,**kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._isLinked = None
+                    return
+            Holder.__name__ = "checkIsLinkedResponse_Holder"
             self.pyclass = Holder
 
     class getConfigInfosRequest_Dec(ElementDeclaration):

@@ -32,6 +32,7 @@ from AccessControl import Unauthorized
 from plone.app.testing import logout
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import testConnectionRequest, testConnectionResponse, \
+                                    checkIsLinkedRequest, checkIsLinkedResponse, \
                                     createItemRequest, createItemResponse, \
                                     searchItemsRequest, searchItemsResponse, \
                                     getItemInfosRequest, getItemInfosResponse, \
@@ -49,7 +50,9 @@ class testItemSOAPMethods(WS4PMTestCase):
     """
 
     def test_connectionRequest(self):
-        """ """
+        """
+          Test that we can connect to the webservice if we are authenticated in PloneMeeting
+        """
         # try without being connected
         logout()
         req = testConnectionRequest()
@@ -59,6 +62,42 @@ class testItemSOAPMethods(WS4PMTestCase):
         self.changeUser('pmManager')
         response = SOAPView(self.portal, req).testConnectionRequest(req, responseHolder)
         self.assertEquals(response._connectionState, True)
+
+    def test_checkIsLinkedRequest(self):
+        """
+          Test that we can ckech that an item is linked to a given externalIdentifier even
+          if the MeetingManager doing the can can not actually see the item... (we use unrestricted search)
+        """
+        # try as a non MeetingManager
+        self.changeUser('pmCreator1')
+        checkIsLinkedReq = checkIsLinkedRequest()
+        checkIsLinkedResponseHolder = checkIsLinkedResponse()
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
+                                                                         checkIsLinkedResponseHolder)
+        self.assertEquals(cm.exception.string,
+                          "You need to be 'Manager' or 'MeetingManager' to check if an element is linked to an item!")
+        # now create an item as 'pmCreator2', aka a user in a group 'pmManager' can not access
+        self.changeUser('pmCreator2')
+        req = self._prepareCreationData()
+        req._proposingGroupId = 'vendors'
+        req._creationData._externalIdentifier = 'my-external-identifier'
+        newItem, response = self._createItem(req)
+        # check that using getItemInfos, MeetingManager can not get informations about created item
+        self.changeUser('pmManager')
+        self.failIf(self._getItemInfos(newItem.UID(), toBeDeserialized=False)._itemInfo)
+        # but while checking if an item is linked, it works...
+        # first check for anotherexternalIdentifier
+        checkIsLinkedReq._meetingConfigId = None
+        checkIsLinkedReq._externalIdentifier = 'my-unexisting-external-identifier'
+        res = SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
+                                                                           checkIsLinkedResponseHolder)
+        self.assertFalse(res._isLinked)
+        # now with the values corresponding to the created item
+        checkIsLinkedReq._externalIdentifier = 'my-external-identifier'
+        res = SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
+                                                                           checkIsLinkedResponseHolder)
+        self.assertTrue(res._isLinked)
 
     def test_createItemRequest(self):
         """
@@ -1016,7 +1055,7 @@ SOAPAction: /
         newItem = self.portal.uid_catalog(UID=response._UID)[0].getObject()
         return newItem, response
 
-    def _getItemInfos(self, itemUID, showAnnexes=False, showExtraInfos=False):
+    def _getItemInfos(self, itemUID, showAnnexes=False, showExtraInfos=False, toBeDeserialized=True):
         """
           Call getItemInfos SOAP method with given itemUID parameter
         """
@@ -1028,7 +1067,10 @@ SOAPAction: /
             req._showExtraInfos = True
         responseHolder = getItemInfosResponse()
         response = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
-        return deserialize(response)
+        if toBeDeserialized:
+            return deserialize(response)
+        else:
+            return response
 
     def _searchItems(self, req):
         """

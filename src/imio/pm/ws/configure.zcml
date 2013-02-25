@@ -37,6 +37,11 @@
   />
 
   <five:implements
+    class=".WS4PM_server.checkIsLinkedRequest"
+    interface=".interfaces.ICheckIsLinkedRequest"
+  />
+
+  <five:implements
     class=".WS4PM_server.getConfigInfosRequest"
     interface=".interfaces.IConfigInfosRequest"
   />
@@ -57,7 +62,12 @@
 
   <soap:view
     for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-    methods="testConnectionRequest getConfigInfosRequest getItemInfosRequest searchItemsRequest createItemRequest"
+    methods="testConnectionRequest
+             checkIsLinkedRequest
+             getConfigInfosRequest
+             getItemInfosRequest
+             searchItemsRequest
+             createItemRequest"
     class=".soap.soapview.SOAPView"
     permission="zope2.SOAPAccess"
   />
@@ -80,6 +90,18 @@
   <utility
     factory=".WS4PM_server.testConnectionResponse"
     name="testConnectionRequest"
+    provides="z3c.soap.interfaces.IZSIResponseType"
+  />
+
+  <utility
+    factory=".WS4PM_server.checkIsLinkedRequest"
+    name="checkIsLinkedRequest"
+    provides="z3c.soap.interfaces.IZSIRequestType"
+  />
+
+  <utility
+    factory=".WS4PM_server.checkIsLinkedResponse"
+    name="checkIsLinkedRequest"
     provides="z3c.soap.interfaces.IZSIResponseType"
   />
 

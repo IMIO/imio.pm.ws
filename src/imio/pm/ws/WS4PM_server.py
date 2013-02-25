@@ -16,6 +16,10 @@ testConnectionRequest = GED("http://ws4pm.imio.be", "testConnectionRequest").pyc
 
 testConnectionResponse = GED("http://ws4pm.imio.be", "testConnectionResponse").pyclass
 
+checkIsLinkedRequest = GED("http://ws4pm.imio.be", "checkIsLinkedRequest").pyclass
+
+checkIsLinkedResponse = GED("http://ws4pm.imio.be", "checkIsLinkedResponse").pyclass
+
 getConfigInfosRequest = GED("http://ws4pm.imio.be", "getConfigInfosRequest").pyclass
 
 getConfigInfosResponse = GED("http://ws4pm.imio.be", "getConfigInfosResponse").pyclass
@@ -47,6 +51,13 @@ class WS4PM(ServiceSOAPBinding):
 
     soapAction['http://ws4pm.imio.be/testConnection'] = 'soap_testConnection'
     root[(testConnectionRequest.typecode.nspname,testConnectionRequest.typecode.pname)] = 'soap_testConnection'
+
+    def soap_checkIsLinked(self, ps, **kw):
+        request = ps.Parse(checkIsLinkedRequest.typecode)
+        return request,checkIsLinkedResponse()
+
+    soapAction['http://ws4pm.imio.be/checkIsLinked'] = 'soap_checkIsLinked'
+    root[(checkIsLinkedRequest.typecode.nspname,checkIsLinkedRequest.typecode.pname)] = 'soap_checkIsLinked'
 
     def soap_getConfigInfos(self, ps, **kw):
         request = ps.Parse(getConfigInfosRequest.typecode)

@@ -23,6 +23,20 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element name="checkIsLinkedRequest" type="tns:CheckIsLinkedRequest"/>
+            <xsd:complexType name="CheckIsLinkedRequest">
+                <xsd:sequence>
+                    <xsd:element name="meetingConfigId" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+                    <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="checkIsLinkedResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="isLinked" type="xsd:boolean" maxOccurs="1" minOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="getConfigInfosRequest" type="tns:ConfigInfosRequest"/>
             <xsd:complexType name="ConfigInfosRequest">
                 <xsd:sequence>
@@ -145,6 +159,13 @@
     <wsdl:message name="testConnectionResponse">
         <wsdl:part name="parameters" element="tns:testConnectionResponse"/>
     </wsdl:message>
+
+    <wsdl:message name="checkIsLinkedRequest">
+        <wsdl:part name="parameters" element="tns:checkIsLinkedRequest"/>
+    </wsdl:message>
+    <wsdl:message name="checkIsLinkedResponse">
+        <wsdl:part name="parameters" element="tns:checkIsLinkedResponse"/>
+    </wsdl:message>
     <wsdl:message name="getConfigInfosRequest">
         <wsdl:part name="parameters" element="tns:getConfigInfosRequest"/>
     </wsdl:message>
@@ -174,6 +195,10 @@
             <wsdl:input message="tns:testConnectionRequest"/>
             <wsdl:output message="tns:testConnectionResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="checkIsLinked">
+            <wsdl:input message="tns:checkIsLinkedRequest"/>
+            <wsdl:output message="tns:checkIsLinkedResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="getConfigInfos">
             <wsdl:input message="tns:getConfigInfosRequest"/>
             <wsdl:output message="tns:getConfigInfosResponse"/>
@@ -198,6 +223,18 @@
                 <xsd:documentation> Method for testing the connection to the server Webservice </xsd:documentation>
             </xsd:annotation>
             <soap:operation soapAction="http://ws4pm.imio.be/testConnection"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="checkIsLinked">
+            <xsd:annotation>
+                <xsd:documentation> Method for checking that an element is already linked to an existing item in PloneMeeting </xsd:documentation>
+            </xsd:annotation>
+            <soap:operation soapAction="http://ws4pm.imio.be/checkIsLinked"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>

@@ -41,6 +41,16 @@ class WS4PMSOAPSOAP:
         response = self.binding.Receive(testConnectionResponse.typecode)
         return response
 
+    # op: checkIsLinked
+    def checkIsLinked(self, request, **kw):
+        if isinstance(request, checkIsLinkedRequest) is False:
+            raise TypeError, "%s incorrect request type" % (request.__class__)
+        # no input wsaction
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/checkIsLinked", **kw)
+        # no output wsaction
+        response = self.binding.Receive(checkIsLinkedResponse.typecode)
+        return response
+
     # op: getConfigInfos
     def getConfigInfos(self, request, **kw):
         if isinstance(request, getConfigInfosRequest) is False:
@@ -84,6 +94,10 @@ class WS4PMSOAPSOAP:
 testConnectionRequest = GED("http://ws4pm.imio.be", "testConnectionRequest").pyclass
 
 testConnectionResponse = GED("http://ws4pm.imio.be", "testConnectionResponse").pyclass
+
+checkIsLinkedRequest = GED("http://ws4pm.imio.be", "checkIsLinkedRequest").pyclass
+
+checkIsLinkedResponse = GED("http://ws4pm.imio.be", "checkIsLinkedResponse").pyclass
 
 getConfigInfosRequest = GED("http://ws4pm.imio.be", "getConfigInfosRequest").pyclass
 

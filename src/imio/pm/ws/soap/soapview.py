@@ -35,6 +35,15 @@ class SOAPView(BrowserView):
         response._connectionState = self._testConnection()
         return response
 
+    def checkIsLinkedRequest(self, request, response):
+        '''
+          This is the accessed SOAP method for checking if an element as already a given externalIdentifier
+          This perform an unrestritedSearchResutls that is why it only returns True or False
+          Only a 'Manager' or 'MeetingManager' can do this request
+        '''
+        response._isLinked = self._checkIsLinked(request._meetingConfigId, request._externalIdentifier)
+        return response
+
     def getConfigInfosRequest(self, request, response):
         '''
           This is the accessed SOAP method for getting informations about the configuration
@@ -93,6 +102,35 @@ class SOAPView(BrowserView):
 
         logger.info('Test connection SOAP made at "%s".' % portal.absolute_url_path())
         return True
+
+    def _checkIsLinked(self, meetingConfigId, externalIdentifier):
+        '''
+          Test if an element in PloneMeeting is linked to given meetingConfig/externalIdentifier
+        '''
+        portal = self.context
+        member = portal.portal_membership.getAuthenticatedMember()
+
+        # this is only available to 'Manager' and 'MeetingManager'
+        if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+            raise ZSI.Fault(ZSI.Fault.Client,
+                            "You need to be 'Manager' or 'MeetingManager' to check if an element is linked to an item!")
+
+        # perform the unrestrictedSearchResult
+        tool = portal.portal_plonemeeting
+        # if a meetingConfigId is given, check that it exists
+        query = {}
+        if meetingConfigId:
+            mc = getattr(tool, meetingConfigId, None)
+            if not mc or not mc.meta_type == 'MeetingConfig':
+                raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
+            query['portal_type'] = mc.getItemTypeName()
+        query['externalIdentifier'] = externalIdentifier
+        brains = portal.portal_catalog.unrestrictedSearchResults(**query)
+
+        logger.info('checkIsLinked SOAP made at "%s".' % portal.absolute_url_path())
+        if brains:
+            return True
+        return False
 
     def _getConfigInfos(self):
         '''
