@@ -175,17 +175,29 @@ SOAPAction: /
         # the connected user must be able to create an item with the given category
         # set back correct proposingGroup
         req._proposingGroupId = 'developers'
+        # if category is mandatory and empty, it raises ZSI.Fault
         self.meetingConfig.setUseGroupsAsCategories(False)
-        req._creationData._category = 'wrongCategoryId'
+        req._creationData._category = ''
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "In this config, category is mandatory.  " \
-                                               "'wrongCategoryId' is not available for the 'developers' group!")
-        # if the user trying to create an item as no member area, a ZSI.Fault is raised
+        self.assertEquals(cm.exception.string, "In this config, category is mandatory!")
+        # wrong category and useGroupsAsCategories, ZSI.Fault
+        self.meetingConfig.setUseGroupsAsCategories(True)
+        req._creationData._category = 'wrong-category-id'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+            "This config does not use categories, the given 'wrong-category-id' category can not be used!")
+        # wrong category and actually accepting categories, aka useGroupsAsCategories to False
+        self.meetingConfig.setUseGroupsAsCategories(False)
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+            "'wrong-category-id' is not available for the 'developers' group!")
+        # if the user trying to create an item has no member area, a ZSI.Fault is raised
         # remove the 'pmCreator2' personal area
         self.changeUser('admin')
         self.portal.Members.manage_delObjects(ids=['pmCreator2'])
-        self.meetingConfig.setUseGroupsAsCategories(True)
         req._proposingGroupId = 'vendors'
         self.changeUser('pmCreator2')
         with self.assertRaises(ZSI.Fault) as cm:
@@ -470,8 +482,6 @@ SOAPAction: /
         self.assertEquals(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
-        # use the 'plonegov-assembly' MeetingConfig that use real categories, not useGroupsAsCategories
-        self.meetingConfig = self.meetingConfig2
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
         itemInMeeting = meeting.getItemsInOrder()[0]
@@ -808,7 +818,6 @@ SOAPAction: /
         # we have valid informations about the meeting_date
         # use the 'plonegov-assembly' MeetingConfig that use real categories,
         # not useGroupsAsCategories
-        self.meetingConfig = self.meetingConfig2
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
         itemInMeeting = meeting.getItemsInOrder()[0]
@@ -876,6 +885,8 @@ SOAPAction: /
         #create an item for 'plonemeeting-assembly' with same data as one created for 'plonegov-assembly' here above
         req = self._prepareCreationData()
         req._meetingConfigId = 'plonemeeting-assembly'
+        # in 'plonemeeting-assembly', the category is not used, useGroupsAsCategories is True
+        req._creationData._category = ''
         newItem, response = self._createItem(req)
         pmItem = self.portal.portal_catalog(UID=response._UID)[0].getObject()
         pmItemUID = pmItem.UID()

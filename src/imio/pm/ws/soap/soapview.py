@@ -361,16 +361,26 @@ class SOAPView(BrowserView):
         # this is necessary before adding annexes
         item.at_post_create_script()
 
-        # check that the given category is really available
-        if not mc.getUseGroupsAsCategories() and not data['category'] in item.listCategories().keys():
-            #if the category is not available, delete the created item and raise an error
+        # check that if category is mandatory (getUseGroupsAsCategories is False), it is given
+        # and that given category is available
+        # if we are not using categories, just ensure that we received an empty category
+        availableCategories = not mc.getUseGroupsAsCategories() and item.listCategories().keys() or ['', ]
+        if not data['category'] in availableCategories:
+            # delete the created item and raise an error
             item.aq_inner.aq_parent.manage_delObjects(ids=[itemId, ])
             # fallback to original user calling the SOAP method
             if inTheNameOf:
                 setSecurityManager(oldsm)
-            raise ZSI.Fault(ZSI.Fault.Client,
-                            "In this config, category is mandatory.  '%s' is not available for the '%s' group!" %
-                            (data['category'], proposingGroupId))
+            # special message if category mandatory and not given
+            if not mc.getUseGroupsAsCategories() and not data['category']:
+                raise ZSI.Fault(ZSI.Fault.Client, "In this config, category is mandatory!")
+            elif mc.getUseGroupsAsCategories() and data['category']:
+                raise ZSI.Fault(ZSI.Fault.Client, "This config does not use categories, the given '%s' category "
+                                                  "can not be used!" % data['category'])
+            # we are using categories but the given one is not in availableCategories
+            elif not mc.getUseGroupsAsCategories():
+                raise ZSI.Fault(ZSI.Fault.Client, "'%s' is not available for the '%s' group!"
+                                    % (data['category'], proposingGroupId))
         item.setCategory(data['category'])
 
         # make sure we have html here, and as clean as possible...
