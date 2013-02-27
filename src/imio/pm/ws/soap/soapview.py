@@ -251,7 +251,7 @@ class SOAPView(BrowserView):
                 itemInfo._extraInfos['meeting_config_title'] = meetingConfig.Title()
             if showAnnexes:
                 for groupOfAnnexesByType in item.getAnnexesByType(realAnnexes=True):
-                    for annex in groupOfAnnexesByType :
+                    for annex in groupOfAnnexesByType:
                         annexInfo = AnnexInfo()
                         annexInfo._title = annex.Title()
                         annexInfo._annexTypeId = annex.getMeetingFileType().getId()
