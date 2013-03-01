@@ -3,6 +3,7 @@ import logging
 logger = logging.getLogger('WS4PM')
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager, setSecurityManager, newSecurityManager
+from zope.i18n import translate
 from Products.Five import BrowserView
 from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
@@ -225,7 +226,7 @@ class SOAPView(BrowserView):
         for brain in brains:
             # XXX for now we still need to wake up the item because we do not have the meeting's date
             # on the brain, this could be great to manage ticket http://trac.imio.be/trac/ticket/4176 so
-            # we could avoid waking up the item
+            # we could avoid waking up the item if showExtraInfos is False
             item = brain.getObject()
             itemInfo = ItemInfo()
             itemInfo._UID = item.UID()
@@ -249,6 +250,12 @@ class SOAPView(BrowserView):
                 meetingConfig = tool.getMeetingConfig(item)
                 itemInfo._extraInfos['meeting_config_id'] = meetingConfig.getId()
                 itemInfo._extraInfos['meeting_config_title'] = meetingConfig.Title()
+                # add the review_state translated
+                itemInfo._extraInfos['review_state_translated'] = translate(msgid=itemInfo._review_state,
+                                                 domain='plone',
+                                                 context=portal.REQUEST)
+                # add the category title
+                itemInfo._extraInfos['category_title'] = item.displayValue(item.listCategories(), item.getCategory())
             if showAnnexes:
                 for groupOfAnnexesByType in item.getAnnexesByType(realAnnexes=True):
                     for annex in groupOfAnnexesByType:
