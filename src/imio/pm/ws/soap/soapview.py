@@ -232,6 +232,7 @@ class SOAPView(BrowserView):
             itemInfo._UID = item.UID()
             itemInfo._id = item.getId()
             itemInfo._title = item.Title()
+            itemInfo._creator = item.Creator()
             itemInfo._category = item.getCategory()
             itemInfo._description = item.getRawDescription()
             itemInfo._decision = item.getRawDecision()
@@ -256,6 +257,8 @@ class SOAPView(BrowserView):
                                                  context=portal.REQUEST)
                 # add the category title
                 itemInfo._extraInfos['category_title'] = item.displayValue(item.listCategories(), item.getCategory())
+                # add the creator fullname
+                itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
             if showAnnexes:
                 for groupOfAnnexesByType in item.getAnnexesByType(realAnnexes=True):
                     for annex in groupOfAnnexesByType:
