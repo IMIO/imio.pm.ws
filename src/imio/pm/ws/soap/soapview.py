@@ -5,7 +5,7 @@ from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager, setSecurityManager, newSecurityManager
 from zope.i18n import translate
 from Products.Five import BrowserView
-from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo
+from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo, TemplateInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
                                                  MAIN_DATA_FROM_ITEM_SCHEMA
 from time import localtime
@@ -78,6 +78,9 @@ class SOAPView(BrowserView):
         # remove the '_showAnnexes' from searchParams as it is not a search parameter
         if '_showAnnexes' in params:
             params.pop('_showAnnexes')
+        # remove the '_showTemplates' from searchParams as it is not a search parameter
+        if '_showTemplates' in params:
+            params.pop('_showTemplates')
         # remove the '_inTheNameOf' from searchParams as it is not a search parameter
         inTheNameOf = None
         if '_inTheNameOf' in params:
@@ -87,7 +90,23 @@ class SOAPView(BrowserView):
         response._itemInfo = self._getItemInfos(params,
                                                 request.__dict__.get('_showExtraInfos', False),
                                                 request.__dict__.get('_showAnnexes', False),
+                                                request.__dict__.get('_showTemplates', False),
                                                 inTheNameOf)
+        return response
+
+    def getItemTemplateRequest(self, request, response):
+        '''
+          This is the accessed SOAP method for getting a generated version of a given template
+        '''
+        response._file = self._getItemTemplate(request._itemUID, request._templateUID)
+        return response
+
+    def createItemRequest(self, request, response):
+        '''
+          This is the accessed SOAP method for creating an item
+        '''
+        response._UID, response._warnings = self._createItem(request._meetingConfigId, request._proposingGroupId, \
+                                                             request._creationData, request._inTheNameOf)
         return response
 
     def _testConnection(self):
@@ -169,7 +188,7 @@ class SOAPView(BrowserView):
                         (tool.absolute_url_path(), memberId))
         return res
 
-    def _getItemInfos(self, searchParams, showExtraInfos=False, showAnnexes=False, inTheNameOf=None):
+    def _getItemInfos(self, searchParams, showExtraInfos=False, showAnnexes=False, showTemplates=False, inTheNameOf=None):
         '''
           Get an item with given searchParams dict.  As the user is connected, the security in portal_catalog do the job
         '''
@@ -206,6 +225,7 @@ class SOAPView(BrowserView):
         memberId = member.getId()
 
         tool = portal.portal_plonemeeting
+        mc = None
         if 'meetingConfigId' in params and not 'portal_type' in params:
             #check that the given meetingConfigId exists
             meetingConfigId = params['meetingConfigId']
@@ -248,9 +268,10 @@ class SOAPView(BrowserView):
                 for field in extraInfosFields:
                     itemInfo._extraInfos[field.getName()] = field.getRaw(item)
                 # also add informations about the linked MeetingConfig
-                meetingConfig = tool.getMeetingConfig(item)
-                itemInfo._extraInfos['meeting_config_id'] = meetingConfig.getId()
-                itemInfo._extraInfos['meeting_config_title'] = meetingConfig.Title()
+                if not mc:
+                    mc = tool.getMeetingConfig(item)
+                itemInfo._extraInfos['meeting_config_id'] = mc.getId()
+                itemInfo._extraInfos['meeting_config_title'] = mc.Title()
                 # add the review_state translated
                 itemInfo._extraInfos['review_state_translated'] = translate(msgid=itemInfo._review_state,
                                                  domain='plone',
@@ -268,13 +289,56 @@ class SOAPView(BrowserView):
                         annexInfo._filename = annex.getFile().filename
                         annexInfo._file = annex.getFile().data
                         itemInfo._annexes.append(annexInfo)
+            if showTemplates:
+                if not mc:
+                    # we need the item's meetingConfig
+                    mc = tool.getMeetingConfig(item)
+                templates = mc.getAvailablePodTemplates(item)
+                for template in templates:
+                    templateInfo = TemplateInfo()
+                    templateInfo._title = template.Title()
+                    templateInfo._templateType = template.getPodFormat()
+                    templateInfo._templateUID = template.UID()
+                    itemInfo._templates.append(templateInfo)
             logger.info('Item at %s SOAP accessed by "%s".' % \
                         (item.absolute_url_path(), memberId))
             res.append(itemInfo,)
+
         # fallback to original user calling the SOAP method
         if inTheNameOf:
             setSecurityManager(oldsm)
         return res
+
+    def _getItemTemplate(self, itemUID, templateUID):
+        '''
+          Generate a POD template p_templateUID on p_itemUID
+        '''
+        portal = self.context
+
+        # search for the item, this will also check if the user can actually access it
+        brains = portal.portal_catalog(UID=itemUID)
+        if not brains:
+            raise ZSI.Fault(ZSI.Fault.Client, "You can not access this item!")
+
+        # check that the template is available to the member
+        item = brains[0].getObject()
+        mc = portal.portal_plonemeeting.getMeetingConfig(item)
+        templates = mc.getAvailablePodTemplates(item)
+        theTemplate = None
+        for template in templates:
+            if template.UID() == templateUID:
+                theTemplate = template
+                break
+        if not theTemplate:
+            raise ZSI.Fault(ZSI.Fault.Client, "You can not access this template!")
+
+        # we can access the item and the template, proceed!
+        # generate the template and return the result
+        member = portal.portal_membership.getAuthenticatedMember()
+        logger.info('Template at "%s" for item at "%s" SOAP accessed by "%s".' % \
+                    (template.absolute_url_path(), item.absolute_url_path(), member.getId()))
+
+        return theTemplate.generateDocument(item, forBrowser=False)
 
     def _getExtraInfosFields(self, item):
         """
@@ -285,14 +349,6 @@ class SOAPView(BrowserView):
             if not field.getName() in MAIN_DATA_FROM_ITEM_SCHEMA:
                 res.append(field)
         return res
-
-    def createItemRequest(self, request, response):
-        '''
-          This is the accessed SOAP method for creating an item
-        '''
-        response._UID, response._warnings = self._createItem(request._meetingConfigId, request._proposingGroupId, \
-                                                             request._creationData, request._inTheNameOf)
-        return response
 
     def _createItem(self, meetingConfigId, proposingGroupId, creationData, inTheNameOf=None):
         '''

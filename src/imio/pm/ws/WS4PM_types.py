@@ -85,7 +85,7 @@ class ns0:
         type = (schema, "ItemInfosRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ItemInfosRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showExtraInfos", aname="_showExtraInfos", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showAnnexes", aname="_showAnnexes", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showExtraInfos", aname="_showExtraInfos", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showAnnexes", aname="_showAnnexes", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showTemplates", aname="_showTemplates", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -98,9 +98,31 @@ class ns0:
                     self._UID = None
                     self._showExtraInfos = 0
                     self._showAnnexes = 0
+                    self._showTemplates = 0
                     self._inTheNameOf = None
                     return
             Holder.__name__ = "ItemInfosRequest_Holder"
+            self.pyclass = Holder
+
+    class ItemTemplateRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+        schema = "http://ws4pm.imio.be"
+        type = (schema, "ItemTemplateRequest")
+        def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
+            ns = ns0.ItemTemplateRequest_Def.schema
+            TClist = [ZSI.TC.String(pname="itemUID", aname="_itemUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateUID", aname="_templateUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            self.attribute_typecode_dict = attributes or {}
+            if extend: TClist += ofwhat
+            if restrict: TClist = ofwhat
+            ZSI.TCcompound.ComplexType.__init__(self, None, TClist, pname=pname, inorder=0, **kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._itemUID = None
+                    self._templateUID = None
+                    return
+            Holder.__name__ = "ItemTemplateRequest_Holder"
             self.pyclass = Holder
 
     class SearchItemsRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
@@ -230,12 +252,34 @@ class ns0:
             Holder.__name__ = "AnnexInfo_Holder"
             self.pyclass = Holder
 
+    class TemplateInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+        schema = "http://ws4pm.imio.be"
+        type = (schema, "TemplateInfo")
+        def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
+            ns = ns0.TemplateInfo_Def.schema
+            TClist = [ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateType", aname="_templateType", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateUID", aname="_templateUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            self.attribute_typecode_dict = attributes or {}
+            if extend: TClist += ofwhat
+            if restrict: TClist = ofwhat
+            ZSI.TCcompound.ComplexType.__init__(self, None, TClist, pname=pname, inorder=0, **kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._title = None
+                    self._templateType = None
+                    self._templateUID = None
+                    return
+            Holder.__name__ = "TemplateInfo_Holder"
+            self.pyclass = Holder
+
     class ItemInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
         schema = "http://ws4pm.imio.be"
         type = (schema, "ItemInfo")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ItemInfo_Def.schema
-            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="creator", aname="_creator", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="category", aname="_category", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="decision", aname="_decision", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="review_state", aname="_review_state", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TCtimes.gDateTime(pname="meeting_date", aname="_meeting_date", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="absolute_url", aname="_absolute_url", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="externalIdentifier", aname="_externalIdentifier", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.AnyType(pname="extraInfos", aname="_extraInfos", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","AnnexInfo",lazy=False)(pname="annexes", aname="_annexes", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="creator", aname="_creator", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="category", aname="_category", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="decision", aname="_decision", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="review_state", aname="_review_state", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TCtimes.gDateTime(pname="meeting_date", aname="_meeting_date", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="absolute_url", aname="_absolute_url", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="externalIdentifier", aname="_externalIdentifier", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.AnyType(pname="extraInfos", aname="_extraInfos", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","AnnexInfo",lazy=False)(pname="annexes", aname="_annexes", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","TemplateInfo",lazy=False)(pname="templates", aname="_templates", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -258,6 +302,7 @@ class ns0:
                     self._externalIdentifier = None
                     self._extraInfos = None
                     self._annexes = []
+                    self._templates = []
                     return
             Holder.__name__ = "ItemInfo_Holder"
             self.pyclass = Holder
@@ -400,6 +445,41 @@ class ns0:
                     self._itemInfo = []
                     return
             Holder.__name__ = "getItemInfosResponse_Holder"
+            self.pyclass = Holder
+
+    class getItemTemplateRequest_Dec(ElementDeclaration):
+        literal = "getItemTemplateRequest"
+        schema = "http://ws4pm.imio.be"
+        substitutionGroup = None
+        def __init__(self, **kw):
+            kw["pname"] = (u'http://ws4pm.imio.be', u'getItemTemplateRequest')
+            kw["aname"] = "_getItemTemplateRequest"
+            if ns0.ItemTemplateRequest_Def not in ns0.getItemTemplateRequest_Dec.__bases__:
+                bases = list(ns0.getItemTemplateRequest_Dec.__bases__)
+                bases.insert(0, ns0.ItemTemplateRequest_Def)
+                ns0.getItemTemplateRequest_Dec.__bases__ = tuple(bases)
+
+            ns0.ItemTemplateRequest_Def.__init__(self, **kw)
+            if self.pyclass is not None: self.pyclass.__name__ = "getItemTemplateRequest_Dec_Holder"
+
+    class getItemTemplateResponse_Dec(ZSI.TCcompound.ComplexType, ElementDeclaration):
+        literal = "getItemTemplateResponse"
+        schema = "http://ws4pm.imio.be"
+        def __init__(self, **kw):
+            ns = ns0.getItemTemplateResponse_Dec.schema
+            TClist = [ZSI.TC.Base64String(pname="file", aname="_file", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            kw["pname"] = (u'http://ws4pm.imio.be', u'getItemTemplateResponse')
+            kw["aname"] = "_getItemTemplateResponse"
+            self.attribute_typecode_dict = {}
+            ZSI.TCcompound.ComplexType.__init__(self,None,TClist,inorder=0,**kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._file = None
+                    return
+            Holder.__name__ = "getItemTemplateResponse_Holder"
             self.pyclass = Holder
 
     class searchItemsRequest_Dec(ElementDeclaration):

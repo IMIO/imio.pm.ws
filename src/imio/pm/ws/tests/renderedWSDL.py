@@ -48,6 +48,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="UID" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                     <xsd:element name="showExtraInfos" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="showAnnexes" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="showTemplates" type="xsd:boolean" maxOccurs="1" minOccurs="0" default="0"/>
                     <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
@@ -55,6 +56,20 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="itemInfo" type="tns:ItemInfo" maxOccurs="unbounded" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getItemTemplateRequest" type="tns:ItemTemplateRequest"/>
+            <xsd:complexType name="ItemTemplateRequest">
+                <xsd:sequence>
+                    <xsd:element name="itemUID" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                    <xsd:element name="templateUID" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getItemTemplateResponse">
+                <xsd:complexType name="ItemTemplateResponse">
+                    <xsd:sequence>
+                        <xsd:element name="file" type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -127,6 +142,13 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="file" type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:complexType>
+            <xsd:complexType name="TemplateInfo">
+                <xsd:sequence>
+                    <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="templateType" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="templateUID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                </xsd:sequence>
+            </xsd:complexType>
             <xsd:complexType name="ItemInfo">
                 <xsd:sequence>
                     <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
@@ -142,6 +164,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="extraInfos" type="xsd:anyType"/>
                     <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="templates" type="tns:TemplateInfo" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>
         </xsd:schema>
@@ -152,7 +175,6 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     <wsdl:message name="testConnectionResponse">
         <wsdl:part name="parameters" element="tns:testConnectionResponse"/>
     </wsdl:message>
-
     <wsdl:message name="checkIsLinkedRequest">
         <wsdl:part name="parameters" element="tns:checkIsLinkedRequest"/>
     </wsdl:message>
@@ -170,6 +192,12 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </wsdl:message>
     <wsdl:message name="getItemInfosResponse">
         <wsdl:part name="parameters" element="tns:getItemInfosResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getItemTemplateRequest">
+        <wsdl:part name="parameters" element="tns:getItemTemplateRequest"/>
+    </wsdl:message>
+    <wsdl:message name="getItemTemplateResponse">
+        <wsdl:part name="parameters" element="tns:getItemTemplateResponse"/>
     </wsdl:message>
     <wsdl:message name="searchItemsRequest">
         <wsdl:part name="parameters" element="tns:searchItemsRequest"/>
@@ -199,6 +227,10 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
         <wsdl:operation name="getItemInfos">
             <wsdl:input message="tns:getItemInfosRequest"/>
             <wsdl:output message="tns:getItemInfosResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getItemTemplate">
+            <wsdl:input message="tns:getItemTemplateRequest"/>
+            <wsdl:output message="tns:getItemTemplateResponse"/>
         </wsdl:operation>
         <wsdl:operation name="searchItems">
             <wsdl:input message="tns:searchItemsRequest"/>
@@ -252,6 +284,18 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                 <xsd:documentation> Method for getting informations about a precise item you know the UID of </xsd:documentation>
             </xsd:annotation>
             <soap:operation soapAction="http://nohost/plone/getItemInfos"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getItemTemplate">
+            <xsd:annotation>
+                <xsd:documentation> Method for getting a specific generated template from PloneMeeting for a given item </xsd:documentation>
+            </xsd:annotation>
+            <soap:operation soapAction="http://nohost/plone/getItemTemplate"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
