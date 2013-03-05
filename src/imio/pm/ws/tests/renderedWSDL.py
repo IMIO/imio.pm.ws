@@ -132,6 +132,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="creator" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                     <xsd:element name="category" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="decision" type="xsd:string" minOccurs="1" maxOccurs="1"/>
