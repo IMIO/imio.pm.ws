@@ -63,7 +63,16 @@ class testSOAPCheckIsLinked(WS4PMTestCase):
         res = SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
                                                                            checkIsLinkedResponseHolder)
         self.assertFalse(res._isLinked)
+        # passing a wrong meetingConfigId will raise a ZSI.Fault
+        # first check for anotherexternalIdentifier
+        checkIsLinkedReq._meetingConfigId = 'wrong-meeting-config-id'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
+                                                                         checkIsLinkedResponseHolder)
+        self.assertEquals(cm.exception.string,
+                          "Unknown meetingConfigId : 'wrong-meeting-config-id'!")
         # now with the values corresponding to the created item
+        checkIsLinkedReq._meetingConfigId = 'plonegov-assembly'
         checkIsLinkedReq._externalIdentifier = 'my-external-identifier'
         res = SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
                                                                            checkIsLinkedResponseHolder)
