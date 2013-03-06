@@ -5,6 +5,7 @@ from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager, setSecurityManager, newSecurityManager
 from zope.i18n import translate
 from Products.Five import BrowserView
+from Products.PloneMeeting import PloneMeetingError
 from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo, TemplateInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
                                                  MAIN_DATA_FROM_ITEM_SCHEMA
@@ -98,7 +99,7 @@ class SOAPView(BrowserView):
         '''
           This is the accessed SOAP method for getting a generated version of a given template
         '''
-        response._file = self._getItemTemplate(request._itemUID, request._templateUID)
+        response._file = self._getItemTemplate(request._itemUID, request._templateId)
         return response
 
     def createItemRequest(self, request, response):
@@ -298,7 +299,8 @@ class SOAPView(BrowserView):
                     templateInfo = TemplateInfo()
                     templateInfo._title = template.Title()
                     templateInfo._templateType = template.getPodFormat()
-                    templateInfo._templateUID = template.UID()
+                    templateInfo._templateId = template.getId()
+                    templateInfo._templateFilename = template._getFileName(item)
                     itemInfo._templates.append(templateInfo)
             logger.info('Item at %s SOAP accessed by "%s".' % \
                         (item.absolute_url_path(), memberId))
@@ -309,9 +311,9 @@ class SOAPView(BrowserView):
             setSecurityManager(oldsm)
         return res
 
-    def _getItemTemplate(self, itemUID, templateUID):
+    def _getItemTemplate(self, itemUID, templateId):
         '''
-          Generate a POD template p_templateUID on p_itemUID
+          Generate a POD template p_templateId on p_itemUID
         '''
         portal = self.context
 
@@ -326,7 +328,7 @@ class SOAPView(BrowserView):
         templates = mc.getAvailablePodTemplates(item)
         theTemplate = None
         for template in templates:
-            if template.UID() == templateUID:
+            if template.getId() == templateId:
                 theTemplate = template
                 break
         if not theTemplate:
@@ -337,8 +339,10 @@ class SOAPView(BrowserView):
         member = portal.portal_membership.getAuthenticatedMember()
         logger.info('Template at "%s" for item at "%s" SOAP accessed by "%s".' % \
                     (template.absolute_url_path(), item.absolute_url_path(), member.getId()))
-
-        return theTemplate.generateDocument(item, forBrowser=False)
+        try:
+            return theTemplate.generateDocument(item, forBrowser=False)
+        except PloneMeetingError, e:
+            raise ZSI.Fault(ZSI.Fault.Client, "PloneMeetingError : %s" % e.message)
 
     def _getExtraInfosFields(self, item):
         """

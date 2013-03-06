@@ -109,7 +109,7 @@ class ns0:
         type = (schema, "ItemTemplateRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ItemTemplateRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="itemUID", aname="_itemUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateUID", aname="_templateUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="itemUID", aname="_itemUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateId", aname="_templateId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -120,7 +120,7 @@ class ns0:
                 def __init__(self):
                     # pyclass
                     self._itemUID = None
-                    self._templateUID = None
+                    self._templateId = None
                     return
             Holder.__name__ = "ItemTemplateRequest_Holder"
             self.pyclass = Holder
@@ -257,7 +257,7 @@ class ns0:
         type = (schema, "TemplateInfo")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.TemplateInfo_Def.schema
-            TClist = [ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateType", aname="_templateType", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateUID", aname="_templateUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateType", aname="_templateType", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateId", aname="_templateId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateFilename", aname="_templateFilename", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -269,7 +269,8 @@ class ns0:
                     # pyclass
                     self._title = None
                     self._templateType = None
-                    self._templateUID = None
+                    self._templateId = None
+                    self._templateFilename = None
                     return
             Holder.__name__ = "TemplateInfo_Holder"
             self.pyclass = Holder

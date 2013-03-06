@@ -25,6 +25,8 @@
 import os
 import zipfile
 import ZSI
+from appy.pod.renderer import NO_PY_PATH
+from Products.PloneMeeting.PodTemplate import POD_ERROR
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import getItemTemplateRequest, getItemTemplateResponse
 from imio.pm.ws.soap.soapview import SOAPView
@@ -63,12 +65,12 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         self.changeUser('pmCreator1')
         mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
         wrongTemplate = mc.podtemplates.agendaTemplate
-        req._templateUID = wrongTemplate.UID()
+        req._templateId = wrongTemplate.getId()
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, 'You can not access this template!')
         # if everything is correct, we receive the rendered template
-        req._templateUID = mc.podtemplates.itemTemplate.UID()
+        req._templateId = mc.podtemplates.itemTemplate.getId()
         renderedTemplate = SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         # check that the rendered file correspond to the newItem's data
         tmp_file = file('/tmp/%s.zip' % newItemUID, 'w')
@@ -77,6 +79,12 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         zipped_file = zipfile.ZipFile('/tmp/%s.zip' % newItemUID)
         self.assertTrue(newItem.Title() in zipped_file.read('content.xml'))
         os.remove('/tmp/%s.zip' % newItemUID)
+        # test if PloneMeeting raise a PloneMeetingError
+        # for example, trying to generate a PDF when Ooo is not in server mode
+        mc.podtemplates.itemTemplate.setPodFormat('pdf')
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, 'PloneMeetingError : %s' % POD_ERROR % NO_PY_PATH % 'pdf')
 
 
 def test_suite():
