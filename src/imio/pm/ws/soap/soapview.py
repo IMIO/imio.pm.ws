@@ -323,10 +323,11 @@ class SOAPView(BrowserView):
         # if we specify in the request that we want to get a template of an item
         # for another user, we need to check that :
         # - user getting the template is 'MeetingManager' or 'Manager'
+        # - the user we want to get informations for exists
         if inTheNameOf:
             if not member.has_role('Manager') and not member.has_role('MeetingManager'):
                 raise ZSI.Fault(ZSI.Fault.Client,
-                                "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
+                            "You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
@@ -367,7 +368,7 @@ class SOAPView(BrowserView):
         logger.info('Template at "%s" for item at "%s" SOAP accessed by "%s".' % \
                     (template.absolute_url_path(), item.absolute_url_path(), member.getId()))
         try:
-            return theTemplate.generateDocument(item, forBrowser=False)
+            res = theTemplate.generateDocument(item, forBrowser=False)
         except PloneMeetingError, e:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
@@ -376,6 +377,7 @@ class SOAPView(BrowserView):
         # fallback to original user calling the SOAP method
         if inTheNameOf:
             setSecurityManager(oldsm)
+        return res
 
     def _getExtraInfosFields(self, item):
         """
