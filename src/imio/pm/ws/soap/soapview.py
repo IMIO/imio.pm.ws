@@ -99,7 +99,9 @@ class SOAPView(BrowserView):
         '''
           This is the accessed SOAP method for getting a generated version of a given template
         '''
-        response._file = self._getItemTemplate(request._itemUID, request._templateId)
+        response._file = self._getItemTemplate(request._itemUID,
+                                               request._templateId,
+                                               request._inTheNameOf)
         return response
 
     def createItemRequest(self, request, response):
@@ -311,15 +313,37 @@ class SOAPView(BrowserView):
             setSecurityManager(oldsm)
         return res
 
-    def _getItemTemplate(self, itemUID, templateId):
+    def _getItemTemplate(self, itemUID, templateId, inTheNameOf):
         '''
           Generates a POD template p_templateId on p_itemUID
         '''
         portal = self.context
+        member = portal.portal_membership.getAuthenticatedMember()
+
+        # if we specify in the request that we want to get a template of an item
+        # for another user, we need to check that :
+        # - user getting the template is 'MeetingManager' or 'Manager'
+        if inTheNameOf:
+            if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
+            # change considered member to inTheNameOf given userid
+            member = portal.acl_users.getUserById(inTheNameOf)
+            if not member:
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
+
+        # if we are creating an item inTheNameOf, use this user for the rest of the process
+        if inTheNameOf:
+            oldsm = getSecurityManager()
+            newSecurityManager(portal.REQUEST, member)
 
         # search for the item, this will also check if the user can actually access it
         brains = portal.portal_catalog(UID=itemUID)
         if not brains:
+            # fallback to original user calling the SOAP method
+            if inTheNameOf:
+                setSecurityManager(oldsm)
             raise ZSI.Fault(ZSI.Fault.Client, "You can not access this item!")
 
         # check that the template is available to the member
@@ -332,6 +356,9 @@ class SOAPView(BrowserView):
                 theTemplate = template
                 break
         if not theTemplate:
+            # fallback to original user calling the SOAP method
+            if inTheNameOf:
+                setSecurityManager(oldsm)
             raise ZSI.Fault(ZSI.Fault.Client, "You can not access this template!")
 
         # we can access the item and the template, proceed!
@@ -342,7 +369,13 @@ class SOAPView(BrowserView):
         try:
             return theTemplate.generateDocument(item, forBrowser=False)
         except PloneMeetingError, e:
+            # fallback to original user calling the SOAP method
+            if inTheNameOf:
+                setSecurityManager(oldsm)
             raise ZSI.Fault(ZSI.Fault.Client, "PloneMeetingError : %s" % e.message)
+        # fallback to original user calling the SOAP method
+        if inTheNameOf:
+            setSecurityManager(oldsm)
 
     def _getExtraInfosFields(self, item):
         """

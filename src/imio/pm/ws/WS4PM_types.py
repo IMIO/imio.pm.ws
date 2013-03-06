@@ -109,7 +109,7 @@ class ns0:
         type = (schema, "ItemTemplateRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ItemTemplateRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="itemUID", aname="_itemUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateId", aname="_templateId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="itemUID", aname="_itemUID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="templateId", aname="_templateId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -121,6 +121,7 @@ class ns0:
                     # pyclass
                     self._itemUID = None
                     self._templateId = None
+                    self._inTheNameOf = None
                     return
             Holder.__name__ = "ItemTemplateRequest_Holder"
             self.pyclass = Holder
