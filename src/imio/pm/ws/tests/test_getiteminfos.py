@@ -303,6 +303,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # the returned template correspond to the one present in the 'plonemeeting-assembly' meetingConfig
         self.assertTrue(resp._itemInfo[0]._templates[0]._templateId == mc.podtemplates.itemTemplate.getId())
         self.assertTrue(resp._itemInfo[0]._templates[0]._templateFilename, 'Mynewitemtitle-Meetingitem')
+        self.assertTrue(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
 
     def test_getItemInfosInTheNameOf(self):
         """

@@ -145,7 +145,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <xsd:complexType name="TemplateInfo">
                 <xsd:sequence>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="templateType" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="templateFormat" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="templateId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="templateFilename" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>

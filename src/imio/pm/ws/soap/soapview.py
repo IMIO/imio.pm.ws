@@ -298,7 +298,7 @@ class SOAPView(BrowserView):
                 for template in templates:
                     templateInfo = TemplateInfo()
                     templateInfo._title = template.Title()
-                    templateInfo._templateType = template.getPodFormat()
+                    templateInfo._templateFormat = template.getPodFormat()
                     templateInfo._templateId = template.getId()
                     templateInfo._templateFilename = template._getFileName(item)
                     itemInfo._templates.append(templateInfo)
@@ -313,7 +313,7 @@ class SOAPView(BrowserView):
 
     def _getItemTemplate(self, itemUID, templateId):
         '''
-          Generate a POD template p_templateId on p_itemUID
+          Generates a POD template p_templateId on p_itemUID
         '''
         portal = self.context
 
