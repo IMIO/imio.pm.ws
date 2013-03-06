@@ -363,10 +363,25 @@ SOAPAction: /
         self.assertEquals(cm.exception.string, "'pmCreator2' can not create items for the 'developers' group!")
         # now for an unexisting inTheNameOf userid
         req._inTheNameOf = 'unexistingUserId'
+        # set back correct proposingGroupId
+        req._proposingGroupId = 'vendors'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
                           "Trying to create an item 'inTheNameOf' an unexisting user 'unexistingUserId'!")
+        # create an itemInTheNameOf a user having no personal area...
+        # if the user trying to create an item has no member area, a ZSI.Fault is raised
+        # remove the 'pmCreator2' personal area
+        self.changeUser('admin')
+        # remove the created item because we can not remove a folder containing items
+        # it would raise a BeforeDeleteException in PloneMeeting
+        newItem.aq_inner.aq_parent.manage_delObjects(ids=[newItem.getId(),])
+        self.portal.Members.manage_delObjects(ids=['pmCreator2'])
+        self.changeUser('pmManager')
+        req._inTheNameOf = 'pmCreator2'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
 
 
 def test_suite():
