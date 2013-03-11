@@ -61,6 +61,16 @@ class WS4PMSOAPSOAP:
         response = self.binding.Receive(getConfigInfosResponse.typecode)
         return response
 
+    # op: getUserInfos
+    def getUserInfos(self, request, **kw):
+        if isinstance(request, getUserInfosRequest) is False:
+            raise TypeError, "%s incorrect request type" % (request.__class__)
+        # no input wsaction
+        self.binding.Send(None, None, request, soapaction="http://portal_url/getUserInfos", **kw)
+        # no output wsaction
+        response = self.binding.Receive(getUserInfosResponse.typecode)
+        return response
+
     # op: getItemInfos
     def getItemInfos(self, request, **kw):
         if isinstance(request, getItemInfosRequest) is False:
@@ -112,6 +122,10 @@ checkIsLinkedResponse = GED("http://ws4pm.imio.be", "checkIsLinkedResponse").pyc
 getConfigInfosRequest = GED("http://ws4pm.imio.be", "getConfigInfosRequest").pyclass
 
 getConfigInfosResponse = GED("http://ws4pm.imio.be", "getConfigInfosResponse").pyclass
+
+getUserInfosRequest = GED("http://ws4pm.imio.be", "getUserInfosRequest").pyclass
+
+getUserInfosResponse = GED("http://ws4pm.imio.be", "getUserInfosResponse").pyclass
 
 getItemInfosRequest = GED("http://ws4pm.imio.be", "getItemInfosRequest").pyclass
 

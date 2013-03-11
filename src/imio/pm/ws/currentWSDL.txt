@@ -42,6 +42,23 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element name="getUserInfosRequest" type="tns:UserInfosRequest"/>
+            <xsd:complexType name="UserInfosRequest">
+                <xsd:sequence>
+                    <xsd:element name="userId" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                    <xsd:element name="showGroups" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="suffix" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getUserInfosResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="fullname" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                        <xsd:element name="email" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                        <xsd:element name="groups" type="tns:UserGroupInfo" maxOccurs="unbounded" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="getItemInfosRequest" type="tns:ItemInfosRequest"/>
             <xsd:complexType name="ItemInfosRequest">
                 <xsd:sequence>
@@ -125,6 +142,14 @@
                     <xsd:element name="type" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:complexType>
+            <xsd:complexType name="UserGroupInfo">
+                <xsd:sequence>
+                    <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                </xsd:sequence>
+            </xsd:complexType>
             <xsd:complexType name="CreationData">
                 <xsd:sequence>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
@@ -189,6 +214,12 @@
     <wsdl:message name="getConfigInfosResponse">
         <wsdl:part name="parameters" element="tns:getConfigInfosResponse"/>
     </wsdl:message>
+    <wsdl:message name="getUserInfosRequest">
+        <wsdl:part name="parameters" element="tns:getUserInfosRequest"/>
+    </wsdl:message>
+    <wsdl:message name="getUserInfosResponse">
+        <wsdl:part name="parameters" element="tns:getUserInfosResponse"/>
+    </wsdl:message>
     <wsdl:message name="getItemInfosRequest">
         <wsdl:part name="parameters" element="tns:getItemInfosRequest"/>
     </wsdl:message>
@@ -225,6 +256,10 @@
         <wsdl:operation name="getConfigInfos">
             <wsdl:input message="tns:getConfigInfosRequest"/>
             <wsdl:output message="tns:getConfigInfosResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getUserInfos">
+            <wsdl:input message="tns:getUserInfosRequest"/>
+            <wsdl:output message="tns:getUserInfosResponse"/>
         </wsdl:operation>
         <wsdl:operation name="getItemInfos">
             <wsdl:input message="tns:getItemInfosRequest"/>
@@ -274,6 +309,18 @@
                 <xsd:documentation> Method for getting informations about the configuration </xsd:documentation>
             </xsd:annotation>
             <soap:operation soapAction="http://ws4pm.imio.be/getConfigInfos"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getUserInfos">
+            <xsd:annotation>
+                <xsd:documentation> Method for getting informations about a given user </xsd:documentation>
+            </xsd:annotation>
+            <soap:operation soapAction="http://portal_url/getUserInfos"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>

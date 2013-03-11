@@ -29,6 +29,12 @@ class IConfigInfosRequest(Interface):
     """
 
 
+class IUserInfosRequest(Interface):
+    """
+    Marker interface for change request
+    """
+
+
 class IItemInfosRequest(Interface):
     """
     Marker interface for change request

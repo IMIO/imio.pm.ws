@@ -80,6 +80,28 @@ class ns0:
             Holder.__name__ = "ConfigInfosRequest_Holder"
             self.pyclass = Holder
 
+    class UserInfosRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+        schema = "http://ws4pm.imio.be"
+        type = (schema, "UserInfosRequest")
+        def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
+            ns = ns0.UserInfosRequest_Def.schema
+            TClist = [ZSI.TC.String(pname="userId", aname="_userId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showGroups", aname="_showGroups", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="suffix", aname="_suffix", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            self.attribute_typecode_dict = attributes or {}
+            if extend: TClist += ofwhat
+            if restrict: TClist = ofwhat
+            ZSI.TCcompound.ComplexType.__init__(self, None, TClist, pname=pname, inorder=0, **kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._userId = None
+                    self._showGroups = 0
+                    self._suffix = None
+                    return
+            Holder.__name__ = "UserInfosRequest_Holder"
+            self.pyclass = Holder
+
     class ItemInfosRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
         schema = "http://ws4pm.imio.be"
         type = (schema, "ItemInfosRequest")
@@ -203,6 +225,29 @@ class ns0:
                     self._type = None
                     return
             Holder.__name__ = "ConfigInfo_Holder"
+            self.pyclass = Holder
+
+    class UserGroupInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+        schema = "http://ws4pm.imio.be"
+        type = (schema, "UserGroupInfo")
+        def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
+            ns = ns0.UserGroupInfo_Def.schema
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            self.attribute_typecode_dict = attributes or {}
+            if extend: TClist += ofwhat
+            if restrict: TClist = ofwhat
+            ZSI.TCcompound.ComplexType.__init__(self, None, TClist, pname=pname, inorder=0, **kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._UID = None
+                    self._id = None
+                    self._title = None
+                    self._description = None
+                    return
+            Holder.__name__ = "UserGroupInfo_Holder"
             self.pyclass = Holder
 
     class CreationData_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
@@ -412,6 +457,43 @@ class ns0:
                     self._configInfo = []
                     return
             Holder.__name__ = "getConfigInfosResponse_Holder"
+            self.pyclass = Holder
+
+    class getUserInfosRequest_Dec(ElementDeclaration):
+        literal = "getUserInfosRequest"
+        schema = "http://ws4pm.imio.be"
+        substitutionGroup = None
+        def __init__(self, **kw):
+            kw["pname"] = (u'http://ws4pm.imio.be', u'getUserInfosRequest')
+            kw["aname"] = "_getUserInfosRequest"
+            if ns0.UserInfosRequest_Def not in ns0.getUserInfosRequest_Dec.__bases__:
+                bases = list(ns0.getUserInfosRequest_Dec.__bases__)
+                bases.insert(0, ns0.UserInfosRequest_Def)
+                ns0.getUserInfosRequest_Dec.__bases__ = tuple(bases)
+
+            ns0.UserInfosRequest_Def.__init__(self, **kw)
+            if self.pyclass is not None: self.pyclass.__name__ = "getUserInfosRequest_Dec_Holder"
+
+    class getUserInfosResponse_Dec(ZSI.TCcompound.ComplexType, ElementDeclaration):
+        literal = "getUserInfosResponse"
+        schema = "http://ws4pm.imio.be"
+        def __init__(self, **kw):
+            ns = ns0.getUserInfosResponse_Dec.schema
+            TClist = [ZSI.TC.String(pname="fullname", aname="_fullname", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="email", aname="_email", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","UserGroupInfo",lazy=False)(pname="groups", aname="_groups", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            kw["pname"] = (u'http://ws4pm.imio.be', u'getUserInfosResponse')
+            kw["aname"] = "_getUserInfosResponse"
+            self.attribute_typecode_dict = {}
+            ZSI.TCcompound.ComplexType.__init__(self,None,TClist,inorder=0,**kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._fullname = None
+                    self._email = None
+                    self._groups = []
+                    return
+            Holder.__name__ = "getUserInfosResponse_Holder"
             self.pyclass = Holder
 
     class getItemInfosRequest_Dec(ElementDeclaration):

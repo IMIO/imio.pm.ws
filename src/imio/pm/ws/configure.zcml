@@ -47,6 +47,11 @@
   />
 
   <five:implements
+    class=".WS4PM_server.getUserInfosRequest"
+    interface=".interfaces.IUserInfosRequest"
+  />
+
+  <five:implements
     class=".WS4PM_server.getItemInfosRequest"
     interface=".interfaces.IItemInfosRequest"
   />
@@ -70,6 +75,7 @@
     methods="testConnectionRequest
              checkIsLinkedRequest
              getConfigInfosRequest
+             getUserInfosRequest
              getItemInfosRequest
              getItemTemplateRequest
              searchItemsRequest
@@ -120,6 +126,18 @@
   <utility
     factory=".WS4PM_server.getConfigInfosResponse"
     name="getConfigInfosRequest"
+    provides="z3c.soap.interfaces.IZSIResponseType"
+  />
+
+  <utility
+    factory=".WS4PM_server.getUserInfosRequest"
+    name="getUserInfosRequest"
+    provides="z3c.soap.interfaces.IZSIRequestType"
+  />
+
+  <utility
+    factory=".WS4PM_server.getUserInfosResponse"
+    name="getUserInfosRequest"
     provides="z3c.soap.interfaces.IZSIResponseType"
   />
 

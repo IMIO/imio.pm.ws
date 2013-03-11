@@ -6,7 +6,7 @@ from AccessControl.SecurityManagement import getSecurityManager, setSecurityMana
 from zope.i18n import translate
 from Products.Five import BrowserView
 from Products.PloneMeeting import PloneMeetingError
-from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, AnnexInfo, TemplateInfo
+from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, UserGroupInfo, AnnexInfo, TemplateInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
                                                  MAIN_DATA_FROM_ITEM_SCHEMA
 from time import localtime
@@ -52,6 +52,15 @@ class SOAPView(BrowserView):
           This will return a list of key elements of the config with the type of element
         '''
         response._configInfo = self._getConfigInfos()
+        return response
+
+    def getUserInfosRequest(self, request, response):
+        '''
+          This is the accessed SOAP method for getting informations about an existing user
+        '''
+        response._fullname, response._email, response._groups = self._getUserInfos(request._userId,
+                                                                                   request._showGroups,
+                                                                                   request._suffix)
         return response
 
     def searchItemsRequest(self, request, response):
@@ -190,6 +199,51 @@ class SOAPView(BrowserView):
         logger.info('Configuration parameters at "%s" SOAP accessed by "%s".' % \
                         (tool.absolute_url_path(), memberId))
         return res
+
+    def _getUserInfos(self, userId, showGroups, suffix=None):
+        '''
+          Returns informations about the given userId.  If p_showGroups is True,
+          it will also returns the list of groups the user is part of
+        '''
+        portal = self.context
+        member = portal.portal_membership.getAuthenticatedMember()
+        memberId = member.getId()
+
+        # a member can get infos for himself
+        # if we want to query informations for another user, the connected user
+        # must have the 'MeetingManager' or 'Manager' role
+        if not memberId == userId:
+            if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+                raise ZSI.Fault(ZSI.Fault.Client,
+                    "You need to be 'Manager' or 'MeetingManager' to get " \
+                    "user informations for another user than '%s'!" % memberId)
+
+        # if getting user informations about the currently connected user
+        # or the connected user is MeetingManager/Manager, proceed!
+        user = portal.portal_membership.getMemberById(userId)
+
+        if not user:
+            raise ZSI.Fault(ZSI.Fault.Client,
+                            "Trying to get user informations for an unexisting user '%s'!"
+                            % userId)
+
+        # show groups the user is member of if specified
+        userGroups = []
+        if showGroups:
+            # if a particular suffix is defined, we use it, it will
+            # returns only groups the user is member of with the defined
+            # suffix, either it will returns every groups the user is member of
+            tool = portal.portal_plonemeeting
+            groups = tool.getGroups(userId=userId, suffix=suffix)
+            for group in groups:
+                userGroupInfo = UserGroupInfo()
+                userGroupInfo._UID = group.UID()
+                userGroupInfo._id = group.getId()
+                userGroupInfo._title = group.Title()
+                userGroupInfo._description = group.Description()
+                userGroups.append(userGroupInfo)
+
+        return user.getProperty('fullname'), user.getProperty('email'), userGroups
 
     def _getItemInfos(self, searchParams, showExtraInfos=False, showAnnexes=False, showTemplates=False, inTheNameOf=None):
         '''

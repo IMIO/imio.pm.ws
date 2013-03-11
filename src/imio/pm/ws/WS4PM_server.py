@@ -24,6 +24,10 @@ getConfigInfosRequest = GED("http://ws4pm.imio.be", "getConfigInfosRequest").pyc
 
 getConfigInfosResponse = GED("http://ws4pm.imio.be", "getConfigInfosResponse").pyclass
 
+getUserInfosRequest = GED("http://ws4pm.imio.be", "getUserInfosRequest").pyclass
+
+getUserInfosResponse = GED("http://ws4pm.imio.be", "getUserInfosResponse").pyclass
+
 getItemInfosRequest = GED("http://ws4pm.imio.be", "getItemInfosRequest").pyclass
 
 getItemInfosResponse = GED("http://ws4pm.imio.be", "getItemInfosResponse").pyclass
@@ -69,6 +73,13 @@ class WS4PM(ServiceSOAPBinding):
 
     soapAction['http://ws4pm.imio.be/getConfigInfos'] = 'soap_getConfigInfos'
     root[(getConfigInfosRequest.typecode.nspname,getConfigInfosRequest.typecode.pname)] = 'soap_getConfigInfos'
+
+    def soap_getUserInfos(self, ps, **kw):
+        request = ps.Parse(getUserInfosRequest.typecode)
+        return request,getUserInfosResponse()
+
+    soapAction['http://portal_url/getUserInfos'] = 'soap_getUserInfos'
+    root[(getUserInfosRequest.typecode.nspname,getUserInfosRequest.typecode.pname)] = 'soap_getUserInfos'
 
     def soap_getItemInfos(self, ps, **kw):
         request = ps.Parse(getItemInfosRequest.typecode)
