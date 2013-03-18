@@ -124,7 +124,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         expected = expected.replace('<description></description>', '<description/>') \
             + "\n</ns1:getConfigInfosResponse>\n"
         self.assertEquals(expected, resp)
-        # the category 'subproducts' is only avaialble to vendors
+        # the category 'subproducts' is only available to vendors
         self.assertFalse('<id>subproducts</id>' in resp)
 
     def test_showCategoriesForUser(self):
@@ -135,7 +135,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         self.changeUser('pmCreator1')
         req = getConfigInfosRequest()
         req._showCategories = True
-        req._userToShowCategoriesFor = 'pmCreator2'
+        req._userToShowCategoriesFor = 'pmCreator1'
         responseHolder = getConfigInfosResponse()
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
@@ -145,6 +145,12 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         self.changeUser('pmManager')
         response = SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
         resp = deserialize(response)
+        # for 'pmCreator1', subproducts is not available
+        self.assertFalse('<id>subproducts</id>' in resp)
+        req._userToShowCategoriesFor = 'pmCreator2'
+        response = SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
+        resp = deserialize(response)
+        # but for 'pmCreator2', subproducts is available
         self.assertTrue('<id>subproducts</id>' in resp)
 
     def _getResultCategoriesForConfig(self, config):
