@@ -65,7 +65,7 @@ class ns0:
         type = (schema, "ConfigInfosRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ConfigInfosRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="showCategories", aname="_showCategories", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="userToShowCategoriesFor", aname="_userToShowCategoriesFor", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.Boolean(pname="showCategories", aname="_showCategories", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="userToShowCategoriesFor", aname="_userToShowCategoriesFor", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
