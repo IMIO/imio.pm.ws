@@ -65,7 +65,7 @@ class ns0:
         type = (schema, "ConfigInfosRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ConfigInfosRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="dummy", aname="_dummy", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="showCategories", aname="_showCategories", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="userToShowCategoriesFor", aname="_userToShowCategoriesFor", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -75,7 +75,8 @@ class ns0:
                 typecode = self
                 def __init__(self):
                     # pyclass
-                    self._dummy = "dummy"
+                    self._showCategories = 0
+                    self._userToShowCategoriesFor = None
                     return
             Holder.__name__ = "ConfigInfosRequest_Holder"
             self.pyclass = Holder
@@ -208,7 +209,7 @@ class ns0:
         type = (schema, "ConfigInfo")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ConfigInfo_Def.schema
-            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="type", aname="_type", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="type", aname="_type", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","BasicInfo",lazy=False)(pname="categories", aname="_categories", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -223,15 +224,16 @@ class ns0:
                     self._title = None
                     self._description = None
                     self._type = None
+                    self._categories = []
                     return
             Holder.__name__ = "ConfigInfo_Holder"
             self.pyclass = Holder
 
-    class UserGroupInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+    class BasicInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
         schema = "http://ws4pm.imio.be"
-        type = (schema, "UserGroupInfo")
+        type = (schema, "BasicInfo")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
-            ns = ns0.UserGroupInfo_Def.schema
+            ns = ns0.BasicInfo_Def.schema
             TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
@@ -247,7 +249,7 @@ class ns0:
                     self._title = None
                     self._description = None
                     return
-            Holder.__name__ = "UserGroupInfo_Holder"
+            Holder.__name__ = "BasicInfo_Holder"
             self.pyclass = Holder
 
     class CreationData_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
@@ -479,7 +481,7 @@ class ns0:
         schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
             ns = ns0.getUserInfosResponse_Dec.schema
-            TClist = [ZSI.TC.String(pname="fullname", aname="_fullname", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="email", aname="_email", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","UserGroupInfo",lazy=False)(pname="groups", aname="_groups", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="fullname", aname="_fullname", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="email", aname="_email", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","BasicInfo",lazy=False)(pname="groups", aname="_groups", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
             kw["pname"] = (u'http://ws4pm.imio.be', u'getUserInfosResponse')
             kw["aname"] = "_getUserInfosResponse"
             self.attribute_typecode_dict = {}

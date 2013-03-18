@@ -32,7 +32,8 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <xsd:element name="getConfigInfosRequest" type="tns:ConfigInfosRequest"/>
             <xsd:complexType name="ConfigInfosRequest">
                 <xsd:sequence>
-                    <xsd:element name="dummy" type="xsd:string" maxOccurs="1" minOccurs="0" default="dummy"/>
+                    <xsd:element name="showCategories" type="xsd:string" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="userToShowCategoriesFor" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getConfigInfosResponse">
@@ -55,7 +56,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:sequence>
                         <xsd:element name="fullname" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                         <xsd:element name="email" type="xsd:string" maxOccurs="1" minOccurs="1"/>
-                        <xsd:element name="groups" type="tns:UserGroupInfo" maxOccurs="unbounded" minOccurs="0"/>
+                        <xsd:element name="groups" type="tns:BasicInfo" maxOccurs="unbounded" minOccurs="0"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -142,7 +143,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <xsd:element name="type" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:complexType>
-            <xsd:complexType name="UserGroupInfo">
+            <xsd:complexType name="BasicInfo">
                 <xsd:sequence>
                     <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>

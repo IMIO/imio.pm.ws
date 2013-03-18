@@ -46,8 +46,8 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getUserInfosRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
-                            "You need to be 'Manager' or 'MeetingManager' to get " \
-                            "user informations for another user than 'pmCreator1'!")
+                          "You need to be 'Manager' or 'MeetingManager' to get "
+                          "user informations for another user than 'pmCreator1'!")
         self.changeUser('pmManager')
         # pmManager can get informations for another user as it is a MeetingManager
         response = SOAPView(self.portal, req).getUserInfosRequest(req, responseHolder)
@@ -64,7 +64,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getUserInfosRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
-                            "Trying to get user informations for an unexisting user 'unexistingUserId'!")
+                          "Trying to get user informations for an unexisting user 'unexistingUserId'!")
 
     def test_getOwnUserInfosRequest(self):
         """
@@ -102,18 +102,20 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         response = SOAPView(self.portal, req).getUserInfosRequest(req, responseHolder)
         resp = deserialize(response)
         expected = """<ns1:getUserInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                   """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+                   """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+                   """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+                   """xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
+                   """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <fullname>M. PMManager</fullname>
   <email>pmmanager@plonemeeting.org</email>
-  <groups xsi:type="ns1:UserGroupInfo">
+  <groups xsi:type="ns1:BasicInfo">
     <UID>%s</UID>
     <id>developers</id>
     <title>Developers</title>
     <description/>
   </groups>
-  <groups xsi:type="ns1:UserGroupInfo">
+  <groups xsi:type="ns1:BasicInfo">
     <UID>%s</UID>
     <id>vendors</id>
     <title>Vendors</title>
@@ -127,12 +129,14 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         response = SOAPView(self.portal, req).getUserInfosRequest(req, responseHolder)
         resp = deserialize(response)
         expected = """<ns1:getUserInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                   """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+                   """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+                   """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+                   """xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
+                   """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <fullname>M. PMManager</fullname>
   <email>pmmanager@plonemeeting.org</email>
-  <groups xsi:type="ns1:UserGroupInfo">
+  <groups xsi:type="ns1:BasicInfo">
     <UID>%s</UID>
     <id>developers</id>
     <title>Developers</title>

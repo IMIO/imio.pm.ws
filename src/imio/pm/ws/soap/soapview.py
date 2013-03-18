@@ -6,9 +6,8 @@ from AccessControl.SecurityManagement import getSecurityManager, setSecurityMana
 from zope.i18n import translate
 from Products.Five import BrowserView
 from Products.PloneMeeting import PloneMeetingError
-from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, UserGroupInfo, AnnexInfo, TemplateInfo
-from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, \
-                                                 MAIN_DATA_FROM_ITEM_SCHEMA
+from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, BasicInfo, AnnexInfo, TemplateInfo
+from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, MAIN_DATA_FROM_ITEM_SCHEMA
 from time import localtime
 from DateTime import DateTime
 import magic
@@ -51,7 +50,8 @@ class SOAPView(BrowserView):
           This is the accessed SOAP method for getting informations about the configuration
           This will return a list of key elements of the config with the type of element
         '''
-        response._configInfo = self._getConfigInfos()
+        response._configInfo = self._getConfigInfos(request._showCategories,
+                                                    request._userToShowCategoriesFor)
         return response
 
     def getUserInfosRequest(self, request, response):
@@ -117,8 +117,10 @@ class SOAPView(BrowserView):
         '''
           This is the accessed SOAP method for creating an item
         '''
-        response._UID, response._warnings = self._createItem(request._meetingConfigId, request._proposingGroupId, \
-                                                             request._creationData, request._inTheNameOf)
+        response._UID, response._warnings = self._createItem(request._meetingConfigId,
+                                                             request._proposingGroupId,
+                                                             request._creationData,
+                                                             request._inTheNameOf)
         return response
 
     def _testConnection(self):
@@ -164,16 +166,23 @@ class SOAPView(BrowserView):
             return True
         return False
 
-    def _getConfigInfos(self):
+    def _getConfigInfos(self, showCategories=False, userToShowCategoriesFor=None):
         '''
           Returns key informations about the configuration : active MeetingGroups and MeetingConfigs
+          If p_showCategories is given, we return also available categories.  We return every available
+          categories by default or categories available to the p_userToShowCategoriesFor userId.
+          Ony a Manager/MeetingManager can give a userToShowCategoriesFor, by default it will be the currently
+          connected user.
         '''
         portal = self.context
-
         member = portal.portal_membership.getAuthenticatedMember()
-        memberId = member.getId()
-
         tool = portal.portal_plonemeeting
+
+        # passing a userToShowCategoriesFor is only available to 'Manager' and 'MeetingManager'
+        if userToShowCategoriesFor:
+            if not tool.isManager():
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "You need to be 'Manager' or 'MeetingManager' to get available categories for a user!")
 
         res = []
         # MeetingConfigs
@@ -184,6 +193,14 @@ class SOAPView(BrowserView):
             configInfo._title = config.Title()
             configInfo._description = config.Description()
             configInfo._type = config.portal_type
+            if showCategories:
+                for category in config.getCategories(userId=userToShowCategoriesFor):
+                    basicInfo = BasicInfo()
+                    basicInfo._UID = category.UID()
+                    basicInfo._id = category.getId()
+                    basicInfo._title = category.Title()
+                    basicInfo._description = category.Description()
+                    configInfo._categories.append(basicInfo)
             res.append(configInfo)
 
         # MeetingGroups
@@ -196,8 +213,9 @@ class SOAPView(BrowserView):
             configInfo._type = group.portal_type
             res.append(configInfo)
 
-        logger.info('Configuration parameters at "%s" SOAP accessed by "%s".' % \
-                        (tool.absolute_url_path(), memberId))
+        memberId = member.getId()
+        logger.info('Configuration parameters at "%s" SOAP accessed by "%s".' %
+                    (tool.absolute_url_path(), memberId))
         return res
 
     def _getUserInfos(self, userId, showGroups, suffix=None):
@@ -214,8 +232,9 @@ class SOAPView(BrowserView):
         # must have the 'MeetingManager' or 'Manager' role
         if not memberId == userId:
             if not member.has_role('Manager') and not member.has_role('MeetingManager'):
-                raise ZSI.Fault(ZSI.Fault.Client,
-                    "You need to be 'Manager' or 'MeetingManager' to get " \
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "You need to be 'Manager' or 'MeetingManager' to get "
                     "user informations for another user than '%s'!" % memberId)
 
         # if getting user informations about the currently connected user
@@ -236,16 +255,21 @@ class SOAPView(BrowserView):
             tool = portal.portal_plonemeeting
             groups = tool.getGroups(userId=userId, suffix=suffix)
             for group in groups:
-                userGroupInfo = UserGroupInfo()
-                userGroupInfo._UID = group.UID()
-                userGroupInfo._id = group.getId()
-                userGroupInfo._title = group.Title()
-                userGroupInfo._description = group.Description()
-                userGroups.append(userGroupInfo)
+                basicInfo = BasicInfo()
+                basicInfo._UID = group.UID()
+                basicInfo._id = group.getId()
+                basicInfo._title = group.Title()
+                basicInfo._description = group.Description()
+                userGroups.append(basicInfo)
 
         return user.getProperty('fullname'), user.getProperty('email'), userGroups
 
-    def _getItemInfos(self, searchParams, showExtraInfos=False, showAnnexes=False, showTemplates=False, inTheNameOf=None):
+    def _getItemInfos(self,
+                      searchParams,
+                      showExtraInfos=False,
+                      showAnnexes=False,
+                      showTemplates=False,
+                      inTheNameOf=None):
         '''
           Get an item with given searchParams dict.  As the user is connected, the security in portal_catalog do the job
         '''
@@ -300,6 +324,7 @@ class SOAPView(BrowserView):
         params['meta_type'] = 'MeetingItem'
         brains = portal.portal_catalog(**params)
         res = []
+        noDate = DateTime('1950/01/01 00:00:00 UTC')
         for brain in brains:
             # XXX for now we still need to wake up the item because we do not have the meeting's date
             # on the brain, this could be great to manage ticket http://trac.imio.be/trac/ticket/4176 so
@@ -314,8 +339,7 @@ class SOAPView(BrowserView):
             itemInfo._description = item.getRawDescription()
             itemInfo._decision = item.getRawDecision()
             itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
-            itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or \
-                                     DateTime('1950/01/01 00:00:00 UTC'))
+            itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)
             itemInfo._absolute_url = item.absolute_url()
             itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
             itemInfo._extraInfos = {}
@@ -331,8 +355,8 @@ class SOAPView(BrowserView):
                 itemInfo._extraInfos['meeting_config_title'] = mc.Title()
                 # add the review_state translated
                 itemInfo._extraInfos['review_state_translated'] = translate(msgid=itemInfo._review_state,
-                                                 domain='plone',
-                                                 context=portal.REQUEST)
+                                                                            domain='plone',
+                                                                            context=portal.REQUEST)
                 # add the category title
                 itemInfo._extraInfos['category_title'] = item.displayValue(item.listCategories(), item.getCategory())
                 # add the creator fullname
@@ -358,7 +382,7 @@ class SOAPView(BrowserView):
                     templateInfo._templateId = template.getId()
                     templateInfo._templateFilename = template._getFileName(item)
                     itemInfo._templates.append(templateInfo)
-            logger.info('Item at %s SOAP accessed by "%s".' % \
+            logger.info('Item at %s SOAP accessed by "%s".' %
                         (item.absolute_url_path(), memberId))
             res.append(itemInfo,)
 
@@ -380,8 +404,9 @@ class SOAPView(BrowserView):
         # - the user we want to get informations for exists
         if inTheNameOf:
             if not member.has_role('Manager') and not member.has_role('MeetingManager'):
-                raise ZSI.Fault(ZSI.Fault.Client,
-                            "You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!")
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
@@ -419,7 +444,7 @@ class SOAPView(BrowserView):
         # we can access the item and the template, proceed!
         # generate the template and return the result
         member = portal.portal_membership.getAuthenticatedMember()
-        logger.info('Template at "%s" for item at "%s" SOAP accessed by "%s".' % \
+        logger.info('Template at "%s" for item at "%s" SOAP accessed by "%s".' %
                     (template.absolute_url_path(), item.absolute_url_path(), member.getId()))
         try:
             res = theTemplate.generateDocument(item, forBrowser=False)
@@ -494,8 +519,8 @@ class SOAPView(BrowserView):
             # fallback to original user calling the SOAP method
             if inTheNameOf:
                 setSecurityManager(oldsm)
-            raise ZSI.Fault(ZSI.Fault.Client, \
-            "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
+            raise ZSI.Fault(ZSI.Fault.Client,
+                            "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
 
         # now that every checks pass, we can create the item
         # creationData keys begin with an '_' (_title, _description, ...) so tranform them
@@ -506,12 +531,8 @@ class SOAPView(BrowserView):
                 data[elt[1:]] = creationData.__dict__[elt]
 
         type_name = mc.getItemTypeName()
-        data.update(
-                    {
-                     'proposingGroup': proposingGroupId,
-                     'id': portal.generateUniqueId(type_name),
-                    }
-                   )
+        data.update({'proposingGroup': proposingGroupId,
+                     'id': portal.generateUniqueId(type_name), })
 
         # we create the item to be able to check the category here above...
         itemId = destFolder.invokeFactory(type_name, **data)
@@ -538,8 +559,8 @@ class SOAPView(BrowserView):
                                                   "can not be used!" % data['category'])
             # we are using categories but the given one is not in availableCategories
             elif not mc.getUseGroupsAsCategories():
-                raise ZSI.Fault(ZSI.Fault.Client, "'%s' is not available for the '%s' group!"
-                                    % (data['category'], proposingGroupId))
+                raise ZSI.Fault(ZSI.Fault.Client, "'%s' is not available for the '%s' group!" %
+                                (data['category'], proposingGroupId))
         item.setCategory(data['category'])
 
         # make sure we have html here, and as clean as possible...
@@ -621,7 +642,7 @@ class SOAPView(BrowserView):
             # check if a mimetype has been found and if a file extension was defined for it
             if not mr_mimetype:
                 warning_message = MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING % ((annex_filename or annex_title),
-                                                                          item.absolute_url_path())
+                                                                         item.absolute_url_path())
                 logger.warning(warning_message)
                 warnings.append(warning_message)
                 continue
@@ -637,9 +658,9 @@ class SOAPView(BrowserView):
                     # several extensions are proposed by mimetypes_registry
                     # and we have nothing to find out what is the extension to use
                     warning_message = MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % \
-                                                    (mr_mimetype[0].normalized(),
-                                                    (annex_filename or annex_title),
-                                                    item.absolute_url_path())
+                        (mr_mimetype[0].normalized(),
+                         (annex_filename or annex_title),
+                         item.absolute_url_path())
                     logger.warning(warning_message)
                     warnings.append(warning_message)
                     continue
@@ -655,10 +676,10 @@ class SOAPView(BrowserView):
             lastInsertedAnnex = itemAnnexes[-1]
             lastInsertedAnnex.getFile().setContentType(annex_mimetype)
 
-        logger.info('Item at "%s"%s SOAP created by "%s".' % \
+        logger.info('Item at "%s"%s SOAP created by "%s".' %
                     (item.absolute_url_path(),
-                     (externalIdentifier and ' with externalIdentifier "%s"' \
-                      % item.externalIdentifier or ''), memberId))
+                     (externalIdentifier and ' with externalIdentifier "%s"' %
+                      item.externalIdentifier or ''), memberId))
         if not warnings:
             # make the user aware that warnings are displayed in the response
             warnings.append(DEFAULT_NO_WARNING_MESSAGE)
