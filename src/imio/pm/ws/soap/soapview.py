@@ -183,6 +183,12 @@ class SOAPView(BrowserView):
             if not tool.isManager():
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "You need to be 'Manager' or 'MeetingManager' to get available categories for a user!")
+            # check that the passed userId exists...
+            user = portal.acl_users.getUserById(userToShowCategoriesFor)
+            if not user:
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "Trying to get avaialble categories for an unexisting user '%s'!" %
+                                userToShowCategoriesFor)
 
         res = []
         # MeetingConfigs

@@ -141,8 +141,16 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
             SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
                           "You need to be 'Manager' or 'MeetingManager' to get available categories for a user!")
-        # now get it.  The 'subproducts' category is only available to vendors (pmCreator2)
+        # now try with a 'pmManager'
         self.changeUser('pmManager')
+        req._userToShowCategoriesFor = 'unexistingUserId'
+        # the userToShowCategoriesFor must exists!
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+                          "Trying to get avaialble categories for an unexisting user 'unexistingUserId'!")
+        # now get it.  The 'subproducts' category is only available to vendors (pmCreator2)
+        req._userToShowCategoriesFor = 'pmCreator1'
         response = SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
         resp = deserialize(response)
         # for 'pmCreator1', subproducts is not available
