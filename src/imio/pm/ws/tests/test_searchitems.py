@@ -252,6 +252,9 @@ class testSOAPSearchItems(WS4PMTestCase):
         createdItemsUids = set((item1.UID(), item2.UID()))
         resultUids = set((result._itemInfo[0].UID, result._itemInfo[1].UID))
         self.assertTrue(createdItemsUids == resultUids)
+        # as we switch user while using inTheNameOf, make sure we have
+        # falled back to original user
+        self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
         # now searchItems inTheNameOf 'pmCreator1'
         req._inTheNameOf = 'pmCreator1'
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)

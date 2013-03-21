@@ -51,7 +51,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
                    """xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
                    """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">""" \
                    """<SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be">""" \
-                   """<ns1:getConfigInfosRequest><showCategories>0</showCategories></ns1:getConfigInfosRequest>""" \
+                   """<ns1:getConfigInfosRequest><showCategories>false</showCategories></ns1:getConfigInfosRequest>""" \
                    """</SOAP-ENV:Body></SOAP-ENV:Envelope>"""
         result = """%s""" % request
         self.assertEquals(expected, result)
@@ -165,8 +165,10 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         """
           Helper method for generating result displayed about categories of a MeetingConfig
         """
-        if not config.meta_type == 'MeetingConfig':
+        # if not using categories, return empty categories list
+        if not config.meta_type == 'MeetingConfig' or config.getUseGroupsAsCategories():
             return ''
+
         result = ""
         for cat in config.getCategories():
             result += """

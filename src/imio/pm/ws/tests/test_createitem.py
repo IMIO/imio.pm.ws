@@ -345,6 +345,9 @@ SOAPAction: /
         req._proposingGroupId = 'vendors'
         responseHolder = createItemResponse()
         response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        # as we switch user while using inTheNameOf, make sure we have
+        # falled back to original user
+        self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
         newItem = self.portal.uid_catalog(UID=response._UID)[0].getObject()
         # as the item is really created by the inTheNameOf user, everything is correct
         self.assertEquals(newItem.Creator(), 'pmCreator2')
@@ -375,7 +378,7 @@ SOAPAction: /
         self.changeUser('admin')
         # remove the created item because we can not remove a folder containing items
         # it would raise a BeforeDeleteException in PloneMeeting
-        newItem.aq_inner.aq_parent.manage_delObjects(ids=[newItem.getId(),])
+        newItem.aq_inner.aq_parent.manage_delObjects(ids=[newItem.getId(), ])
         self.portal.Members.manage_delObjects(ids=['pmCreator2'])
         self.changeUser('pmManager')
         req._inTheNameOf = 'pmCreator2'

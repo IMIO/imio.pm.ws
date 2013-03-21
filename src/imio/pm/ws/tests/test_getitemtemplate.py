@@ -117,12 +117,15 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
-                    "You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!")
+            "You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!")
         # now as MeetingManager, it works
         self.changeUser('pmManager')
         renderedTemplate = SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         # check that the rendered file correspond to the newItem's data
         self._isCorrectlyRenderedTemplate(renderedTemplate, newItem)
+        # as we switch user while using inTheNameOf, make sure we have
+        # falled back to original user
+        self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
         # now inTheNameOf a user that can not access newItem
         req._inTheNameOf = 'pmCreator2'
         with self.assertRaises(ZSI.Fault) as cm:

@@ -199,7 +199,8 @@ class SOAPView(BrowserView):
             configInfo._title = config.Title()
             configInfo._description = config.Description()
             configInfo._type = config.portal_type
-            if showCategories:
+            # only return categories if the meetingConfig uses it
+            if showCategories and not config.getUseGroupsAsCategories():
                 for category in config.getCategories(userId=userToShowCategoriesFor):
                     basicInfo = BasicInfo()
                     basicInfo._UID = category.UID()
@@ -322,79 +323,80 @@ class SOAPView(BrowserView):
             params['portal_type'] = mc.getItemTypeName()
 
         # if we are getting item informations inTheNameOf, use this user for the rest of the process
-        if inTheNameOf:
-            oldsm = getSecurityManager()
-            newSecurityManager(portal.REQUEST, member)
-
-        # force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
-        params['meta_type'] = 'MeetingItem'
-        brains = portal.portal_catalog(**params)
         res = []
-        noDate = DateTime('1950/01/01 00:00:00 UTC')
-        for brain in brains:
-            # XXX for now we still need to wake up the item because we do not have the meeting's date
-            # on the brain, this could be great to manage ticket http://trac.imio.be/trac/ticket/4176 so
-            # we could avoid waking up the item if showExtraInfos is False
-            item = brain.getObject()
-            itemInfo = ItemInfo()
-            itemInfo._UID = item.UID()
-            itemInfo._id = item.getId()
-            itemInfo._title = item.Title()
-            itemInfo._creator = item.Creator()
-            itemInfo._category = item.getCategory()
-            itemInfo._description = item.getRawDescription()
-            itemInfo._decision = item.getRawDecision()
-            itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
-            itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)
-            itemInfo._absolute_url = item.absolute_url()
-            itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
-            itemInfo._extraInfos = {}
-            if showExtraInfos:
-                extraInfosFields = self._getExtraInfosFields(item)
-                # store every other informations in the 'extraInfos' dict
-                for field in extraInfosFields:
-                    itemInfo._extraInfos[field.getName()] = field.getRaw(item)
-                # also add informations about the linked MeetingConfig
-                if not mc:
-                    mc = tool.getMeetingConfig(item)
-                itemInfo._extraInfos['meeting_config_id'] = mc.getId()
-                itemInfo._extraInfos['meeting_config_title'] = mc.Title()
-                # add the review_state translated
-                itemInfo._extraInfos['review_state_translated'] = translate(msgid=itemInfo._review_state,
-                                                                            domain='plone',
-                                                                            context=portal.REQUEST)
-                # add the category title
-                itemInfo._extraInfos['category_title'] = item.displayValue(item.listCategories(), item.getCategory())
-                # add the creator fullname
-                itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
-            if showAnnexes:
-                for groupOfAnnexesByType in item.getAnnexesByType(realAnnexes=True):
-                    for annex in groupOfAnnexesByType:
-                        annexInfo = AnnexInfo()
-                        annexInfo._title = annex.Title()
-                        annexInfo._annexTypeId = annex.getMeetingFileType().getId()
-                        annexInfo._filename = annex.getFile().filename
-                        annexInfo._file = annex.getFile().data
-                        itemInfo._annexes.append(annexInfo)
-            if showTemplates:
-                if not mc:
-                    # we need the item's meetingConfig
-                    mc = tool.getMeetingConfig(item)
-                templates = mc.getAvailablePodTemplates(item)
-                for template in templates:
-                    templateInfo = TemplateInfo()
-                    templateInfo._title = template.Title()
-                    templateInfo._templateFormat = template.getPodFormat()
-                    templateInfo._templateId = template.getId()
-                    templateInfo._templateFilename = template._getFileName(item)
-                    itemInfo._templates.append(templateInfo)
-            logger.info('Item at %s SOAP accessed by "%s".' %
-                        (item.absolute_url_path(), memberId))
-            res.append(itemInfo,)
+        try:
+            if inTheNameOf:
+                oldsm = getSecurityManager()
+                newSecurityManager(portal.REQUEST, member)
 
-        # fallback to original user calling the SOAP method
-        if inTheNameOf:
-            setSecurityManager(oldsm)
+            # force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
+            params['meta_type'] = 'MeetingItem'
+            brains = portal.portal_catalog(**params)
+            noDate = DateTime('1950/01/01 00:00:00 UTC')
+            for brain in brains:
+                # XXX for now we still need to wake up the item because we do not have the meeting's date
+                # on the brain, this could be great to manage ticket http://trac.imio.be/trac/ticket/4176 so
+                # we could avoid waking up the item if showExtraInfos is False
+                item = brain.getObject()
+                itemInfo = ItemInfo()
+                itemInfo._UID = item.UID()
+                itemInfo._id = item.getId()
+                itemInfo._title = item.Title()
+                itemInfo._creator = item.Creator()
+                itemInfo._category = item.getCategory()
+                itemInfo._description = item.getRawDescription()
+                itemInfo._decision = item.getRawDecision()
+                itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
+                itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)
+                itemInfo._absolute_url = item.absolute_url()
+                itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
+                itemInfo._extraInfos = {}
+                if showExtraInfos:
+                    extraInfosFields = self._getExtraInfosFields(item)
+                    # store every other informations in the 'extraInfos' dict
+                    for field in extraInfosFields:
+                        itemInfo._extraInfos[field.getName()] = field.getRaw(item)
+                    # also add informations about the linked MeetingConfig
+                    if not mc:
+                        mc = tool.getMeetingConfig(item)
+                    itemInfo._extraInfos['meeting_config_id'] = mc.getId()
+                    itemInfo._extraInfos['meeting_config_title'] = mc.Title()
+                    # add the review_state translated
+                    itemInfo._extraInfos['review_state_translated'] = translate(msgid=itemInfo._review_state,
+                                                                                domain='plone',
+                                                                                context=portal.REQUEST)
+                    # add the category title
+                    itemInfo._extraInfos['category_title'] = item.displayValue(item.listCategories(), item.getCategory())
+                    # add the creator fullname
+                    itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
+                if showAnnexes:
+                    for groupOfAnnexesByType in item.getAnnexesByType(realAnnexes=True):
+                        for annex in groupOfAnnexesByType:
+                            annexInfo = AnnexInfo()
+                            annexInfo._title = annex.Title()
+                            annexInfo._annexTypeId = annex.getMeetingFileType().getId()
+                            annexInfo._filename = annex.getFile().filename
+                            annexInfo._file = annex.getFile().data
+                            itemInfo._annexes.append(annexInfo)
+                if showTemplates:
+                    if not mc:
+                        # we need the item's meetingConfig
+                        mc = tool.getMeetingConfig(item)
+                    templates = mc.getAvailablePodTemplates(item)
+                    for template in templates:
+                        templateInfo = TemplateInfo()
+                        templateInfo._title = template.Title()
+                        templateInfo._templateFormat = template.getPodFormat()
+                        templateInfo._templateId = template.getId()
+                        templateInfo._templateFilename = template._getFileName(item)
+                        itemInfo._templates.append(templateInfo)
+                logger.info('Item at %s SOAP accessed by "%s".' %
+                            (item.absolute_url_path(), memberId))
+                res.append(itemInfo,)
+        finally:
+            # fallback to original user calling the SOAP method
+            if inTheNameOf:
+                setSecurityManager(oldsm)
         return res
 
     def _getItemTemplate(self, itemUID, templateId, inTheNameOf):
@@ -420,48 +422,41 @@ class SOAPView(BrowserView):
                                 "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
 
         # if we are creating an item inTheNameOf, use this user for the rest of the process
-        if inTheNameOf:
-            oldsm = getSecurityManager()
-            newSecurityManager(portal.REQUEST, member)
-
-        # search for the item, this will also check if the user can actually access it
-        brains = portal.portal_catalog(UID=itemUID)
-        if not brains:
-            # fallback to original user calling the SOAP method
-            if inTheNameOf:
-                setSecurityManager(oldsm)
-            raise ZSI.Fault(ZSI.Fault.Client, "You can not access this item!")
-
-        # check that the template is available to the member
-        item = brains[0].getObject()
-        mc = portal.portal_plonemeeting.getMeetingConfig(item)
-        templates = mc.getAvailablePodTemplates(item)
-        theTemplate = None
-        for template in templates:
-            if template.getId() == templateId:
-                theTemplate = template
-                break
-        if not theTemplate:
-            # fallback to original user calling the SOAP method
-            if inTheNameOf:
-                setSecurityManager(oldsm)
-            raise ZSI.Fault(ZSI.Fault.Client, "You can not access this template!")
-
-        # we can access the item and the template, proceed!
-        # generate the template and return the result
-        member = portal.portal_membership.getAuthenticatedMember()
-        logger.info('Template at "%s" for item at "%s" SOAP accessed by "%s".' %
-                    (template.absolute_url_path(), item.absolute_url_path(), member.getId()))
         try:
-            res = theTemplate.generateDocument(item, forBrowser=False)
-        except PloneMeetingError, e:
+            if inTheNameOf:
+                oldsm = getSecurityManager()
+                newSecurityManager(portal.REQUEST, member)
+
+            # search for the item, this will also check if the user can actually access it
+            brains = portal.portal_catalog(UID=itemUID)
+            if not brains:
+                raise ZSI.Fault(ZSI.Fault.Client, "You can not access this item!")
+
+            # check that the template is available to the member
+            item = brains[0].getObject()
+            mc = portal.portal_plonemeeting.getMeetingConfig(item)
+            templates = mc.getAvailablePodTemplates(item)
+            theTemplate = None
+            for template in templates:
+                if template.getId() == templateId:
+                    theTemplate = template
+                    break
+            if not theTemplate:
+                raise ZSI.Fault(ZSI.Fault.Client, "You can not access this template!")
+
+            # we can access the item and the template, proceed!
+            # generate the template and return the result
+            member = portal.portal_membership.getAuthenticatedMember()
+            logger.info('Template at "%s" for item at "%s" SOAP accessed by "%s".' %
+                        (template.absolute_url_path(), item.absolute_url_path(), member.getId()))
+            try:
+                res = theTemplate.generateDocument(item, forBrowser=False)
+            except PloneMeetingError, e:
+                raise ZSI.Fault(ZSI.Fault.Client, "PloneMeetingError : %s" % e.message)
             # fallback to original user calling the SOAP method
+        finally:
             if inTheNameOf:
                 setSecurityManager(oldsm)
-            raise ZSI.Fault(ZSI.Fault.Client, "PloneMeetingError : %s" % e.message)
-        # fallback to original user calling the SOAP method
-        if inTheNameOf:
-            setSecurityManager(oldsm)
         return res
 
     def _getExtraInfosFields(self, item):
@@ -512,187 +507,182 @@ class SOAPView(BrowserView):
             raise ZSI.Fault(ZSI.Fault.Client,
                             "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
 
-        # if we are creating an item inTheNameOf, use this user for the rest of the process
-        if inTheNameOf:
-            oldsm = getSecurityManager()
-            newSecurityManager(portal.REQUEST, member)
-
-        # get or create the meetingFolder the item will be created in
-        # if the user does not have a memberArea
-        # (never connected, then we raise an error)
-        destFolder = tool.getPloneMeetingFolder(meetingConfigId, memberId)
-        if destFolder.meta_type == 'Plone Site':
-            # fallback to original user calling the SOAP method
+        try:
+            # if we are creating an item inTheNameOf, use this user for the rest of the process
             if inTheNameOf:
-                setSecurityManager(oldsm)
-            raise ZSI.Fault(ZSI.Fault.Client,
-                            "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
+                oldsm = getSecurityManager()
+                newSecurityManager(portal.REQUEST, member)
 
-        # now that every checks pass, we can create the item
-        # creationData keys begin with an '_' (_title, _description, ...) so tranform them
-        data = {}
-        for elt in creationData.__dict__.keys():
-            #do not take annexes into account
-            if not elt == '_annexes':
-                data[elt[1:]] = creationData.__dict__[elt]
+            # get or create the meetingFolder the item will be created in
+            # if the user does not have a memberArea
+            # (never connected, then we raise an error)
+            destFolder = tool.getPloneMeetingFolder(meetingConfigId, memberId)
+            if destFolder.meta_type == 'Plone Site':
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
 
-        type_name = mc.getItemTypeName()
-        data.update({'proposingGroup': proposingGroupId,
-                     'id': portal.generateUniqueId(type_name), })
+            # now that every checks pass, we can create the item
+            # creationData keys begin with an '_' (_title, _description, ...) so tranform them
+            data = {}
+            for elt in creationData.__dict__.keys():
+                #do not take annexes into account
+                if not elt == '_annexes':
+                    data[elt[1:]] = creationData.__dict__[elt]
 
-        # we create the item to be able to check the category here above...
-        itemId = destFolder.invokeFactory(type_name, **data)
-        item = getattr(destFolder, itemId)
-        # processForm calls at_post_create_script too
-        # this is necessary before adding annexes
-        item.at_post_create_script()
+            type_name = mc.getItemTypeName()
+            data.update({'proposingGroup': proposingGroupId,
+                         'id': portal.generateUniqueId(type_name), })
 
-        # check that if category is mandatory (getUseGroupsAsCategories is False), it is given
-        # and that given category is available
-        # if we are not using categories, just ensure that we received an empty category
-        availableCategories = not mc.getUseGroupsAsCategories() and item.listCategories().keys() or ['', ]
-        if not data['category'] in availableCategories:
-            # delete the created item and raise an error
-            item.aq_inner.aq_parent.manage_delObjects(ids=[itemId, ])
-            # fallback to original user calling the SOAP method
-            if inTheNameOf:
-                setSecurityManager(oldsm)
-            # special message if category mandatory and not given
-            if not mc.getUseGroupsAsCategories() and not data['category']:
-                raise ZSI.Fault(ZSI.Fault.Client, "In this config, category is mandatory!")
-            elif mc.getUseGroupsAsCategories() and data['category']:
-                raise ZSI.Fault(ZSI.Fault.Client, "This config does not use categories, the given '%s' category "
-                                                  "can not be used!" % data['category'])
-            # we are using categories but the given one is not in availableCategories
-            elif not mc.getUseGroupsAsCategories():
-                raise ZSI.Fault(ZSI.Fault.Client, "'%s' is not available for the '%s' group!" %
-                                (data['category'], proposingGroupId))
-        item.setCategory(data['category'])
+            # we create the item to be able to check the category here above...
+            itemId = destFolder.invokeFactory(type_name, **data)
+            item = getattr(destFolder, itemId)
+            # processForm calls at_post_create_script too
+            # this is necessary before adding annexes
+            item.at_post_create_script()
 
-        # make sure we have html here, and as clean as possible...
-        from BeautifulSoup import BeautifulSoup
-        # find htmlFieldIds we will have to check/clean
-        htmlFieldIds = []
-        managedFieldIds = data.keys()
-        for field in item.Schema().fields():
-            fieldName = field.getName()
-            if fieldName in managedFieldIds and field.widget.getName() in ['RichWidget', 'VisualWidget', ]:
-                    htmlFieldIds.append(fieldName)
-        warnWrongHTML = False
-        for htmlFieldId in htmlFieldIds:
-            soup = BeautifulSoup(data[htmlFieldId])
-            # we need a surrounding <p></p> or the content is not generated by appy.pod
-            if not data[htmlFieldId].startswith('<p>') or not data[htmlFieldId].endswith('</p>'):
-                data[htmlFieldId] = unicode('<p>%s</p>' % data[htmlFieldId], 'utf-8')
-            if not soup.contents or not getattr(soup.contents[0], 'name', None) == u'p':
+            # check that if category is mandatory (getUseGroupsAsCategories is False), it is given
+            # and that given category is available
+            # if we are not using categories, just ensure that we received an empty category
+            availableCategories = not mc.getUseGroupsAsCategories() and item.listCategories().keys() or ['', ]
+            if not data['category'] in availableCategories:
+                # delete the created item and raise an error
+                item.aq_inner.aq_parent.manage_delObjects(ids=[itemId, ])
+                # special message if category mandatory and not given
+                if not mc.getUseGroupsAsCategories() and not data['category']:
+                    raise ZSI.Fault(ZSI.Fault.Client, "In this config, category is mandatory!")
+                elif mc.getUseGroupsAsCategories() and data['category']:
+                    raise ZSI.Fault(ZSI.Fault.Client, "This config does not use categories, the given '%s' category "
+                                                      "can not be used!" % data['category'])
+                # we are using categories but the given one is not in availableCategories
+                elif not mc.getUseGroupsAsCategories():
+                    raise ZSI.Fault(ZSI.Fault.Client, "'%s' is not available for the '%s' group!" %
+                                    (data['category'], proposingGroupId))
+            item.setCategory(data['category'])
+
+            # make sure we have html here, and as clean as possible...
+            from BeautifulSoup import BeautifulSoup
+            # find htmlFieldIds we will have to check/clean
+            htmlFieldIds = []
+            managedFieldIds = data.keys()
+            for field in item.Schema().fields():
+                fieldName = field.getName()
+                if fieldName in managedFieldIds and field.widget.getName() in ['RichWidget', 'VisualWidget', ]:
+                        htmlFieldIds.append(fieldName)
+            warnWrongHTML = False
+            for htmlFieldId in htmlFieldIds:
                 soup = BeautifulSoup(data[htmlFieldId])
-            # check that we have valid HTML or we use the transformed HTML by BeautifulSoup
-            # compare unicode as data[htmlFieldId] is unicode...
-            renderedSoupContents = soup.renderContents()
-            if isinstance(data[htmlFieldId], unicode):
-                renderedSoupContents = unicode(renderedSoupContents, 'utf-8')
-            if not renderedSoupContents == data[htmlFieldId]:
-                warnWrongHTML = True
-                data[htmlFieldId] = renderedSoupContents
-            # use 'text/x-html-safe' mimetype when creating the item
-            field = item.getField(htmlFieldId)
-            field.getMutator(item)(data[htmlFieldId], mimetype='text/x-html-safe')
+                # we need a surrounding <p></p> or the content is not generated by appy.pod
+                if not data[htmlFieldId].startswith('<p>') or not data[htmlFieldId].endswith('</p>'):
+                    data[htmlFieldId] = unicode('<p>%s</p>' % data[htmlFieldId], 'utf-8')
+                if not soup.contents or not getattr(soup.contents[0], 'name', None) == u'p':
+                    soup = BeautifulSoup(data[htmlFieldId])
+                # check that we have valid HTML or we use the transformed HTML by BeautifulSoup
+                # compare unicode as data[htmlFieldId] is unicode...
+                renderedSoupContents = soup.renderContents()
+                if isinstance(data[htmlFieldId], unicode):
+                    renderedSoupContents = unicode(renderedSoupContents, 'utf-8')
+                if not renderedSoupContents == data[htmlFieldId]:
+                    warnWrongHTML = True
+                    data[htmlFieldId] = renderedSoupContents
+                # use 'text/x-html-safe' mimetype when creating the item
+                field = item.getField(htmlFieldId)
+                field.getMutator(item)(data[htmlFieldId], mimetype='text/x-html-safe')
 
-        # manage externalIdentifier
-        externalIdentifier = False
-        field = item.getField(EXTERNAL_IDENTIFIER_FIELD_NAME)
-        if data['externalIdentifier']:
-            #we received an externalIdentifier, use it!
-            field.getMutator(item)(data['externalIdentifier'])
-            externalIdentifier = True
-        else:
-            field.getMutator(item)(field.default)
+            # manage externalIdentifier
+            externalIdentifier = False
+            field = item.getField(EXTERNAL_IDENTIFIER_FIELD_NAME)
+            if data['externalIdentifier']:
+                #we received an externalIdentifier, use it!
+                field.getMutator(item)(data['externalIdentifier'])
+                externalIdentifier = True
+            else:
+                field.getMutator(item)(field.default)
 
-        # manage annexes
-        # call processForm before adding annexes because it calls at_post_create_script
-        # where we set some usefull values regarding annexes
-        item.processForm()
-        # add warning message after processForm because the id of the item may be changed
-        if warnWrongHTML:
-            warning_message = WRONG_HTML_WARNING % (item.absolute_url_path(), memberId)
-            logger.warning(warning_message)
-            warnings.append(warning_message)
-        # existing annex types
-        fileTypes = mc.getFileTypes()
-        for annex in creationData._annexes:
-            annex_title = annex._title
-            annex_type_id = annex._annexTypeId
-            annex_filename = annex._filename
-            validFileName = annex_filename and len(annex_filename.split('.')) == 2
-            annex_file = annex._file
-            # we have an annex_type_id, find relevant MeetingFileType object
-            if not annex_type_id or not annex_type_id in [fileType.id for fileType in fileTypes]:
-                # take the first available annex fileType that is the default one
-                annex_type = fileTypes[0]
-            else:
-                annex_type = getattr(mc.meetingfiletypes, annex_type_id)
-            # manage mimetype manually
-            # as we receive base64 encoded binary, mimetypes registry can not handle this correctly...
-            mime = magic.Magic(mime=True)
-            mr = self.context.mimetypes_registry
-            annex_mimetype = mime.from_buffer(annex_file)
-            if annex_mimetype:
-                mr_mimetype = mr.lookup(annex_mimetype)
-            else:
-                # if libmagic could not determine file mimetype (like in version 5.09 of the command 'file'
-                # where MS mimetypes (doc, xls, ...) are not recognized...), we use the file extension...
-                mr_mimetype = ()
-                if validFileName:
-                    # mr.lookup here above returns a tuple so we build a tuple also...
-                    mr_mimetype = (mr.lookupExtension(annex_filename.split('.')[1]),)
-            # check if a mimetype has been found and if a file extension was defined for it
-            if not mr_mimetype:
-                warning_message = MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING % ((annex_filename or annex_title),
-                                                                         item.absolute_url_path())
+            # manage annexes
+            # call processForm before adding annexes because it calls at_post_create_script
+            # where we set some usefull values regarding annexes
+            item.processForm()
+            # add warning message after processForm because the id of the item may be changed
+            if warnWrongHTML:
+                warning_message = WRONG_HTML_WARNING % (item.absolute_url_path(), memberId)
                 logger.warning(warning_message)
                 warnings.append(warning_message)
-                continue
-            elif not mr_mimetype[0].extensions:
-                warning_message = NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % (mr_mimetype[0].normalized(),
-                                                                                (annex_filename or annex_title),
-                                                                                item.absolute_url_path())
-                logger.warning(warning_message)
-                warnings.append(warning_message)
-                continue
-            elif len(mr_mimetype[0].extensions) > 1:
-                if not validFileName:
-                    # several extensions are proposed by mimetypes_registry
-                    # and we have nothing to find out what is the extension to use
-                    warning_message = MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % \
-                        (mr_mimetype[0].normalized(),
-                         (annex_filename or annex_title),
-                         item.absolute_url_path())
+            # existing annex types
+            fileTypes = mc.getFileTypes()
+            for annex in creationData._annexes:
+                annex_title = annex._title
+                annex_type_id = annex._annexTypeId
+                annex_filename = annex._filename
+                validFileName = annex_filename and len(annex_filename.split('.')) == 2
+                annex_file = annex._file
+                # we have an annex_type_id, find relevant MeetingFileType object
+                if not annex_type_id or not annex_type_id in [fileType.id for fileType in fileTypes]:
+                    # take the first available annex fileType that is the default one
+                    annex_type = fileTypes[0]
+                else:
+                    annex_type = getattr(mc.meetingfiletypes, annex_type_id)
+                # manage mimetype manually
+                # as we receive base64 encoded binary, mimetypes registry can not handle this correctly...
+                mime = magic.Magic(mime=True)
+                mr = self.context.mimetypes_registry
+                annex_mimetype = mime.from_buffer(annex_file)
+                if annex_mimetype:
+                    mr_mimetype = mr.lookup(annex_mimetype)
+                else:
+                    # if libmagic could not determine file mimetype (like in version 5.09 of the command 'file'
+                    # where MS mimetypes (doc, xls, ...) are not recognized...), we use the file extension...
+                    mr_mimetype = ()
+                    if validFileName:
+                        # mr.lookup here above returns a tuple so we build a tuple also...
+                        mr_mimetype = (mr.lookupExtension(annex_filename.split('.')[1]),)
+                # check if a mimetype has been found and if a file extension was defined for it
+                if not mr_mimetype:
+                    warning_message = MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING % ((annex_filename or annex_title),
+                                                                             item.absolute_url_path())
                     logger.warning(warning_message)
                     warnings.append(warning_message)
                     continue
-            # now that we have the correct mimetype, we can handle the filename if necessary
-            if not validFileName:
-                # we have the file extension, generate a filename
-                annex_filename = "annex.%s" % mr_mimetype[0].extensions[0]
-            # now that we have everything we need, proceed with annex creation
-            kwargs = {}
-            kwargs['filename'] = annex_filename
-            item.addAnnex(annex_filename, annex_type, annex_title, annex_file, False, annex_type, **kwargs)
-            itemAnnexes = item.objectValues('MeetingFile')
-            lastInsertedAnnex = itemAnnexes[-1]
-            lastInsertedAnnex.getFile().setContentType(annex_mimetype)
+                elif not mr_mimetype[0].extensions:
+                    warning_message = NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % (mr_mimetype[0].normalized(),
+                                                                                    (annex_filename or annex_title),
+                                                                                    item.absolute_url_path())
+                    logger.warning(warning_message)
+                    warnings.append(warning_message)
+                    continue
+                elif len(mr_mimetype[0].extensions) > 1:
+                    if not validFileName:
+                        # several extensions are proposed by mimetypes_registry
+                        # and we have nothing to find out what is the extension to use
+                        warning_message = MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % \
+                            (mr_mimetype[0].normalized(),
+                             (annex_filename or annex_title),
+                             item.absolute_url_path())
+                        logger.warning(warning_message)
+                        warnings.append(warning_message)
+                        continue
+                # now that we have the correct mimetype, we can handle the filename if necessary
+                if not validFileName:
+                    # we have the file extension, generate a filename
+                    annex_filename = "annex.%s" % mr_mimetype[0].extensions[0]
+                # now that we have everything we need, proceed with annex creation
+                kwargs = {}
+                kwargs['filename'] = annex_filename
+                item.addAnnex(annex_filename, annex_type, annex_title, annex_file, False, annex_type, **kwargs)
+                itemAnnexes = item.objectValues('MeetingFile')
+                lastInsertedAnnex = itemAnnexes[-1]
+                lastInsertedAnnex.getFile().setContentType(annex_mimetype)
 
-        logger.info('Item at "%s"%s SOAP created by "%s".' %
-                    (item.absolute_url_path(),
-                     (externalIdentifier and ' with externalIdentifier "%s"' %
-                      item.externalIdentifier or ''), memberId))
-        if not warnings:
-            # make the user aware that warnings are displayed in the response
-            warnings.append(DEFAULT_NO_WARNING_MESSAGE)
-
-        # fallback to original user calling the SOAP method
-        if inTheNameOf:
-            setSecurityManager(oldsm)
+            logger.info('Item at "%s"%s SOAP created by "%s".' %
+                        (item.absolute_url_path(),
+                         (externalIdentifier and ' with externalIdentifier "%s"' %
+                          item.externalIdentifier or ''), memberId))
+            if not warnings:
+                # make the user aware that warnings are displayed in the response
+                warnings.append(DEFAULT_NO_WARNING_MESSAGE)
+        finally:
+            # fallback to original user calling the SOAP method
+            if inTheNameOf:
+                setSecurityManager(oldsm)
         return item.UID(), warnings
 
 

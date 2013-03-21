@@ -340,6 +340,9 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # and it will return relevant result as 'pmCreator1' can see the item
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertTrue(result._itemInfo[0].UID == item.UID())
+        # as we switch user while using inTheNameOf, make sure we have
+        # falled back to original user
+        self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
         # as 'pmCreator2', we can not get item informations
         req._inTheNameOf = 'pmCreator2'
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
