@@ -453,8 +453,8 @@ class SOAPView(BrowserView):
                 res = theTemplate.generateDocument(item, forBrowser=False)
             except PloneMeetingError, e:
                 raise ZSI.Fault(ZSI.Fault.Client, "PloneMeetingError : %s" % e.message)
-            # fallback to original user calling the SOAP method
         finally:
+            # fallback to original user calling the SOAP method
             if inTheNameOf:
                 setSecurityManager(oldsm)
         return res
