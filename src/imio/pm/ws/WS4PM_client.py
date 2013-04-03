@@ -20,10 +20,10 @@ class WS4PMLocator:
     def getWS4PMSOAPAddress(self):
         return WS4PMLocator.WS4PMSOAP_address
     def getWS4PMSOAP(self, url=None, **kw):
-        return WS4PMSOAPSOAP(url or WS4PMLocator.WS4PMSOAP_address, **kw)
+        return WS4PMSOAPBindingSOAP(url or WS4PMLocator.WS4PMSOAP_address, **kw)
 
 # Methods
-class WS4PMSOAPSOAP:
+class WS4PMSOAPBindingSOAP:
     def __init__(self, url, **kw):
         kw.setdefault("readerclass", None)
         kw.setdefault("writerclass", None)
@@ -66,7 +66,7 @@ class WS4PMSOAPSOAP:
         if isinstance(request, getUserInfosRequest) is False:
             raise TypeError, "%s incorrect request type" % (request.__class__)
         # no input wsaction
-        self.binding.Send(None, None, request, soapaction="http://portal_url/getUserInfos", **kw)
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getUserInfos", **kw)
         # no output wsaction
         response = self.binding.Receive(getUserInfosResponse.typecode)
         return response

@@ -78,7 +78,7 @@ class WS4PM(ServiceSOAPBinding):
         request = ps.Parse(getUserInfosRequest.typecode)
         return request,getUserInfosResponse()
 
-    soapAction['http://portal_url/getUserInfos'] = 'soap_getUserInfos'
+    soapAction['http://ws4pm.imio.be/getUserInfos'] = 'soap_getUserInfos'
     root[(getUserInfosRequest.typecode.nspname,getUserInfosRequest.typecode.pname)] = 'soap_getUserInfos'
 
     def soap_getItemInfos(self, ps, **kw):
