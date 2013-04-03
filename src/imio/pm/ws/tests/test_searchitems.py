@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# File: testItemMethods.py
+# File: test_searchitems.py
 #
-# Copyright (c) 2012 by CommunesPlone
+# Copyright (c) 2013 by Imio.be
 #
 # GNU General Public License (GPL)
 #

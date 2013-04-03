@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2012 by CommunesPlone
+# Copyright (c) 2013 by Imio.be
 #
 # GNU General Public License (GPL)
 #
@@ -26,8 +26,7 @@ from Products.PloneMeeting.tests.PloneMeetingTestCase import PloneMeetingTestCas
 from imio.pm.ws.soap.soapview import SOAPView
 from imio.pm.ws.testing import WS4PM_PM_TEST_PROFILE_FUNCTIONAL
 from imio.pm.ws.WS4PM_client import createItemRequest, createItemResponse, \
-                                    searchItemsResponse, \
-                                    getItemInfosRequest, getItemInfosResponse
+    searchItemsResponse, getItemInfosRequest, getItemInfosResponse
 
 
 class WS4PMTestCase(PloneMeetingTestCase):

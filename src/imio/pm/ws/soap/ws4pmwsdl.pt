@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <wsdl:definitions xmlns:tal="http://xml.zope.org/namespaces/tal"
                   xmlns:metal="http://xml.zope.org/namespaces/metal"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
