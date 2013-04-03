@@ -5,7 +5,6 @@
                   xmlns:tns="http://ws4pm.imio.be"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                  name="WS4PM"
                   targetNamespace="http://ws4pm.imio.be"
                   tal:define="portal_url context/@@plone_portal_state/portal_url">
     <wsdl:types>
