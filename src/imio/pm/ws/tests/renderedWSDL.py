@@ -287,7 +287,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <xsd:annotation>
                 <xsd:documentation> Method for testing the connection to the server Webservice </xsd:documentation>
             </xsd:annotation>
-            <soap:operation soapAction="http://ws4pm.imio.be/testConnection"/>
+            <soap:operation soapAction="http://nohost/plone/testConnection"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -299,7 +299,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <xsd:annotation>
                 <xsd:documentation> Method for checking that an element is already linked to an existing item in PloneMeeting </xsd:documentation>
             </xsd:annotation>
-            <soap:operation soapAction="http://ws4pm.imio.be/checkIsLinked"/>
+            <soap:operation soapAction="http://nohost/plone/checkIsLinked"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>

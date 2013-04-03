@@ -322,7 +322,7 @@
             <xsd:annotation>
                 <xsd:documentation> Method for getting informations about a given user </xsd:documentation>
             </xsd:annotation>
-            <soap:operation soapAction="http://portal_url/getUserInfos"/>
+            <soap:operation soapAction="http://ws4pm.imio.be/getUserInfos"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>

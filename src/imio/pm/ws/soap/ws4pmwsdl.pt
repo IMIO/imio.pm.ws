@@ -295,7 +295,7 @@
             <xsd:annotation>
                 <xsd:documentation> Method for testing the connection to the server Webservice </xsd:documentation>
             </xsd:annotation>
-            <soap:operation soapAction="http://ws4pm.imio.be/testConnection"/>
+            <soap:operation tal:attributes="soapAction string:${portal_url}/testConnection" soapAction="http://ws4pm.imio.be/testConnection"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -307,7 +307,7 @@
             <xsd:annotation>
                 <xsd:documentation> Method for checking that an element is already linked to an existing item in PloneMeeting </xsd:documentation>
             </xsd:annotation>
-            <soap:operation soapAction="http://ws4pm.imio.be/checkIsLinked"/>
+            <soap:operation tal:attributes="soapAction string:${portal_url}/checkIsLinked" soapAction="http://ws4pm.imio.be/checkIsLinked"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
