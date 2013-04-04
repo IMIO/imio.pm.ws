@@ -117,6 +117,7 @@ class SOAPView(BrowserView):
         '''
           This is the accessed SOAP method for creating an item
         '''
+        import ipdb; ipdb.set_trace()
         response._UID, response._warnings = self._createItem(request._meetingConfigId,
                                                              request._proposingGroupId,
                                                              request._creationData,
@@ -528,6 +529,10 @@ class SOAPView(BrowserView):
                 #do not take annexes into account
                 if not elt == '_annexes':
                     data[elt[1:]] = creationData.__dict__[elt]
+
+            #category can not be None
+            if data['category'] is None:
+                data['category'] = ''
 
             type_name = mc.getItemTypeName()
             data.update({'proposingGroup': proposingGroupId,
