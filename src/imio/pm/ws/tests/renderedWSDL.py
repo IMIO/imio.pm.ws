@@ -86,7 +86,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8"?>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="getItemTemplateResponse">
-                <xsd:complexType name="ItemTemplateResponse">
+                <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="file" type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
                     </xsd:sequence>
