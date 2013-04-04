@@ -117,7 +117,6 @@ class SOAPView(BrowserView):
         '''
           This is the accessed SOAP method for creating an item
         '''
-        import ipdb; ipdb.set_trace()
         response._UID, response._warnings = self._createItem(request._meetingConfigId,
                                                              request._proposingGroupId,
                                                              request._creationData,
