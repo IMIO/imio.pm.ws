@@ -34,6 +34,3 @@ msgstr "Mimetype could not be determined correctly for annex '${annex_path}' of 
 msgid "No extension available in mimetypes_registry for mimetype '${mime}' for annex '${annex_path}' of item '${item_path}', this annex was not added."
 msgstr "No extension available in mimetypes_registry for mimetype '${mime}' for annex '${annex_path}' of item '${item_path}', this annex was not added."
 
-#. Default: "There was NO WARNING message during item creation."
-msgid "There was NO WARNING message during item creation."
-msgstr "There was NO WARNING message during item creation."

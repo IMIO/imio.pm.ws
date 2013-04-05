@@ -12,7 +12,6 @@ from time import localtime
 from DateTime import DateTime
 import magic
 
-DEFAULT_NO_WARNING_MESSAGE = "There was NO WARNING message during item creation."
 WRONG_HTML_WARNING = "HTML used for creating the item at '${item_path}' by '${creator}' was not valid. " \
                      "Used corrected HTML."
 MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING = "Mimetype could not be determined correctly for annex '${annex_path}' of " \
@@ -694,11 +693,6 @@ class SOAPView(BrowserView):
                         (item.absolute_url_path(),
                          (externalIdentifier and ' with externalIdentifier "%s"' %
                           item.externalIdentifier or ''), memberId))
-            if not warnings:
-                # make the user aware that warnings are displayed in the response
-                warnings.append(translate(DEFAULT_NO_WARNING_MESSAGE,
-                                          domain='imio.pm.ws',
-                                          context=portal.REQUEST))
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:

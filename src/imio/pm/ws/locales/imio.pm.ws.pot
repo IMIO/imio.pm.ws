@@ -11,11 +11,6 @@ msgstr ""
 "Preferred-encodings: utf-8 latin1\n"
 "Domain: imio.pm.ws\n"
 
-
-#. Default: "There was NO WARNING message during item creation."
-msgid "There was NO WARNING message during item creation."
-msgstr ""
-
 #. Default: "HTML used for creating the item at '${item_path}' by '${creator}' was not valid. Used corrected HTML."
 msgid "HTML used for creating the item at '${item_path}' by '${creator}' was not valid. Used corrected HTML."
 msgstr ""

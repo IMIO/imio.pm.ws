@@ -34,7 +34,3 @@ msgstr "Le type MIME n'a pu être déterminé correctement pour l'annexe '${anne
 msgid "No extension available in mimetypes_registry for mimetype '${mime}' for annex '${annex_path}' of item '${item_path}', this annex was not added."
 msgstr "Aucune extension disponible dans mimetypes_registry pour le type MIME '${mime}' de l'annexe '${annex_path}' du point '${item_path}', l'annexe n'a pas été ajoutée."
 
-#. Default: "There was NO WARNING message during item creation."
-msgid "There was NO WARNING message during item creation."
-msgstr "Il n'y a eu aucun avertissement pendant la création du point."
-
