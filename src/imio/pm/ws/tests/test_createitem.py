@@ -24,6 +24,7 @@
 
 import base64
 import ZSI
+from zope.i18n import translate
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import createItemResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
@@ -82,8 +83,12 @@ SOAPAction: /
   <UID>%s</UID>
   <warnings>%s</warnings>
 </ns1:createItemResponse>
-""" % (newItemUID, WRONG_HTML_WARNING % ('/'.join(newItem.getPhysicalPath()),
-                                         self.portal.portal_membership.getAuthenticatedMember().getId()))
+""" % (newItemUID, translate(WRONG_HTML_WARNING,
+                             domain='imio.pm.ws',
+                             mapping={'item_path': newItem.absolute_url_path(),
+                                      'creator': 'pmCreator1'},
+                             context=self.request)
+       )
         self.assertEquals(expected, resp)
         # the item is actually created
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemUID)) == 1)
@@ -302,7 +307,11 @@ SOAPAction: /
   <UID>%s</UID>
   <warnings>%s</warnings>
 </ns1:createItemResponse>
-""" % (newItem.UID(), WRONG_HTML_WARNING % (newItem.absolute_url_path(), 'pmCreator1'))
+""" % (newItem.UID(), translate(WRONG_HTML_WARNING,
+                                domain='imio.pm.ws',
+                                mapping={'item_path': newItem.absolute_url_path(),
+                                         'creator': 'pmCreator1'},
+                                context=self.request))
         self.assertEquals(expected, resp)
         #now test warnings around file mimetype
         data = {'title': 'My annex',
@@ -323,10 +332,17 @@ SOAPAction: /
   <warnings>%s</warnings>
 </ns1:createItemResponse>
 """ % (newItem.UID(),
-       WRONG_HTML_WARNING % (newItem.absolute_url_path(), 'pmCreator1'),
-       MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % ('application/octet-stream',
-                                                           'notValidFileNameNoExtension',
-                                                           newItem.absolute_url_path()),
+       translate(WRONG_HTML_WARNING,
+                 domain='imio.pm.ws',
+                 mapping={'item_path': newItem.absolute_url_path(),
+                          'creator': 'pmCreator1'},
+                 context=self.request),
+       translate(MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
+                 domain='imio.pm.ws',
+                 mapping={'mime': 'application/octet-stream',
+                          'annex_path': 'notValidFileNameNoExtension',
+                          'item_path': newItem.absolute_url_path()},
+                 context=self.request)
        )
         self.assertEquals(expected, resp)
 

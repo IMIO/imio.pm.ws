@@ -12,15 +12,17 @@ from time import localtime
 from DateTime import DateTime
 import magic
 
-DEFAULT_NO_WARNING_MESSAGE = 'There was NO WARNING message during item creation.'
-WRONG_HTML_WARNING = 'HTML used for creating item at "%s" by "%s" was not valid.  Used BeautifulSoup corrected HTML.'
-MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING = 'Mimetype could not be determined correctly for annex "%s" of item "%s", ' \
-                                      'this annex was not added.'
-NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = 'No extensions available in mimetypes_registry for mimetype "%s" ' \
-                                             'for annex "%s" of item "%s", this annex was not added.'
-MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "Could not determine an extension to use for mimetype '%s', ' \
-                                                  'too many available, for annex '%s' of item '%s', ' \
-                                                  'this annex was not added."
+DEFAULT_NO_WARNING_MESSAGE = "There was NO WARNING message during item creation."
+WRONG_HTML_WARNING = "HTML used for creating the item at '${item_path}' by '${creator}' was not valid. " \
+                     "Used corrected HTML."
+MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING = "Mimetype could not be determined correctly for annex '${annex_path}' of " \
+                                      "item '${item_path}', this annex was not added."
+NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "No extension available in mimetypes_registry for mimetype '${mime}' " \
+                                             "for annex '${annex_path}' of item '${item_path}', " \
+                                             "this annex was not added."
+MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "Could not determine an extension to use for mimetype '${mime}', " \
+                                                   "too many available, for annex '${annex_path}' of " \
+                                                   "item '${item_path}', this annex was not added."
 
 
 class SOAPView(BrowserView):
@@ -608,7 +610,11 @@ class SOAPView(BrowserView):
             item.processForm()
             # add warning message after processForm because the id of the item may be changed
             if warnWrongHTML:
-                warning_message = WRONG_HTML_WARNING % (item.absolute_url_path(), memberId)
+                warning_message = translate(WRONG_HTML_WARNING,
+                                            domain='imio.pm.ws',
+                                            mapping={'item_path': item.absolute_url_path(),
+                                                     'creator': memberId},
+                                            context=portal.REQUEST)
                 logger.warning(warning_message)
                 warnings.append(warning_message)
             # existing annex types
@@ -641,15 +647,21 @@ class SOAPView(BrowserView):
                         mr_mimetype = (mr.lookupExtension(annex_filename.split('.')[1]),)
                 # check if a mimetype has been found and if a file extension was defined for it
                 if not mr_mimetype:
-                    warning_message = MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING % ((annex_filename or annex_title),
-                                                                             item.absolute_url_path())
+                    warning_message = translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
+                                                domain='imio.pm.ws',
+                                                mapping={'annex_path': (annex_filename or annex_title),
+                                                         'item_path': item.absolute_url_path()},
+                                                context=portal.REQUEST)
                     logger.warning(warning_message)
                     warnings.append(warning_message)
                     continue
                 elif not mr_mimetype[0].extensions:
-                    warning_message = NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % (mr_mimetype[0].normalized(),
-                                                                                    (annex_filename or annex_title),
-                                                                                    item.absolute_url_path())
+                    warning_message = translate(NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
+                                                domain='imio.pm.ws',
+                                                mapping={'mime': mr_mimetype[0].normalized(),
+                                                         'annex_path': (annex_filename or annex_title),
+                                                         'item_path': item.absolute_url_path()},
+                                                context=portal.REQUEST)
                     logger.warning(warning_message)
                     warnings.append(warning_message)
                     continue
@@ -657,10 +669,12 @@ class SOAPView(BrowserView):
                     if not validFileName:
                         # several extensions are proposed by mimetypes_registry
                         # and we have nothing to find out what is the extension to use
-                        warning_message = MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING % \
-                            (mr_mimetype[0].normalized(),
-                             (annex_filename or annex_title),
-                             item.absolute_url_path())
+                        warning_message = translate(MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
+                                                    domain='imio.pm.ws',
+                                                    mapping={'mime': mr_mimetype[0].normalized(),
+                                                             'annex_path': (annex_filename or annex_title),
+                                                             'item_path': item.absolute_url_path()},
+                                                    context=portal.REQUEST)
                         logger.warning(warning_message)
                         warnings.append(warning_message)
                         continue
@@ -682,7 +696,9 @@ class SOAPView(BrowserView):
                           item.externalIdentifier or ''), memberId))
             if not warnings:
                 # make the user aware that warnings are displayed in the response
-                warnings.append(DEFAULT_NO_WARNING_MESSAGE)
+                warnings.append(translate(DEFAULT_NO_WARNING_MESSAGE,
+                                          domain='imio.pm.ws',
+                                          context=portal.REQUEST))
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
