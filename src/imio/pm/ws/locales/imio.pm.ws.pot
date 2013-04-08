@@ -26,3 +26,7 @@ msgstr ""
 #. Default: "Could not determine an extension to use for mimetype '${mime}', too many available, for annex '${annex_path}' of item '${item_path}', this annex was not added."
 msgid "Could not determine an extension to use for mimetype '${mime}', too many available, for annex '${annex_path}' of item '${item_path}', this annex was not added."
 msgstr ""
+
+#. Default: "This item has been created using the Webservice."
+msgid "This item has been created using the Webservice."
+msgstr ""

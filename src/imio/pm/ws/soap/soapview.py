@@ -22,6 +22,7 @@ NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "No extension available in mimetype
 MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "Could not determine an extension to use for mimetype '${mime}', " \
                                                    "too many available, for annex '${annex_path}' of " \
                                                    "item '${item_path}', this annex was not added."
+ITEM_SOAP_CREATED_COMMENT = "This item has been created using the Webservice."
 
 
 class SOAPView(BrowserView):
@@ -688,6 +689,12 @@ class SOAPView(BrowserView):
                 itemAnnexes = item.objectValues('MeetingFile')
                 lastInsertedAnnex = itemAnnexes[-1]
                 lastInsertedAnnex.getFile().setContentType(annex_mimetype)
+
+            # change the comment in the item's add a line in the item's history
+            review_history = item.workflow_history[item.getWorkflowName()]
+            review_history[0]['comments'] = translate(ITEM_SOAP_CREATED_COMMENT,
+                                                      domain='imio.pm.ws',
+                                                      context=portal.REQUEST)
 
             logger.info('Item at "%s"%s SOAP created by "%s".' %
                         (item.absolute_url_path(),
