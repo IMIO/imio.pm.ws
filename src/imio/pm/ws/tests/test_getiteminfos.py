@@ -234,7 +234,6 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         afile.close()
         kwargs = {'filename': 'myBeautifulTestFile.odt'}
         newItem.addAnnex('myBeautifulTestFile.odt',
-                         '',
                          'My BeautifulTestFile title',
                          annex_file,
                          False,

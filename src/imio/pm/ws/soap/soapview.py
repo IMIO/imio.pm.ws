@@ -685,7 +685,7 @@ class SOAPView(BrowserView):
                 # now that we have everything we need, proceed with annex creation
                 kwargs = {}
                 kwargs['filename'] = annex_filename
-                item.addAnnex(annex_filename, annex_type, annex_title, annex_file, False, annex_type, **kwargs)
+                item.addAnnex(annex_filename, annex_title, annex_file, False, annex_type, **kwargs)
                 itemAnnexes = item.objectValues('MeetingFile')
                 lastInsertedAnnex = itemAnnexes[-1]
                 lastInsertedAnnex.getFile().setContentType(annex_mimetype)
