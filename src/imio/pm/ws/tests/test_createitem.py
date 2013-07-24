@@ -126,7 +126,7 @@ SOAPAction: /
         req._proposingGroupId = 'developers'
         # if category is mandatory and empty, it raises ZSI.Fault
         self.meetingConfig.setUseGroupsAsCategories(False)
-        req._creationData._category = ''
+        req._creationData._category = None
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "In this config, category is mandatory!")
