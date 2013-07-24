@@ -34,7 +34,7 @@ class testSOAPConnection(WS4PMTestCase):
         Tests the soap.connectionRequest method by accessing the real SOAP service
     """
 
-    def test_connectionRequest(self):
+    def test_ws_connectionRequest(self):
         """
           Test that we can connect to the webservice if we are authenticated in PloneMeeting
         """
@@ -53,5 +53,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSOAPConnection, prefix='test_'))
+    suite.addTest(makeSuite(testSOAPConnection, prefix='test_ws_'))
     return suite

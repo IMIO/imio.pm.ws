@@ -37,7 +37,7 @@ class testSOAPCreateItem(WS4PMTestCase):
         Tests the soap.createItemRequest method by accessing the real SOAP service
     """
 
-    def test_createItemRequest(self):
+    def test_ws_createItemRequest(self):
         """
           In the default test configuration, the user 'pmCreator1' can create an item for
           proposingGroup 'developers' in the MeetingConfig 'plonegov-assembly'
@@ -94,8 +94,8 @@ SOAPAction: /
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemUID)) == 1)
         # responseHolder for tests here above
         responseHolder = createItemResponse()
-        # check that we can create an item with an empty HTML field
-        req._creationData._decision = ''
+        # check that we can create an item with a NoneType HTML field
+        req._creationData._decision = None
         newItemWithEmptyDecisionUID = SOAPView(self.portal, req).createItemRequest(req, responseHolder)._UID
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga',
                                                        UID=newItemWithEmptyDecisionUID)) == 1)
@@ -103,6 +103,13 @@ SOAPAction: /
         obj = self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)[0].getObject()
         self.failIf(obj.getDecision() != "<p></p>")
         # if the user can not create the item, a ZSI.Fault is returned
+        # the title is mandatory
+        old_title = req._creationData._title
+        req._creationData._title = None
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string, "A 'title' is mandatory!")
+        req._creationData._title = old_title
         # the meetingConfigId must exists
         req._meetingConfigId = 'wrongMeetingConfigId'
         with self.assertRaises(ZSI.Fault) as cm:
@@ -146,7 +153,7 @@ SOAPAction: /
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
 
-    def test_createItemWithOneAnnexRequest(self):
+    def test_ws_createItemWithOneAnnexRequest(self):
         """
           Test SOAP service behaviour when creating items with one annex
         """
@@ -193,7 +200,7 @@ SOAPAction: /
         #the annex metadata are ok
         self.failUnless(annex.Title() == 'My annex 1' and annex.getMeetingFileType().getId() == 'financial-analysis')
 
-    def test_createItemWithSeveralAnnexesRequest(self):
+    def test_ws_createItemWithSeveralAnnexesRequest(self):
         """
           Test SOAP service behaviour when creating items with several annexes of different types
         """
@@ -288,7 +295,7 @@ SOAPAction: /
         self.failUnless(annexes[2].getFile().filename == 'largeTestFile.doc')
         self.failUnless(annexes[3].getFile().filename == 'validExtension.bin')
 
-    def test_createItemWithWarnings(self):
+    def test_ws_createItemWithWarnings(self):
         """
           Test that during item creation, if non blocker errors occur (warnings), it is displayed in the response
         """
@@ -346,7 +353,7 @@ SOAPAction: /
        )
         self.assertEquals(expected, resp)
 
-    def test_createItemInTheNameOf(self):
+    def test_ws_createItemInTheNameOf(self):
         """
           It is possible for Managers and MeetingManagers to create an item inTheNameOf another user
           Every other checks are made except that for using the inTheNameOf functionnality :
@@ -407,5 +414,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSOAPCreateItem, prefix='test_'))
+    suite.addTest(makeSuite(testSOAPCreateItem, prefix='test_ws_'))
     return suite

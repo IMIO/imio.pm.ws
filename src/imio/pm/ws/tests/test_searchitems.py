@@ -36,7 +36,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         Tests the soap.searchItemsRequest method by accessing the real SOAP service
     """
 
-    def test_searchItemsRequest(self):
+    def test_ws_searchItemsRequest(self):
         """
           Test that searching with given parameters returns valuable informations
         """
@@ -185,7 +185,7 @@ class testSOAPSearchItems(WS4PMTestCase):
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
 
-    def test_searchItemsInTheNameOf(self):
+    def test_ws_searchItemsInTheNameOf(self):
         """
           Test that searching items inTheNameOf antother user works
           Create 2 items, one by 'pmCreator1', member of the 'developers' group
@@ -271,5 +271,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSOAPSearchItems, prefix='test_'))
+    suite.addTest(makeSuite(testSOAPSearchItems, prefix='test_ws_'))
     return suite

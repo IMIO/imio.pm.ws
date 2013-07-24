@@ -33,7 +33,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         Tests the soap.getUserInfosRequest method by accessing the real SOAP service
     """
 
-    def test_canNotGetUserInfosForAnotherUser(self):
+    def test_ws_canNotGetUserInfosForAnotherUser(self):
         """
           Test that getting informations about another user is not possible
           except if the connected user is MeetingManager or Manager
@@ -53,7 +53,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         response = SOAPView(self.portal, req).getUserInfosRequest(req, responseHolder)
         self.assertTrue(response._fullname == 'M. PMCreator Two')
 
-    def test_queriedUserMustExists(self):
+    def test_ws_queriedUserMustExists(self):
         """
           Test that getting informations fails if the queried user does not exist
         """
@@ -66,7 +66,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         self.assertEquals(cm.exception.string,
                           "Trying to get user informations for an unexisting user 'unexistingUserId'!")
 
-    def test_getOwnUserInfosRequest(self):
+    def test_ws_getOwnUserInfosRequest(self):
         """
           Test that getting informations about a user returns valuable informations
         """
@@ -89,7 +89,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         self.assertTrue(response._email == 'pmcreator2@plonemeeting.org')
         self.assertTrue(response._groups == [])
 
-    def test_getUserInfosShowGroups(self):
+    def test_ws_getUserInfosShowGroups(self):
         """
           Test getting user informations including groups
         """
@@ -149,5 +149,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSOAPGetUserInfos, prefix='test_'))
+    suite.addTest(makeSuite(testSOAPGetUserInfos, prefix='test_ws_'))
     return suite

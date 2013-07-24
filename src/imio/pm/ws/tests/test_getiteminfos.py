@@ -38,7 +38,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         Tests the soap.getItemInfosRequest method by accessing the real SOAP service
     """
 
-    def test_getItemInfosRequest(self):
+    def test_ws_getItemInfosRequest(self):
         """
           Test that getting an item with a given UID returns valuable informations
         """
@@ -135,7 +135,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         resp = self._getItemInfos(newItemUID)
         self.assertEquals(expected, resp)
 
-    def test_getItemInfosWithExtraInfosRequest(self):
+    def test_ws_getItemInfosWithExtraInfosRequest(self):
         """
           Test that getting an item with a given UID and specifying that we want
           extraInfos returns every available informations of the item
@@ -157,7 +157,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         for extraInfosField in extraInfosFields:
             self.failUnless(extraInfosField.getName() in resp)
 
-    def test_getItemInfosWithAnnexesRequest(self):
+    def test_ws_getItemInfosWithAnnexesRequest(self):
         """
           Test that getting an item with a given UID returns valuable informations and linked annexes
         """
@@ -279,7 +279,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         #2 annexes are shown
         self.assertEquals(expected, resp)
 
-    def test_getItemInfosWithTemplatesRequest(self):
+    def test_ws_getItemInfosWithTemplatesRequest(self):
         """
           Test that getting an item with a given UID and specifying that we want
           showTemplates returns informations about generatable POD templates
@@ -304,7 +304,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertTrue(resp._itemInfo[0]._templates[0]._templateFilename, 'Mynewitemtitle-Meetingitem')
         self.assertTrue(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
 
-    def test_getItemInfosInTheNameOf(self):
+    def test_ws_getItemInfosInTheNameOf(self):
         """
           Test that getting an item inTheNameOf antother user works
           Create an item by 'pmCreator1', member of the 'developers' group
@@ -358,5 +358,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSOAPGetItemInfos, prefix='test_'))
+    suite.addTest(makeSuite(testSOAPGetItemInfos, prefix='test_ws_'))
     return suite

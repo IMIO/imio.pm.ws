@@ -135,3 +135,12 @@ def deserialize(objectToDeserialize):
     root = etree.XML(str(deserializedObject))
     body = root[0]
     return etree.tostring(body, encoding='utf-8', pretty_print=True)
+
+
+# this is necessary to execute base test
+# test_tescasesubproduct_VerifyTestFiles from PloneMeeting
+def test_suite():
+    from unittest import TestSuite, makeSuite
+    suite = TestSuite()
+    suite.addTest(makeSuite(WS4PMTestCase, prefix='test_dummy_'))
+    return suite

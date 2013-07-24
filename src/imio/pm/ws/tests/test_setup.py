@@ -31,7 +31,7 @@ class testSetup(WS4PMTestCase):
         Tests the setup : install/uninstall process and WSDL
     """
 
-    def test_renderedWSDL(self):
+    def test_ws_renderedWSDL(self):
         """
           Check that the rendered WSDL correspond to what we expect
         """
@@ -40,7 +40,7 @@ class testSetup(WS4PMTestCase):
         self.maxDiff = None
         self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), renderedWSDL)
 
-    def test_uninstall(self):
+    def test_ws_uninstall(self):
         """
           At uninstall time, we remove the BrowserLayer that makes
           schemaextender and ws4pm.wsdl available.  We also remove the added indexes/columns.
@@ -76,5 +76,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSetup, prefix='test_'))
+    suite.addTest(makeSuite(testSetup, prefix='test_ws_'))
     return suite

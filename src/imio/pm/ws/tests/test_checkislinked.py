@@ -33,7 +33,7 @@ class testSOAPCheckIsLinked(WS4PMTestCase):
         Tests the soap.checkItemIsLinkedRequest method by accessing the real SOAP service
     """
 
-    def test_checkIsLinkedRequest(self):
+    def test_ws_checkIsLinkedRequest(self):
         """
           Test that we can ckech that an item is linked to a given externalIdentifier even
           if the MeetingManager doing the can can not actually see the item... (we use unrestricted search)
@@ -83,5 +83,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSOAPCheckIsLinked, prefix='test_'))
+    suite.addTest(makeSuite(testSOAPCheckIsLinked, prefix='test_ws_'))
     return suite

@@ -43,7 +43,7 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         # in the PM test profile, some templates are only defined for the plonemeeting-assembly
         self.usedMeetingConfigId = "plonemeeting-assembly"
 
-    def test_getItemTemplateRequest(self):
+    def test_ws_getItemTemplateRequest(self):
         """
           Test that getting an item with a given UID and specifying that we want
           showTemplates returns informations about generatable POD templates
@@ -85,7 +85,7 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, 'PloneMeetingError : %s' % POD_ERROR % NO_PY_PATH % 'pdf')
 
-    def test_getItemTemplateInTheNameOf(self):
+    def test_ws_getItemTemplateInTheNameOf(self):
         """
           Test that getting an item template inTheNameOf antother user works
           Create an item by 'pmCreator1', member of the 'developers' group
@@ -153,5 +153,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSOAPGetItemTemplate, prefix='test_'))
+    suite.addTest(makeSuite(testSOAPGetItemTemplate, prefix='test_ws_'))
     return suite

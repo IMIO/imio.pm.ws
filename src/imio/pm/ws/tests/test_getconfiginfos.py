@@ -35,7 +35,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         Tests the soap.getConfigInfosRequest method by accessing the real SOAP service
     """
 
-    def test_getConfigInfosRequest(self):
+    def test_ws_getConfigInfosRequest(self):
         """
           Test that getting informations about the configuration returns valuable informations
         """
@@ -87,7 +87,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
             + "\n</ns1:getConfigInfosResponse>\n"
         self.assertEquals(expected, resp)
 
-    def test_showCategories(self):
+    def test_ws_showCategories(self):
         """
           Test while getting configInfos with categories.
         """
@@ -127,7 +127,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         # the category 'subproducts' is only available to vendors
         self.assertFalse('<id>subproducts</id>' in resp)
 
-    def test_showCategoriesForUser(self):
+    def test_ws_showCategoriesForUser(self):
         """
           Test while getting configInfos with categories and using userToShowCategoriesFor.
         """
@@ -187,5 +187,5 @@ def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
-    suite.addTest(makeSuite(testSOAPGetConfigInfos, prefix='test_'))
+    suite.addTest(makeSuite(testSOAPGetConfigInfos, prefix='test_ws_'))
     return suite
