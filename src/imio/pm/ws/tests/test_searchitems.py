@@ -59,20 +59,23 @@ class testSOAPSearchItems(WS4PMTestCase):
         request = serializeRequest(req)
         #This is what the sent enveloppe should looks like
         expected = """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">""" \
-"""<SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:searchItemsRequest>""" \
-"""<Title>%s</Title><getCategory>%s</getCategory></ns1:searchItemsRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" \
-% (req._Title, req._getCategory)
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">""" \
+            """<SOAP-ENV:Header></SOAP-ENV:Header>""" \
+            """<SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:searchItemsRequest>""" \
+            """<Title>%s</Title><getCategory>%s</getCategory></ns1:searchItemsRequest>""" \
+            """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % (req._Title, req._getCategory)
         result = """%s""" % request
         self.assertEquals(expected, result)
         #now really use the SOAP method to get informations about the item
         resp = self._searchItems(req)
         #the item is not in a meeting so the meeting date is 1950-01-01
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
     <id>my-new-item-title</id>
@@ -110,9 +113,10 @@ class testSOAPSearchItems(WS4PMTestCase):
         #searching for items can returns several items
         #for example here, searching for 'item title' in existing items title will returns 2 items...
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
     <id>o3</id>
@@ -148,9 +152,10 @@ class testSOAPSearchItems(WS4PMTestCase):
         req._Title = 'aWrongTitle'
         resp = self._searchItems(req)
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 """
         self.assertEquals(resp, expected)
         #if not search params is pass, a ZSI.Fault is raised

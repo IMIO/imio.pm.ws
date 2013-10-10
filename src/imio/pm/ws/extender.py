@@ -27,15 +27,17 @@ class ExternalIdentifierExtender(object):
     layer = IWS4PMLayer
 
     fields = [
-        ExternalIdentifierStringField(EXTERNAL_IDENTIFIER_FIELD_NAME,
-        required=False,
-        default='',
-        searchable=False,
-        languageIndependent=True,
-        widget = StringWidget(
-                    label=(u"External identifier"),
-                    description=(u"You may enter an external identifier here if the item is created using an external service"),))
-            ]
+        ExternalIdentifierStringField(
+            EXTERNAL_IDENTIFIER_FIELD_NAME,
+            required=False,
+            default='',
+            searchable=False,
+            languageIndependent=True,
+            widget=StringWidget(
+                label=(u"External identifier"),
+                description=(u"You may enter an external identifier here if the "
+                             u"item is created using an external service"),))
+    ]
 
     def __init__(self, context):
         self.context = context
@@ -47,4 +49,3 @@ class ExternalIdentifierExtender(object):
 
     def getFields(self):
         return self.fields
-

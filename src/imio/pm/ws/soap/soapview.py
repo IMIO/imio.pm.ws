@@ -368,7 +368,8 @@ class SOAPView(BrowserView):
                                                                                 domain='plone',
                                                                                 context=portal.REQUEST)
                     # add the category title
-                    itemInfo._extraInfos['category_title'] = item.displayValue(item.listCategories(), item.getCategory())
+                    itemInfo._extraInfos['category_title'] = item.displayValue(item.listCategories(),
+                                                                               item.getCategory())
                     # add the creator fullname
                     itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
                 if showAnnexes:

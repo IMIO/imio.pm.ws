@@ -56,21 +56,24 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         request = serializeRequest(req)
         #This is what the sent enveloppe should looks like
         expected = """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">""" \
-"""<SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getItemInfosRequest>""" \
-"""<UID>%s</UID><showExtraInfos>false</showExtraInfos><showAnnexes>false</showAnnexes>""" \
-"""<showTemplates>false</showTemplates></ns1:getItemInfosRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">""" \
+            """<SOAP-ENV:Header></SOAP-ENV:Header>""" \
+            """<SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getItemInfosRequest>""" \
+            """<UID>%s</UID><showExtraInfos>false</showExtraInfos><showAnnexes>false</showAnnexes>""" \
+            """<showTemplates>false</showTemplates></ns1:getItemInfosRequest>""" \
+            """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
         result = """%s""" % request
         self.assertEquals(expected, result)
         #now really use the SOAP method to get informations about the item
         resp = self._getItemInfos(newItemUID)
         #the item is not in a meeting so the meeting date is 1950-01-01
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
-"""xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
-"""xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
+            """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
     <id>my-new-item-title</id>
@@ -100,9 +103,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         resp = self._getItemInfos(itemInMeeting.UID())
         meetingDate = gDateTime.get_formatted_content(gDateTime(), localtime(meeting.getDate()))
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
     <id>o3</id>
@@ -125,9 +129,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # unexisting item UID
         resp = self._getItemInfos('aWrongUID')
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 """
         self.assertEquals(expected, resp)
         #item UID the logged in user can not access
@@ -174,10 +179,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         #get informations about the item, by default 'showAnnexes' is False
         resp = self._getItemInfos(newItemUID)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
-"""xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
-"""xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
+            """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
     <id>my-new-item-title</id>
@@ -199,9 +204,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         #now with 'showAnnexes=True'
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
     <id>my-new-item-title</id>
@@ -241,9 +247,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                          **kwargs)
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
     <id>my-new-item-title</id>

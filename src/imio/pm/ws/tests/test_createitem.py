@@ -77,9 +77,10 @@ SOAPAction: /
         newItemUID = newItem.UID()
         resp = deserialize(response)
         expected = """<ns1:createItemResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """\
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """\
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <UID>%s</UID>
   <warnings>%s</warnings>
 </ns1:createItemResponse>
@@ -136,13 +137,15 @@ SOAPAction: /
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
-            "This config does not use categories, the given 'wrong-category-id' category can not be used!")
+                          "This config does not use categories, the given 'wrong-category-id' "
+                          "category can not be used!")
         # wrong category and actually accepting categories, aka useGroupsAsCategories to False
         self.meetingConfig.setUseGroupsAsCategories(False)
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
-            "'wrong-category-id' is not available for the 'developers' group!")
+                          "'wrong-category-id' is not available for "
+                          "the 'developers' group!")
         # if the user trying to create an item has no member area, a ZSI.Fault is raised
         # remove the 'pmCreator2' personal area
         self.changeUser('admin')
@@ -245,7 +248,7 @@ SOAPAction: /
         annexesEnveloppePart = ""
         for annex in req._creationData._annexes:
             annexesEnveloppePart = annexesEnveloppePart + """<annexes xsi:type="ns1:AnnexInfo"><title>%s</title>""" \
-"""<annexTypeId>%s</annexTypeId><filename>%s</filename><file>
+                """<annexTypeId>%s</annexTypeId><filename>%s</filename><file>
 %s</file></annexes>""" % (annex._title, annex._annexTypeId, annex._filename, base64.encodestring(annex._file))
         #This is what the sent enveloppe should looks like
         expected = """POST /plone/createItemRequest HTTP/1.0
@@ -308,9 +311,10 @@ SOAPAction: /
         newItem, response = self._createItem(req)
         resp = deserialize(response)
         expected = """<ns1:createItemResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <UID>%s</UID>
   <warnings>%s</warnings>
 </ns1:createItemResponse>
@@ -331,9 +335,10 @@ SOAPAction: /
         resp = deserialize(response)
         #2 warnings are returned
         expected = """<ns1:createItemResponse xmlns:ns1="http://ws4pm.imio.be" """ \
-"""xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
-"""xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
-"""xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
+            """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
+            """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
+            """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <UID>%s</UID>
   <warnings>%s</warnings>
   <warnings>%s</warnings>

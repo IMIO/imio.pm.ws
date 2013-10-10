@@ -117,7 +117,8 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
-            "You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!")
+                          "You need to be 'Manager' or 'MeetingManager' to get "
+                          "a template for an item 'inTheNameOf'!")
         # now as MeetingManager, it works
         self.changeUser('pmManager')
         renderedTemplate = SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
