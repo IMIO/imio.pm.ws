@@ -67,7 +67,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
                    """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
                    """xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
                    """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">"""
-        elements = self.tool.getActiveConfigs() + self.tool.getActiveGroups()
+        elements = self.tool.getActiveConfigs() + self.tool.getMeetingGroups()
         # content
         for element in elements:
             expected += """
@@ -104,7 +104,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
                    """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
                    """xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
                    """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">"""
-        elements = self.tool.getActiveConfigs() + self.tool.getActiveGroups()
+        elements = self.tool.getActiveConfigs() + self.tool.getMeetingGroups()
         # content
         for element in elements:
             expected += """

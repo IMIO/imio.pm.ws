@@ -213,7 +213,7 @@ class SOAPView(BrowserView):
             res.append(configInfo)
 
         # MeetingGroups
-        for group in tool.getActiveGroups():
+        for group in tool.getMeetingGroups():
             configInfo = ConfigInfo()
             configInfo._UID = group.UID()
             configInfo._id = group.getId()
