@@ -12,7 +12,6 @@
 
   <include package="archetypes.schemaextender" />
   <include package="Products.CMFPlacefulWorkflow"/>
-  <include package="Products.PloneMeeting"/>
 
   <!-- include the soap namespace for the soap:view directive -->
   <include package="z3c.soap" file="meta.zcml" />

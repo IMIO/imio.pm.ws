@@ -2,6 +2,7 @@
            i18n_domain="imio.pm.ws">
 
     <include file="configure.zcml"/>
+    <include package="Products.PloneMeeting" />
     <include package="Products.PloneMeeting" file="overrides.zcml"/>
 
 </configure>
