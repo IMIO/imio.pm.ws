@@ -514,6 +514,29 @@ class SOAPView(BrowserView):
         if not creationData.__dict__['_title']:
             raise ZSI.Fault(ZSI.Fault.Client, "A 'title' is mandatory!")
 
+        # build creationData
+        # creationData keys begin with an '_' (_title, _description, ...) so tranform them
+        data = {}
+        for elt in creationData.__dict__.keys():
+            # do not take annexes into account
+            if not elt == '_annexes':
+                data[elt[1:]] = creationData.__dict__[elt]
+
+        # category can not be None
+        if data['category'] is None:
+            data['category'] = ''
+
+        # raise if we pass an optional attribute that is not activated in this MeetingConfig
+        optionalItemFields = mc.listUsedItemAttributes()
+        activatedOptionalItemFields = mc.getUsedItemAttributes()
+        for field in data:
+            # if the field is an optional field that is not used and that has a value (contains data), we raise
+            if field in optionalItemFields and not \
+               field in activatedOptionalItemFields and \
+               data[field]:
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "The optional field '%s' is not activated in this configuration!" % field)
+
         try:
             # if we are creating an item inTheNameOf, use this user for the rest of the process
             if inTheNameOf:
@@ -527,18 +550,6 @@ class SOAPView(BrowserView):
             if destFolder.meta_type == 'Plone Site':
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
-
-            # now that every checks pass, we can create the item
-            # creationData keys begin with an '_' (_title, _description, ...) so tranform them
-            data = {}
-            for elt in creationData.__dict__.keys():
-                # do not take annexes into account
-                if not elt == '_annexes':
-                    data[elt[1:]] = creationData.__dict__[elt]
-
-            # category can not be None
-            if data['category'] is None:
-                data['category'] = ''
 
             type_name = mc.getItemTypeName()
             data.update({'proposingGroup': proposingGroupId,

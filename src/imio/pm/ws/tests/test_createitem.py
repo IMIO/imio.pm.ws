@@ -103,14 +103,21 @@ SOAPAction: /
         # No matter how the item is created, with or without a decision, every HTML fields are surrounded by <p></p>
         obj = self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)[0].getObject()
         self.failIf(obj.getDecision() != "<p></p>")
-        # if the user can not create the item, a ZSI.Fault is returned
+
+    def test_ws_createItemRaisedZSIFaults(self):
+        """
+          Test SOAP service behaviour when creating an item with some wrong arguments
+        """
+        # by default no item exists
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+        responseHolder = createItemResponse()
         # the title is mandatory
-        old_title = req._creationData._title
         req._creationData._title = None
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "A 'title' is mandatory!")
-        req._creationData._title = old_title
+        req._creationData._title = 'A valid title'
         # the meetingConfigId must exists
         req._meetingConfigId = 'wrongMeetingConfigId'
         with self.assertRaises(ZSI.Fault) as cm:
@@ -155,6 +162,26 @@ SOAPAction: /
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
+
+    def test_ws_createItemWithOptionalFields(self):
+        """
+          Test SOAP service behaviour when creating an item with some optional fields
+        """
+        # by default no item exists
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+        responseHolder = createItemResponse()
+        # we can not use an optional field that is not activated in the current MeetingConfig
+        self.assertTrue('motivation' not in self.meetingConfig.getUsedItemAttributes())
+        req._creationData._motivation = '<p>Motivation sample text</p>'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+                          "The optional field 'motivation' is not activated in this configuration!")
+        # if we activate it, then the resulting item is correct
+        self.meetingConfig.setUsedItemAttributes(self.meetingConfig.getUsedItemAttributes() + ('motivation', ))
+        newItem, response = self._createItem(req)
+        self.assertTrue(newItem.getMotivation() == '<p>Motivation sample text</p>')
 
     def test_ws_createItemWithOneAnnexRequest(self):
         """

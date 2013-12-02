@@ -157,6 +157,8 @@
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="category" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="detailedDescription" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="motivation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="decision" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="10"/>

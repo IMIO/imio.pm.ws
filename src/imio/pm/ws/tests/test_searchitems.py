@@ -40,24 +40,24 @@ class testSOAPSearchItems(WS4PMTestCase):
         """
           Test that searching with given parameters returns valuable informations
         """
-        #by default no item exists
+        # by default no item exists
         self.changeUser('pmCreator1')
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga')) == 0)
-        #prepare data for a default item
+        # prepare data for a default item
         req = self._prepareCreationData()
         req._creationData._externalIdentifier = 'my_external_app_identifier'
-        #use the SOAP service to create one
+        # use the SOAP service to create one
         newItem, response = self._createItem(req)
         newItemUID = newItem.UID()
-        #externalIdentifier is actually set
+        # externalIdentifier is actually set
         self.assertEquals(newItem.externalIdentifier, 'my_external_app_identifier')
-        #now an item exists, get informations about it
+        # now an item exists, get informations about it
         req = searchItemsRequest()
         req._Title = 'item'
         req._getCategory = 'development'
-        #Serialize the request so it can be easily tested
+        # Serialize the request so it can be easily tested
         request = serializeRequest(req)
-        #This is what the sent enveloppe should looks like
+        # This is what the sent enveloppe should looks like
         expected = """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
             """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
@@ -68,9 +68,9 @@ class testSOAPSearchItems(WS4PMTestCase):
             """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % (req._Title, req._getCategory)
         result = """%s""" % request
         self.assertEquals(expected, result)
-        #now really use the SOAP method to get informations about the item
+        # now really use the SOAP method to get informations about the item
         resp = self._searchItems(req)
-        #the item is not in a meeting so the meeting date is 1950-01-01
+        # the item is not in a meeting so the meeting date is 1950-01-01
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
             """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
@@ -100,7 +100,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
         itemInMeeting = meeting.getItemsInOrder()[0]
-        #by default, PloneMeeting creates item without title/description/decision...
+        # by default, PloneMeeting creates item without title/description/decision...
         itemInMeeting.setTitle('My new item title')
         itemInMeeting.setDescription('<p>Description</p>', mimetype='text/x-html-safe')
         itemInMeeting.setDecision('<p>Décision</p>', mimetype='text/x-html-safe')
@@ -110,8 +110,8 @@ class testSOAPSearchItems(WS4PMTestCase):
         resp = self._searchItems(req)
         itemInMeetingUID = itemInMeeting.UID()
         meetingDate = gDateTime.get_formatted_content(gDateTime(), localtime(meeting.getDate()))
-        #searching for items can returns several items
-        #for example here, searching for 'item title' in existing items title will returns 2 items...
+        # searching for items can returns several items
+        # for example here, searching for 'item title' in existing items title will returns 2 items...
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
             """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
@@ -148,7 +148,7 @@ class testSOAPSearchItems(WS4PMTestCase):
 </ns1:searchItemsResponse>
 """ % (itemInMeetingUID, meetingDate, newItemUID)
         self.assertEquals(expected, resp)
-        #if the search params do not return an existing UID, the response is empty
+        # if the search params do not return an existing UID, the response is empty
         req._Title = 'aWrongTitle'
         resp = self._searchItems(req)
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" """ \
@@ -158,14 +158,14 @@ class testSOAPSearchItems(WS4PMTestCase):
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 """
         self.assertEquals(resp, expected)
-        #if not search params is pass, a ZSI.Fault is raised
+        # if not search params is pass, a ZSI.Fault is raised
         req._Title = ''
         responseHolder = searchItemsResponse()
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, 'Define at least one search parameter!')
-        #if a 'meetingConfigId' is passed, items of this meetingConfig are taken into account
-        #create an item for 'plonemeeting-assembly' with same data as one created for 'plonegov-assembly' here above
+        # if a 'meetingConfigId' is passed, items of this meetingConfig are taken into account
+        # create an item for 'plonemeeting-assembly' with same data as one created for 'plonegov-assembly' here above
         req = self._prepareCreationData()
         req._meetingConfigId = 'plonemeeting-assembly'
         # in 'plonemeeting-assembly', the category is not used, useGroupsAsCategories is True
@@ -173,7 +173,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         newItem, response = self._createItem(req)
         pmItem = self.portal.portal_catalog(UID=response._UID)[0].getObject()
         pmItemUID = pmItem.UID()
-        #searching items with Title like 'item title' returns the 3 created elements
+        # searching items with Title like 'item title' returns the 3 created elements
         req = searchItemsRequest()
         req._Title = 'item title'
         responseHolder = searchItemsResponse()
