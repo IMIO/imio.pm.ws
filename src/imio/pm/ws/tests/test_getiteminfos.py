@@ -27,6 +27,7 @@ import os
 from time import localtime
 import ZSI
 from ZSI.TCtimes import gDateTime
+from Products.PloneMeeting.interfaces import IAnnexable
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import getItemInfosRequest, getItemInfosResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest
@@ -230,7 +231,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID, base64.encodestring(newItem.getAnnexes()[0].getFile().data))
+""" % (newItemUID, base64.encodestring(IAnnexable(newItem).getAnnexes()[0].getFile().data))
         #one annex is shown
         self.assertEquals(expected, resp)
         #now check with several (2) annexes...
@@ -239,12 +240,12 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         annex_file = afile.read()
         afile.close()
         kwargs = {'filename': 'myBeautifulTestFile.odt'}
-        newItem.addAnnex('myBeautifulTestFile.odt',
-                         'My BeautifulTestFile title',
-                         annex_file,
-                         False,
-                         annex_type,
-                         **kwargs)
+        IAnnexable(newItem).addAnnex('myBeautifulTestFile.odt',
+                                     'My BeautifulTestFile title',
+                                     annex_file,
+                                     False,
+                                     annex_type,
+                                     **kwargs)
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
@@ -281,8 +282,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
   </itemInfo>
 </ns1:getItemInfosResponse>
 """ % (newItemUID,
-       base64.encodestring(newItem.getAnnexesByType(realAnnexes=True)[0][0].getFile().data),
-       base64.encodestring(newItem.getAnnexesByType(realAnnexes=True)[1][0].getFile().data))
+       base64.encodestring(IAnnexable(newItem).getAnnexesByType(relatedTo='item', realAnnexes=True)[0][0].getFile().data),
+       base64.encodestring(IAnnexable(newItem).getAnnexesByType(relatedTo='item', realAnnexes=True)[1][0].getFile().data))
         #2 annexes are shown
         self.assertEquals(expected, resp)
 

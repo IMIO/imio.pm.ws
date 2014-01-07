@@ -1,14 +1,18 @@
 Changelog
 =========
 
-1.0dev (unreleased)
--------------------
-- renamed package from communesplone.ws4plonemeeting to imio.pm.ws
-- moved to Plone 4.2
-- use ZSI 2.1a1
-- avoid error if item created without a description or a decision (empty HTML field)
+1.1 (unreleased)
+----------------
+- Nothing yet
 
-0.1 2012-10-15
---------------
+1.0 (2014-01-07)
+-----------------
+- Renamed package from communesplone.ws4plonemeeting to imio.pm.ws
+- Moved to Plone 4.3
+- Use ZSI 2.1a1
+- Avoid error if item created without a description or a decision (empty HTML field)
+
+0.1 (2012-10-15)
+----------------
 - Initial release
-- added methods to 'getItemInfos', 'createItem', 'getConfigInfos', 'searchItems'
+- Added methods to 'getItemInfos', 'createItem', 'getConfigInfos', 'searchItems'

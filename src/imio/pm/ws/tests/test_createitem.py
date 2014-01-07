@@ -25,6 +25,7 @@
 import base64
 import ZSI
 from zope.i18n import translate
+from Products.PloneMeeting.interfaces import IAnnexable
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import createItemResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
@@ -221,7 +222,7 @@ SOAPAction: /
         self.assertEquals(expected, result)
         newItem, response = self._createItem(req)
         #now check the created item have the annex
-        annexes = newItem.getAnnexes()
+        annexes = IAnnexable(newItem).getAnnexes()
         #the annex is actually created
         self.failUnless(len(annexes) == 1)
         #the annex mimetype is correct
@@ -300,7 +301,6 @@ SOAPAction: /
 %s""" % ('pmCreator1', 'meeting', request)
         self.assertEquals(expected, result)
         newItem, response = self._createItem(req)
-        # use objectValues so order is kept because getAnnexes is a ReferenceField
         annexes = newItem.objectValues('MeetingFile')
         # 4 annexes are actually created
         self.failUnless(len(annexes) == 4)
@@ -324,6 +324,17 @@ SOAPAction: /
         self.failUnless(annexes[1].getFile().filename == 'arbitraryFilename.odt')
         self.failUnless(annexes[2].getFile().filename == 'largeTestFile.doc')
         self.failUnless(annexes[3].getFile().filename == 'validExtension.bin')
+        # now try to create an item with an annex that has no file
+        # when file attribute is not provided, the annex is not created
+        data = {'title': 'My annex 7',
+                'filename': 'validExtension.bin',
+                'annexTypeId': 'budget-analysis'}
+        req._creationData._annexes = [self._prepareAnnexInfo(**data), ]
+        self.assertEquals(req._creationData._annexes[0]._file, None)
+        newItem, response = self._createItem(req)
+        annexes = newItem.objectValues('MeetingFile')
+        # no annexes have been added
+        self.assertEquals(len(annexes), 0)
 
     def test_ws_createItemWithWarnings(self):
         """
