@@ -324,6 +324,17 @@ SOAPAction: /
         self.failUnless(annexes[1].getFile().filename == 'arbitraryFilename.odt')
         self.failUnless(annexes[2].getFile().filename == 'largeTestFile.doc')
         self.failUnless(annexes[3].getFile().filename == 'validExtension.bin')
+        # now try to create an item with an annex that has no file
+        # when file attribute is not provided, the annex is not created
+        data = {'title': 'My annex 7',
+                'filename': 'validExtension.bin',
+                'annexTypeId': 'budget-analysis'}
+        req._creationData._annexes = [self._prepareAnnexInfo(**data), ]
+        self.assertEquals(req._creationData._annexes[0]._file, None)
+        newItem, response = self._createItem(req)
+        annexes = newItem.objectValues('MeetingFile')
+        # no annexes have been added
+        self.assertEquals(len(annexes), 0)
 
     def test_ws_createItemWithWarnings(self):
         """

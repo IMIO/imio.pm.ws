@@ -643,7 +643,8 @@ class SOAPView(BrowserView):
                 annex_type_id = annex._annexTypeId
                 annex_filename = annex._filename
                 validFileName = annex_filename and len(annex_filename.split('.')) == 2
-                annex_file = annex._file
+                # if annex._file is None, we turn it to an empty string
+                annex_file = annex._file or ''
                 # we have an annex_type_id, find relevant MeetingFileType object
                 if not annex_type_id or not annex_type_id in [fileType.id for fileType in fileTypes]:
                     # take the first available annex fileType that is the default one
