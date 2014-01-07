@@ -1,6 +1,8 @@
 import ZSI
 import logging
 logger = logging.getLogger('WS4PM')
+import magic
+from magic import MagicException
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager, setSecurityManager, newSecurityManager
 from zope.i18n import translate
@@ -10,7 +12,6 @@ from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, BasicInfo, AnnexInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, MAIN_DATA_FROM_ITEM_SCHEMA
 from time import localtime
 from DateTime import DateTime
-import magic
 
 WRONG_HTML_WARNING = "HTML used for creating the item at '${item_path}' by '${creator}' was not valid. " \
                      "Used corrected HTML."
@@ -653,15 +654,21 @@ class SOAPView(BrowserView):
                     annex_type = getattr(mc.meetingfiletypes, annex_type_id)
                 # manage mimetype manually
                 # as we receive base64 encoded binary, mimetypes registry can not handle this correctly...
-                mime = magic.Magic(mime=True)
                 mr = self.context.mimetypes_registry
-                annex_mimetype = mime.from_buffer(annex_file)
-                if annex_mimetype:
-                    mr_mimetype = mr.lookup(annex_mimetype)
+                mime = magic.Magic(mime=True)
+                magic_mimetype = None
+                try:
+                    magic_mimetype = mime.from_buffer(annex_file)
+                except MagicException:
+                    # in case there is an error with magic trying to find annex mimetype, we pass
+                    # we will have magic_mimetype=None and so will try to use file extension to determinate it here under
+                    pass
+                mr_mimetype = ()
+                if magic_mimetype:
+                    mr_mimetype = mr.lookup(magic_mimetype)
                 else:
                     # if libmagic could not determine file mimetype (like in version 5.09 of the command 'file'
                     # where MS mimetypes (doc, xls, ...) are not recognized...), we use the file extension...
-                    mr_mimetype = ()
                     if validFileName:
                         # mr.lookup here above returns a tuple so we build a tuple also...
                         mr_mimetype = (mr.lookupExtension(annex_filename.split('.')[1]),)
@@ -708,7 +715,7 @@ class SOAPView(BrowserView):
                 item.addAnnex(annex_filename, annex_title, annex_file, False, annex_type, **kwargs)
                 itemAnnexes = item.objectValues('MeetingFile')
                 lastInsertedAnnex = itemAnnexes[-1]
-                lastInsertedAnnex.getFile().setContentType(annex_mimetype)
+                lastInsertedAnnex.getFile().setContentType(mr_mimetype[0].normalized())
 
             # change the comment in the item's add a line in the item's history
             review_history = item.workflow_history[item.getWorkflowName()]
