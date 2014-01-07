@@ -24,13 +24,17 @@
 
 import base64
 import ZSI
+import magic
+from magic import MagicException
 from zope.i18n import translate
 from Products.PloneMeeting.interfaces import IAnnexable
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import createItemResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
 from imio.pm.ws.soap.soapview import SOAPView
-from imio.pm.ws.soap.soapview import WRONG_HTML_WARNING, MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING
+from imio.pm.ws.soap.soapview import WRONG_HTML_WARNING
+from imio.pm.ws.soap.soapview import MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING
+from imio.pm.ws.soap.soapview import MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING
 
 
 class testSOAPCreateItem(WS4PMTestCase):
@@ -230,6 +234,46 @@ SOAPAction: /
         self.failUnless(annex.getContentType() == 'application/pdf')
         #the annex metadata are ok
         self.failUnless(annex.Title() == 'My annex 1' and annex.getMeetingFileType().getId() == 'financial-analysis')
+
+    def test_ws_createItemWithAnnexNotRecognizedByLibmagicRequest(self):
+        """
+          Test SOAP service behaviour when creating items with one annex that is not recognized
+          by libmagic.  The annex used here is a MS Word .doc file that fails to be recognized when
+          using libmagic/file 5.09
+        """
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+        data = {'title': 'My crashing created annex',
+                'filename': 'file_crash_libmagic.doc',
+                'file': 'file_crash_libmagic.doc'}
+        req._creationData._annexes = [self._prepareAnnexInfo(**data)]
+        annex = req._creationData._annexes[0]
+        # first make sure this file crash libmagic
+        self.assertRaises(MagicException, magic.Magic(mime=True).from_buffer, annex._file)
+        newItem, response = self._createItem(req)
+        # the annex is nevertheless created and correctly recognized because it had a correct file extension
+        annexes = IAnnexable(newItem).getAnnexes()
+        self.failUnless(len(annexes) == 1)
+        # the annex mimetype is correct
+        annex = annexes[0]
+        self.failUnless(annex.getContentType() == 'application/msword')
+        # the annex metadata are ok
+        self.failUnless(annex.Title() == 'My crashing created annex' and
+                        annex.getMeetingFileType().getId() == 'financial-analysis')
+        # if libmagic crash and no valid filename provided, the annex is not created
+        data = {'title': 'My crashing NOT created annex',
+                'filename': 'file_crash_libmagic_without_extension',
+                'file': 'file_crash_libmagic.doc'}
+        req._creationData._annexes = [self._prepareAnnexInfo(**data)]
+        newItem2, response = self._createItem(req)
+        self.failUnless(len(IAnnexable(newItem2).getAnnexes()) == 0)
+        # a warning specifying that annex was not added because mimetype could
+        # not reliabily be found is added in the response
+        self.assertEquals(response._warnings, [translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
+                                              domain='imio.pm.ws',
+                                              mapping={'annex_path': (data['filename']),
+                                                       'item_path': newItem2.absolute_url_path()},
+                                              context=self.portal.REQUEST)])
 
     def test_ws_createItemWithSeveralAnnexesRequest(self):
         """
