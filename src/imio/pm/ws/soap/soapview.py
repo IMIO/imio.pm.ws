@@ -264,7 +264,7 @@ class SOAPView(BrowserView):
             # returns only groups the user is member of with the defined
             # suffix, either it will returns every groups the user is member of
             tool = portal.portal_plonemeeting
-            groups = tool.getGroups(userId=userId, suffix=suffix)
+            groups = tool.getGroupsForUser(userId=userId, suffix=suffix)
             for group in groups:
                 basicInfo = BasicInfo()
                 basicInfo._UID = group.UID()
@@ -507,7 +507,7 @@ class SOAPView(BrowserView):
 
         # check that the user is a creator for given proposingGroupId
         # get the MeetingGroups for wich inTheNameOfMemberId is creator
-        userGroups = tool.getGroups(userId=memberId, suffix="creators")
+        userGroups = tool.getGroupsForUser(userId=memberId, suffix="creators")
         proposingGroup = [group for group in userGroups if group.getId() == proposingGroupId]
         if not proposingGroup:
             raise ZSI.Fault(ZSI.Fault.Client,
