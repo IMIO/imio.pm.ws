@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.2 (unreleased)
+----------------
+- Nothing yet
+
 1.1 (2014-02-12)
 ----------------
 - Use with ProductS.PloneMeeting 3.2+
