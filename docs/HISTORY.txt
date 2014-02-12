@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1 (unreleased)
+1.1 (2014-02-12)
 ----------------
 - Use with ProductS.PloneMeeting 3.2+
 - Handle case where libmagic could not determinate annex mimetype correctly (and added test)
