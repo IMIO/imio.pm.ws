@@ -226,7 +226,7 @@ SOAPAction: /
         self.assertEquals(expected, result)
         newItem, response = self._createItem(req)
         #now check the created item have the annex
-        annexes = IAnnexable(newItem).getAnnexes()
+        annexes = IAnnexable(newItem).getAnnexesInOrder()
         #the annex is actually created
         self.failUnless(len(annexes) == 1)
         #the annex mimetype is correct
@@ -252,7 +252,7 @@ SOAPAction: /
         self.assertRaises(MagicException, magic.Magic(mime=True).from_buffer, annex._file)
         newItem, response = self._createItem(req)
         # the annex is nevertheless created and correctly recognized because it had a correct file extension
-        annexes = IAnnexable(newItem).getAnnexes()
+        annexes = IAnnexable(newItem).getAnnexesInOrder()
         self.failUnless(len(annexes) == 1)
         # the annex mimetype is correct
         annex = annexes[0]
@@ -266,7 +266,7 @@ SOAPAction: /
                 'file': 'file_crash_libmagic.doc'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
         newItem2, response = self._createItem(req)
-        self.failUnless(len(IAnnexable(newItem2).getAnnexes()) == 0)
+        self.failUnless(len(IAnnexable(newItem2).getAnnexesInOrder()) == 0)
         # a warning specifying that annex was not added because mimetype could
         # not reliabily be found is added in the response
         self.assertEquals(response._warnings, [translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
