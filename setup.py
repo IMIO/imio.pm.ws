@@ -24,16 +24,6 @@ setup(name='imio.pm.ws',
       namespace_packages=['imio', 'imio.pm'],
       include_package_data=True,
       zip_safe=False,
-      extras_require=dict(
-            test=['unittest2',
-                  'zope.testing',
-                  'plone.testing',
-                  'plone.app.testing',
-                  'Products.CMFPlacefulWorkflow',
-                  'zope.testing',
-                  'Products.PloneTestCase'],
-            templates=['Genshi',
-                  ]),
       install_requires=[
           'setuptools',
           # -*- Extra requirements: -*-
