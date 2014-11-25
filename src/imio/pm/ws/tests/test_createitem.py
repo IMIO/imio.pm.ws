@@ -110,6 +110,19 @@ SOAPAction: /
         obj = self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)[0].getObject()
         self.failIf(obj.getDecision(keepWithNext=False) != '<p></p>')
 
+    def test_ws_createItemCleanHTML(self):
+        """
+          Special characters like &#xa0; in the html breaks PortalTransforms
+          that is why we clean the HTML from wrong characters and styles
+        """
+
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+        HTML = "<p style='padding-left: 5em'>My HTML</p><p>&#xa0;</p>"
+        req._creationData._decision = HTML
+        newItem, response = self._createItem(req)
+        self.assertTrue(newItem.getDecision(keepWithNext=False) == '<p>My HTML</p><p>\xc2\xa0</p>')
+
     def test_ws_createItemRaisedZSIFaults(self):
         """
           Test SOAP service behaviour when creating an item with some wrong arguments
