@@ -37,6 +37,10 @@ class WS4PMTestCase(PloneMeetingTestCase):
     def setUp(self):
         """ """
         PloneMeetingTestCase.setUp(self)
+        # remove items of the config
+        self.changeUser('admin')
+        self._removeConfigObjectsFor(self.meetingConfig)
+        self._removeConfigObjectsFor(self.meetingConfig2)
         # use the 'plonegov-assembly' MeetingConfig that use real categories,
         # not useGroupsAsCategories, even if it could be changed during a test
         self.meetingConfig = self.meetingConfig2

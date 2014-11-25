@@ -23,6 +23,7 @@
 #
 
 import base64
+import unittest2 as unittest
 import ZSI
 import magic
 from magic import MagicException
@@ -107,7 +108,7 @@ SOAPAction: /
                                                        UID=newItemWithEmptyDecisionUID)) == 1)
         # No matter how the item is created, with or without a decision, every HTML fields are surrounded by <p></p>
         obj = self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)[0].getObject()
-        self.failIf(obj.getDecision() != "<p></p>")
+        self.failIf(obj.getDecision(keepWithNext=False) != '<p></p>')
 
     def test_ws_createItemRaisedZSIFaults(self):
         """
@@ -226,15 +227,17 @@ SOAPAction: /
         self.assertEquals(expected, result)
         newItem, response = self._createItem(req)
         #now check the created item have the annex
-        annexes = IAnnexable(newItem).getAnnexesInOrder()
+        annexes = IAnnexable(newItem).getAnnexes()
         #the annex is actually created
         self.failUnless(len(annexes) == 1)
         #the annex mimetype is correct
         annex = annexes[0]
         self.failUnless(annex.getContentType() == 'application/pdf')
         #the annex metadata are ok
-        self.failUnless(annex.Title() == 'My annex 1' and annex.getMeetingFileType().getId() == 'financial-analysis')
+        self.failUnless(annex.Title() == 'My annex 1' and
+                        annex.getMeetingFileType(theRealObject=True).getId() == 'financial-analysis')
 
+    @unittest.skip("This test is skipped, remove decorator if you use libmagic/file < 5.10")
     def test_ws_createItemWithAnnexNotRecognizedByLibmagicRequest(self):
         """
           Test SOAP service behaviour when creating items with one annex that is not recognized
@@ -252,7 +255,7 @@ SOAPAction: /
         self.assertRaises(MagicException, magic.Magic(mime=True).from_buffer, annex._file)
         newItem, response = self._createItem(req)
         # the annex is nevertheless created and correctly recognized because it had a correct file extension
-        annexes = IAnnexable(newItem).getAnnexesInOrder()
+        annexes = IAnnexable(newItem).getAnnexes()
         self.failUnless(len(annexes) == 1)
         # the annex mimetype is correct
         annex = annexes[0]
@@ -266,14 +269,14 @@ SOAPAction: /
                 'file': 'file_crash_libmagic.doc'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
         newItem2, response = self._createItem(req)
-        self.failUnless(len(IAnnexable(newItem2).getAnnexesInOrder()) == 0)
+        self.failUnless(len(IAnnexable(newItem2).getAnnexes()) == 0)
         # a warning specifying that annex was not added because mimetype could
         # not reliabily be found is added in the response
         self.assertEquals(response._warnings, [translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
-                                              domain='imio.pm.ws',
-                                              mapping={'annex_path': (data['filename']),
-                                                       'item_path': newItem2.absolute_url_path()},
-                                              context=self.portal.REQUEST)])
+                                                         domain='imio.pm.ws',
+                                                         mapping={'annex_path': (data['filename']),
+                                                                  'item_path': newItem2.absolute_url_path()},
+                                                         context=self.portal.REQUEST)])
 
     def test_ws_createItemWithSeveralAnnexesRequest(self):
         """
@@ -355,14 +358,14 @@ SOAPAction: /
         self.failUnless(annexes[3].getContentType() == 'application/octet-stream')
         # the annexes metadata are ok
         self.failUnless(annexes[0].Title() == 'My annex 1' and
-                        annexes[0].getMeetingFileType().getId() == 'financial-analysis')
+                        annexes[0].getMeetingFileType(theRealObject=True).getId() == 'financial-analysis')
         self.failUnless(annexes[1].Title() == 'My annex 2' and
-                        annexes[1].getMeetingFileType().getId() == 'budget-analysis')
+                        annexes[1].getMeetingFileType(theRealObject=True).getId() == 'budget-analysis')
         # meetingFileType is back to default one when a wrong file type is given in the annexInfo
         self.failUnless(annexes[2].Title() == 'My annex 3' and
-                        annexes[2].getMeetingFileType().getId() == 'financial-analysis')
+                        annexes[2].getMeetingFileType(theRealObject=True).getId() == 'financial-analysis')
         self.failUnless(annexes[3].Title() == 'My annex 6' and
-                        annexes[3].getMeetingFileType().getId() == 'budget-analysis')
+                        annexes[3].getMeetingFileType(theRealObject=True).getId() == 'budget-analysis')
         # annexes filename are the ones defined in the 'filename', either it is generated
         self.failUnless(annexes[0].getFile().filename == 'smallTestFile.pdf')
         self.failUnless(annexes[1].getFile().filename == 'arbitraryFilename.odt')

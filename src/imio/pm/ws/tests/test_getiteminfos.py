@@ -231,7 +231,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID, base64.encodestring(IAnnexable(newItem).getAnnexesInOrder()[0].getFile().data))
+""" % (newItemUID, base64.encodestring(IAnnexable(newItem).getAnnexes()[0].getFile().data))
         #one annex is shown
         self.assertEquals(expected, resp)
         #now check with several (2) annexes...
@@ -244,7 +244,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                                      'My BeautifulTestFile title',
                                      annex_file,
                                      False,
-                                     annex_type,
+                                     annex_type.UID(),
                                      **kwargs)
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \

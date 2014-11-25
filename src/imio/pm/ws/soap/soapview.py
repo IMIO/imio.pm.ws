@@ -349,7 +349,7 @@ class SOAPView(BrowserView):
                 itemInfo._creator = item.Creator()
                 itemInfo._category = item.getCategory()
                 itemInfo._description = item.getRawDescription()
-                itemInfo._decision = item.getRawDecision()
+                itemInfo._decision = item.getRawDecision(keepWithNext=False)
                 itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
                 itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)
                 itemInfo._absolute_url = item.absolute_url()
@@ -380,7 +380,7 @@ class SOAPView(BrowserView):
                         for annex in groupOfAnnexesByType:
                             annexInfo = AnnexInfo()
                             annexInfo._title = annex.Title()
-                            annexInfo._annexTypeId = annex.getMeetingFileType().getId()
+                            annexInfo._annexTypeId = annex.getMeetingFileType(theRealObject=True).getId()
                             annexInfo._filename = annex.getFile().filename
                             annexInfo._file = annex.getFile().data
                             itemInfo._annexes.append(annexInfo)
@@ -649,11 +649,13 @@ class SOAPView(BrowserView):
                 # if annex._file is None, we turn it to an empty string
                 annex_file = annex._file or ''
                 # we have an annex_type_id, find relevant MeetingFileType object
-                if not annex_type_id or not annex_type_id in [fileType.id for fileType in fileTypes]:
+                # getFileTypes returns a dict with as 'id' the fileType UID
+                fileTypeIds = [fileType['absolute_url'].split('/')[-1] for fileType in fileTypes]
+                if not annex_type_id or not annex_type_id in fileTypeIds:
                     # take the first available annex fileType that is the default one
-                    annex_type = fileTypes[0]
+                    annex_type = fileTypes[0]['meetingFileTypeObjectUID']
                 else:
-                    annex_type = getattr(mc.meetingfiletypes, annex_type_id)
+                    annex_type = getattr(mc.meetingfiletypes, annex_type_id).UID()
                 # manage mimetype manually
                 # as we receive base64 encoded binary, mimetypes registry can not handle this correctly...
                 mr = self.context.mimetypes_registry

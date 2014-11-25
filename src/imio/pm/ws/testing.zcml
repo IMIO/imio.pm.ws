@@ -3,6 +3,5 @@
 
     <include file="configure.zcml"/>
     <include package="Products.PloneMeeting" />
-    <include package="Products.PloneMeeting" file="overrides.zcml"/>
 
 </configure>
