@@ -25,6 +25,7 @@
 import base64
 import ZSI
 import magic
+import unittest2 as unittest
 from magic import MagicException
 from zope.i18n import translate
 from Products.PloneMeeting.interfaces import IAnnexable
@@ -248,6 +249,7 @@ SOAPAction: /
         #the annex metadata are ok
         self.failUnless(annex.Title() == 'My annex 1' and annex.getMeetingFileType().getId() == 'financial-analysis')
 
+    @unittest.skip("This test is skipped, remove decorator if you use libmagic/file < 5.10")
     def test_ws_createItemWithAnnexNotRecognizedByLibmagicRequest(self):
         """
           Test SOAP service behaviour when creating items with one annex that is not recognized
