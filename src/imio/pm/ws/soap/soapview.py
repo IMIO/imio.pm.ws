@@ -583,13 +583,13 @@ class SOAPView(BrowserView):
                     data[htmlFieldId] = '<p>%s</p>' % data[htmlFieldId]
                 if not soup.contents or not getattr(soup.contents[0], 'name', None) == u'p':
                     soup = BeautifulSoup(data[htmlFieldId])
-                # clean HTML with HTMLParser, it will remove special entities like &#xa0;
-                renderedSoupContents = HTMLParser().unescape(soup.renderContents())
-                # clean HTML with lxml Cleaner
+                renderedSoupContents = soup.renderContents()
                 if not isinstance(renderedSoupContents, unicode):
                     renderedSoupContents = unicode(renderedSoupContents, 'utf-8')
+                # clean HTML with HTMLParser, it will remove special entities like &#xa0;
+                renderedSoupContents = HTMLParser().unescape(renderedSoupContents)
+                # clean HTML with lxml Cleaner
                 renderedSoupContents = cleaner.clean_html(renderedSoupContents).encode('utf-8')
-
                 # clean_html surrounds the cleaned HTML with <div>...</div>... removes it!
                 if renderedSoupContents.startswith('<div>') and renderedSoupContents.endswith('</div>'):
                     renderedSoupContents = renderedSoupContents[5:-6]
