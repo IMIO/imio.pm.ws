@@ -300,7 +300,9 @@ SOAPAction: /
         req = self._prepareCreationData()
         # add 4 extra annexes
         # no data give, some default values are used (smallTestFile.pdf)
-        data1 = {'title': 'My annex 1', 'filename': 'smallTestFile.pdf', 'file': 'smallTestFile.pdf'}
+        data1 = {'title': 'My annex 1',
+                 'filename': 'smallTestFile.pdf',
+                 'file': 'smallTestFile.pdf'}
         # other annexTypeId than the default one
         data2 = {'title': 'My annex 2',
                  'filename': 'arbitraryFilename.odt',
@@ -330,6 +332,7 @@ SOAPAction: /
         req._creationData._annexes = [self._prepareAnnexInfo(**data1), self._prepareAnnexInfo(**data2),
                                       self._prepareAnnexInfo(**data3), self._prepareAnnexInfo(**data4),
                                       self._prepareAnnexInfo(**data5), self._prepareAnnexInfo(**data6)]
+        import ipdb; ipdb.set_trace()
         # serialize the request so it can be easily tested
         request = serializeRequest(req)
         # build annexes part of the envelope
