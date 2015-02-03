@@ -332,7 +332,6 @@ SOAPAction: /
         req._creationData._annexes = [self._prepareAnnexInfo(**data1), self._prepareAnnexInfo(**data2),
                                       self._prepareAnnexInfo(**data3), self._prepareAnnexInfo(**data4),
                                       self._prepareAnnexInfo(**data5), self._prepareAnnexInfo(**data6)]
-        import ipdb; ipdb.set_trace()
         # serialize the request so it can be easily tested
         request = serializeRequest(req)
         # build annexes part of the envelope
