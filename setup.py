@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.2dev'
+version = '1.3dev'
 
 setup(name='imio.pm.ws',
       version=version,
@@ -39,7 +39,7 @@ setup(name='imio.pm.ws',
           #'suds',
       ],
       dependency_links = ['http://sourceforge.net/projects/pywebsvcs/files/ZSI/ZSI-2.0/ZSI-2.0.tar.gz/download'],
-      extras_require={'test': ['plone.app.testing', 'unittest2']},
+      extras_require={'test': ['Products.PloneMeeting [test]']},
       entry_points="""
       # -*- Entry points: -*-
       """,
