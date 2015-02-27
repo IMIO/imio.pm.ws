@@ -150,10 +150,9 @@ class SOAPView(BrowserView):
           Test if an element in PloneMeeting is linked to given meetingConfig/externalIdentifier
         '''
         portal = self.context
-        member = portal.portal_membership.getAuthenticatedMember()
 
         # this is only available to 'Manager' and 'MeetingManager'
-        if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+        if not self._mayAccessAdvancedFunctionnalities():
             raise ZSI.Fault(ZSI.Fault.Client,
                             "You need to be 'Manager' or 'MeetingManager' to check if an element is linked to an item!")
 
@@ -188,7 +187,7 @@ class SOAPView(BrowserView):
 
         # passing a userToShowCategoriesFor is only available to 'Manager' and 'MeetingManager'
         if userToShowCategoriesFor:
-            if not tool.isManager():
+            if not self._mayAccessAdvancedFunctionnalities():
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "You need to be 'Manager' or 'MeetingManager' to get available categories for a user!")
             # check that the passed userId exists...
@@ -246,7 +245,7 @@ class SOAPView(BrowserView):
         # if we want to query informations for another user, the connected user
         # must have the 'MeetingManager' or 'Manager' role
         if not memberId == userId:
-            if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+            if not self._mayAccessAdvancedFunctionnalities():
                 raise ZSI.Fault(
                     ZSI.Fault.Client,
                     "You need to be 'Manager' or 'MeetingManager' to get "
@@ -309,7 +308,7 @@ class SOAPView(BrowserView):
         # - user getting infos for another is 'MeetingManager' or 'Manager'
         # - the user we want to get informations for exists
         if inTheNameOf:
-            if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+            if not self._mayAccessAdvancedFunctionnalities():
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
@@ -421,7 +420,7 @@ class SOAPView(BrowserView):
         # - user getting the template is 'MeetingManager' or 'Manager'
         # - the user we want to get informations for exists
         if inTheNameOf:
-            if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+            if not self._mayAccessAdvancedFunctionnalities():
                 raise ZSI.Fault(
                     ZSI.Fault.Client,
                     "You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!")
@@ -494,7 +493,7 @@ class SOAPView(BrowserView):
         # - user creating for another is 'MeetingManager' or 'Manager'
         # - the user we want to create an item for exists
         if inTheNameOf:
-            if not member.has_role('Manager') and not member.has_role('MeetingManager'):
+            if not self._mayAccessAdvancedFunctionnalities():
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
@@ -749,6 +748,19 @@ class SOAPView(BrowserView):
             if inTheNameOf:
                 setSecurityManager(oldsm)
         return item.UID(), warnings
+
+    def _mayAccessAdvancedFunctionnalities(self):
+        '''
+          This method will protect various advances functionnalities like the
+          'inTheNameOf' functionnality.
+          By default, the given user must be 'MeetingManager' for a
+          MeetingConfig to be able to use 'inTheNameOf' or a 'Manager'.
+        '''
+        if self.context.portal_plonemeeting.userIsAmong('meetingmanagers') or \
+           self.context.portal_membership.getAuthenticatedMember().has_role('Manager'):
+            return True
+
+        return False
 
 
 class WS4PMWSDL(BrowserView):
