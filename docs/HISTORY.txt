@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.3 (unreleased)
+----------------
+- Added item creation date and modification date in ItemInfo (getItemInfo and searchItems)
+
 1.2 (2015-02-27)
 ----------------
 - Use with Products.PloneMeeting 3.3+

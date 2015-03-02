@@ -350,6 +350,8 @@ class SOAPView(BrowserView):
                 itemInfo._id = item.getId()
                 itemInfo._title = item.Title()
                 itemInfo._creator = item.Creator()
+                itemInfo._creation_date = localtime(item.created())
+                itemInfo._modification_date = localtime(item.modified())
                 itemInfo._category = item.getCategory()
                 itemInfo._description = item.getRawDescription()
                 itemInfo._decision = item.getRawDecision(keepWithNext=False)

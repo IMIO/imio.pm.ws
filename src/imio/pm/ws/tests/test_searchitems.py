@@ -81,6 +81,8 @@ class testSOAPSearchItems(WS4PMTestCase):
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
+    <creation_date>%s</creation_date>
+    <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
@@ -91,7 +93,9 @@ class testSOAPSearchItems(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:searchItemsResponse>
-""" % (newItemUID)
+""" % (newItemUID,
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
         self.assertEquals(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
@@ -122,6 +126,8 @@ class testSOAPSearchItems(WS4PMTestCase):
     <id>o3</id>
     <title>My new item title</title>
     <creator>pmManager</creator>
+    <creation_date>%s</creation_date>
+    <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
@@ -136,6 +142,8 @@ class testSOAPSearchItems(WS4PMTestCase):
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
+    <creation_date>%s</creation_date>
+    <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
@@ -146,7 +154,13 @@ class testSOAPSearchItems(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:searchItemsResponse>
-""" % (itemInMeetingUID, meetingDate, newItemUID)
+""" % (itemInMeetingUID,
+       gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
+       gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
+       meetingDate,
+       newItemUID,
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
         self.assertEquals(expected, resp)
         # if the search params do not return an existing UID, the response is empty
         req._Title = 'aWrongTitle'

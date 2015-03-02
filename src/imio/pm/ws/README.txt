@@ -3,7 +3,7 @@ WSDL management :
 
 The files WS4PM_server.py, WS4PM_services.py and WS4PM_services_types.py are created using the following command :
 
-bin/wsdl2py --file src/imio.pm.ws/imio/pm/ws/currentWSDL.txt -o src/imio.pm.ws/imio/pm/ws -b
+/srv/zsi/bin/wsdl2py currentWSDL.txt -o . -b
 
 bin/wsdl2py is available when the egg "ZSI" is installed.
 

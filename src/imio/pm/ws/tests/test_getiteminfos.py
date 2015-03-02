@@ -80,6 +80,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
+    <creation_date>%s</creation_date>
+    <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
@@ -90,7 +92,9 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID)
+""" % (newItemUID,
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
         self.assertEquals(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
@@ -113,6 +117,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <id>o3</id>
     <title>My new item title</title>
     <creator>pmManager</creator>
+    <creation_date>%s</creation_date>
+    <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
@@ -123,7 +129,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (itemInMeeting.UID(), meetingDate)
+""" % (itemInMeeting.UID(),
+       gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
+       gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
+       meetingDate)
         self.assertEquals(expected, resp)
         # if the item with this UID has not been found (user can not access or item does not exists),
         # an empty response is returned
@@ -189,6 +198,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
+    <creation_date>%s</creation_date>
+    <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
@@ -199,7 +210,9 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID)
+""" % (newItemUID,
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
         #annexes are not shown by default
         self.assertEquals(expected, resp)
         #now with 'showAnnexes=True'
@@ -214,6 +227,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
+    <creation_date>%s</creation_date>
+    <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
@@ -231,7 +246,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID, base64.encodestring(IAnnexable(newItem).getAnnexes()[0].getFile().data))
+""" % (newItemUID,
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+       base64.encodestring(IAnnexable(newItem).getAnnexes()[0].getFile().data))
         #one annex is shown
         self.assertEquals(expected, resp)
         #now check with several (2) annexes...
@@ -257,6 +275,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
+    <creation_date>%s</creation_date>
+    <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
@@ -282,6 +302,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
   </itemInfo>
 </ns1:getItemInfosResponse>
 """ % (newItemUID,
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
        base64.encodestring(IAnnexable(newItem).getAnnexesByType(relatedTo='item', realAnnexes=True)[0][0].getFile().data),
        base64.encodestring(IAnnexable(newItem).getAnnexesByType(relatedTo='item', realAnnexes=True)[1][0].getFile().data))
         #2 annexes are shown
