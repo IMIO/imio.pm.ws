@@ -41,7 +41,7 @@ class SOAPView(BrowserView):
           This is the accessed SOAP method for testing the connection to the webservices
           This method is usefull for SOAP clients
         '''
-        response._connectionState = self._testConnection()
+        response._connectionState, response._version = self._testConnection()
         return response
 
     def checkIsLinkedRequest(self, request, response):
@@ -143,7 +143,8 @@ class SOAPView(BrowserView):
             raise Unauthorized
 
         logger.info('Test connection SOAP made at "%s".' % portal.absolute_url_path())
-        return True
+        version = portal.portal_setup.getVersionForProfile('imio.pm.ws:default')
+        return True, version
 
     def _checkIsLinked(self, meetingConfigId, externalIdentifier):
         '''

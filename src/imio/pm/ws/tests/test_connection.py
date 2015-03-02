@@ -47,6 +47,8 @@ class testSOAPConnection(WS4PMTestCase):
         self.changeUser('pmManager')
         response = SOAPView(self.portal, req).testConnectionRequest(req, responseHolder)
         self.assertEquals(response._connectionState, True)
+        version = self.portal.portal_setup.getVersionForProfile('imio.pm.ws:default')
+        self.assertEquals(response._version, version)
 
 
 def test_suite():

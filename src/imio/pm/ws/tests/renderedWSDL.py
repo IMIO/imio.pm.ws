@@ -12,6 +12,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8"?>
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="connectionState" type="xsd:boolean" maxOccurs="1" minOccurs="1"/>
+                        <xsd:element name="version" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>

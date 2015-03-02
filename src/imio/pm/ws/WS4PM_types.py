@@ -380,7 +380,7 @@ class ns0:
         schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
             ns = ns0.testConnectionResponse_Dec.schema
-            TClist = [ZSI.TC.Boolean(pname="connectionState", aname="_connectionState", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.Boolean(pname="connectionState", aname="_connectionState", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="version", aname="_version", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             kw["pname"] = (u'http://ws4pm.imio.be', u'testConnectionResponse')
             kw["aname"] = "_testConnectionResponse"
             self.attribute_typecode_dict = {}
@@ -391,6 +391,7 @@ class ns0:
                 def __init__(self):
                     # pyclass
                     self._connectionState = None
+                    self._version = None
                     return
             Holder.__name__ = "testConnectionResponse_Holder"
             self.pyclass = Holder
