@@ -181,6 +181,27 @@ class ns0:
             Holder.__name__ = "SearchItemsRequest_Holder"
             self.pyclass = Holder
 
+    class MeetingsAcceptingItemsRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+        schema = "http://ws4pm.imio.be"
+        type = (schema, "MeetingsAcceptingItemsRequest")
+        def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
+            ns = ns0.MeetingsAcceptingItemsRequest_Def.schema
+            TClist = [ZSI.TC.String(pname="meetingConfigId", aname="_meetingConfigId", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            self.attribute_typecode_dict = attributes or {}
+            if extend: TClist += ofwhat
+            if restrict: TClist = ofwhat
+            ZSI.TCcompound.ComplexType.__init__(self, None, TClist, pname=pname, inorder=0, **kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._meetingConfigId = None
+                    self._inTheNameOf = None
+                    return
+            Holder.__name__ = "MeetingsAcceptingItemsRequest_Holder"
+            self.pyclass = Holder
+
     class CreateItemRequest_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
         schema = "http://ws4pm.imio.be"
         type = (schema, "CreateItemRequest")
@@ -358,6 +379,27 @@ class ns0:
                     self._templates = []
                     return
             Holder.__name__ = "ItemInfo_Holder"
+            self.pyclass = Holder
+
+    class MeetingInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+        schema = "http://ws4pm.imio.be"
+        type = (schema, "MeetingInfo")
+        def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
+            ns = ns0.MeetingInfo_Def.schema
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TCtimes.gDateTime(pname="date", aname="_date", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            self.attribute_typecode_dict = attributes or {}
+            if extend: TClist += ofwhat
+            if restrict: TClist = ofwhat
+            ZSI.TCcompound.ComplexType.__init__(self, None, TClist, pname=pname, inorder=0, **kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._UID = None
+                    self._date = None
+                    return
+            Holder.__name__ = "MeetingInfo_Holder"
             self.pyclass = Holder
 
     class testConnectionRequest_Dec(ElementDeclaration):
@@ -606,6 +648,41 @@ class ns0:
                     self._itemInfo = []
                     return
             Holder.__name__ = "searchItemsResponse_Holder"
+            self.pyclass = Holder
+
+    class meetingsAcceptingItemsRequest_Dec(ElementDeclaration):
+        literal = "meetingsAcceptingItemsRequest"
+        schema = "http://ws4pm.imio.be"
+        substitutionGroup = None
+        def __init__(self, **kw):
+            kw["pname"] = (u'http://ws4pm.imio.be', u'meetingsAcceptingItemsRequest')
+            kw["aname"] = "_meetingsAcceptingItemsRequest"
+            if ns0.MeetingsAcceptingItemsRequest_Def not in ns0.meetingsAcceptingItemsRequest_Dec.__bases__:
+                bases = list(ns0.meetingsAcceptingItemsRequest_Dec.__bases__)
+                bases.insert(0, ns0.MeetingsAcceptingItemsRequest_Def)
+                ns0.meetingsAcceptingItemsRequest_Dec.__bases__ = tuple(bases)
+
+            ns0.MeetingsAcceptingItemsRequest_Def.__init__(self, **kw)
+            if self.pyclass is not None: self.pyclass.__name__ = "meetingsAcceptingItemsRequest_Dec_Holder"
+
+    class meetingsAcceptingItemsResponse_Dec(ZSI.TCcompound.ComplexType, ElementDeclaration):
+        literal = "meetingsAcceptingItemsResponse"
+        schema = "http://ws4pm.imio.be"
+        def __init__(self, **kw):
+            ns = ns0.meetingsAcceptingItemsResponse_Dec.schema
+            TClist = [GTD("http://ws4pm.imio.be","MeetingInfo",lazy=False)(pname="meetingInfo", aname="_meetingInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            kw["pname"] = (u'http://ws4pm.imio.be', u'meetingsAcceptingItemsResponse')
+            kw["aname"] = "_meetingsAcceptingItemsResponse"
+            self.attribute_typecode_dict = {}
+            ZSI.TCcompound.ComplexType.__init__(self,None,TClist,inorder=0,**kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._meetingInfo = []
+                    return
+            Holder.__name__ = "meetingsAcceptingItemsResponse_Holder"
             self.pyclass = Holder
 
     class createItemRequest_Dec(ElementDeclaration):

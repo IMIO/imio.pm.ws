@@ -40,6 +40,10 @@ searchItemsRequest = GED("http://ws4pm.imio.be", "searchItemsRequest").pyclass
 
 searchItemsResponse = GED("http://ws4pm.imio.be", "searchItemsResponse").pyclass
 
+meetingsAcceptingItemsRequest = GED("http://ws4pm.imio.be", "meetingsAcceptingItemsRequest").pyclass
+
+meetingsAcceptingItemsResponse = GED("http://ws4pm.imio.be", "meetingsAcceptingItemsResponse").pyclass
+
 createItemRequest = GED("http://ws4pm.imio.be", "createItemRequest").pyclass
 
 createItemResponse = GED("http://ws4pm.imio.be", "createItemResponse").pyclass
@@ -101,6 +105,13 @@ class WS4PM(ServiceSOAPBinding):
 
     soapAction['http://ws4pm.imio.be/searchItems'] = 'soap_searchItems'
     root[(searchItemsRequest.typecode.nspname,searchItemsRequest.typecode.pname)] = 'soap_searchItems'
+
+    def soap_meetingsAcceptingItems(self, ps, **kw):
+        request = ps.Parse(meetingsAcceptingItemsRequest.typecode)
+        return request,meetingsAcceptingItemsResponse()
+
+    soapAction['http://ws4pm.imio.be/meetingsAcceptingItems'] = 'soap_meetingsAcceptingItems'
+    root[(meetingsAcceptingItemsRequest.typecode.nspname,meetingsAcceptingItemsRequest.typecode.pname)] = 'soap_meetingsAcceptingItems'
 
     def soap_createItem(self, ps, **kw):
         request = ps.Parse(createItemRequest.typecode)

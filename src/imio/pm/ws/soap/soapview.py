@@ -13,7 +13,12 @@ from Products.Five import BrowserView
 from Products.PloneMeeting import PloneMeetingError
 from Products.PloneMeeting.interfaces import IAnnexable
 from Products.PloneMeeting.MeetingItem import MeetingItem
-from imio.pm.ws.soap.basetypes import ItemInfo, ConfigInfo, BasicInfo, AnnexInfo, TemplateInfo
+from imio.pm.ws.soap.basetypes import AnnexInfo
+from imio.pm.ws.soap.basetypes import BasicInfo
+from imio.pm.ws.soap.basetypes import ConfigInfo
+from imio.pm.ws.soap.basetypes import ItemInfo
+from imio.pm.ws.soap.basetypes import MeetingInfo
+from imio.pm.ws.soap.basetypes import TemplateInfo
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, MAIN_DATA_FROM_ITEM_SCHEMA
 from time import localtime
 from DateTime import DateTime
@@ -119,6 +124,14 @@ class SOAPView(BrowserView):
         response._file = self._getItemTemplate(request._itemUID,
                                                request._templateId,
                                                request._inTheNameOf)
+        return response
+
+    def meetingsAcceptingItemsRequest(self, request, response):
+        '''
+          This is the accessed SOAP method for getting meetings that accept items in a given meeting config
+        '''
+        response._meetingInfo = self._meetingsAcceptingItems(request._meetingConfigId,
+                                                             request._inTheNameOf)
         return response
 
     def createItemRequest(self, request, response):
@@ -479,6 +492,60 @@ class SOAPView(BrowserView):
         for field in item.Schema().filterFields(isMetadata=False):
             if not field.getName() in MAIN_DATA_FROM_ITEM_SCHEMA:
                 res.append(field)
+        return res
+
+    def _meetingsAcceptingItems(self, meetingConfigId, inTheNameOf=None):
+        '''
+        '''
+        portal = self.context
+        member = portal.portal_membership.getAuthenticatedMember()
+        tool = portal.portal_plonemeeting
+
+        # if we specify in the request that we want to get infos about an item
+        # for another user, we need to check that :
+        # - user getting infos for another is 'MeetingManager' or 'Manager'
+        # - the user we want to get informations for exists
+        if inTheNameOf:
+            if not self._mayAccessAdvancedFunctionnalities():
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+            # change considered member to inTheNameOf given userid
+            member = portal.acl_users.getUserById(inTheNameOf)
+            if not member:
+                raise ZSI.Fault(ZSI.Fault.Client,
+                                "Trying to get meetings accepting items 'inTheNameOf' an unexisting user '%s'!"
+                                % inTheNameOf)
+        memberId = member.getId()
+
+        tool = portal.portal_plonemeeting
+        cfg = getattr(tool, meetingConfigId or '', None)
+        if not cfg or not cfg.meta_type == 'MeetingConfig':
+            raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
+
+        # if we are getting item informations inTheNameOf, use this user for the rest of the process
+        res = []
+        try:
+            if inTheNameOf:
+                oldsm = getSecurityManager()
+                newSecurityManager(portal.REQUEST, member)
+
+            brains = cfg.getMeetingsAcceptingItems()
+            for brain in brains:
+                # XXX for now we still need to wake up the item because we do not have the meeting's date
+                # on the brain, this could be great to manage ticket http://trac.imio.be/trac/ticket/4176 so
+                # we could avoid waking up the item if showExtraInfos is False
+                meeting = brain.getObject()
+                meetingInfo = MeetingInfo()
+                meetingInfo._UID = meeting.UID()
+                meetingInfo._date = localtime(meeting.getDate())
+
+                logger.info('MeetingConfig at %s SOAP accessed by "%s" to get meetings accepting items.' %
+                            (cfg.absolute_url_path(), memberId))
+                res.append(meetingInfo,)
+        finally:
+            # fallback to original user calling the SOAP method
+            if inTheNameOf:
+                setSecurityManager(oldsm)
         return res
 
     def _createItem(self, meetingConfigId, proposingGroupId, creationData, inTheNameOf=None):

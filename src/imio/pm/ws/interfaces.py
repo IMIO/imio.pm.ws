@@ -53,6 +53,12 @@ class ISearchItemsRequest(Interface):
     """
 
 
+class IMeetingsAcceptingItemsRequest(Interface):
+    """
+    Marker interface for change request
+    """
+
+
 class ICreateItemRequest(Interface):
     """
     Marker interface for change request

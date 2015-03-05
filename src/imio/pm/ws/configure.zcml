@@ -67,6 +67,10 @@
     interface=".interfaces.ISearchItemsRequest"
   />
   <five:implements
+    class=".WS4PM_server.meetingsAcceptingItemsRequest"
+    interface=".interfaces.IMeetingsAcceptingItemsRequest"
+  />
+  <five:implements
     class=".WS4PM_server.createItemRequest"
     interface=".interfaces.ICreateItemRequest"
   />
@@ -80,6 +84,7 @@
              getItemInfosRequest
              getItemTemplateRequest
              searchItemsRequest
+             meetingsAcceptingItemsRequest
              createItemRequest"
     class=".soap.soapview.SOAPView"
     permission="zope2.SOAPAccess"
@@ -175,6 +180,18 @@
   <utility
     factory=".WS4PM_server.searchItemsResponse"
     name="searchItemsRequest"
+    provides="z3c.soap.interfaces.IZSIResponseType"
+  />
+
+  <utility
+    factory=".WS4PM_server.meetingsAcceptingItemsRequest"
+    name="meetingsAcceptingItemsRequest"
+    provides="z3c.soap.interfaces.IZSIRequestType"
+  />
+
+  <utility
+    factory=".WS4PM_server.meetingsAcceptingItemsResponse"
+    name="meetingsAcceptingItemsRequest"
     provides="z3c.soap.interfaces.IZSIResponseType"
   />
 

@@ -101,6 +101,16 @@ class WS4PMSOAPBindingSOAP:
         response = self.binding.Receive(searchItemsResponse.typecode)
         return response
 
+    # op: meetingsAcceptingItems
+    def meetingsAcceptingItems(self, request, **kw):
+        if isinstance(request, meetingsAcceptingItemsRequest) is False:
+            raise TypeError, "%s incorrect request type" % (request.__class__)
+        # no input wsaction
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/meetingsAcceptingItems", **kw)
+        # no output wsaction
+        response = self.binding.Receive(meetingsAcceptingItemsResponse.typecode)
+        return response
+
     # op: createItem
     def createItem(self, request, **kw):
         if isinstance(request, createItemRequest) is False:
@@ -138,6 +148,10 @@ getItemTemplateResponse = GED("http://ws4pm.imio.be", "getItemTemplateResponse")
 searchItemsRequest = GED("http://ws4pm.imio.be", "searchItemsRequest").pyclass
 
 searchItemsResponse = GED("http://ws4pm.imio.be", "searchItemsResponse").pyclass
+
+meetingsAcceptingItemsRequest = GED("http://ws4pm.imio.be", "meetingsAcceptingItemsRequest").pyclass
+
+meetingsAcceptingItemsResponse = GED("http://ws4pm.imio.be", "meetingsAcceptingItemsResponse").pyclass
 
 createItemRequest = GED("http://ws4pm.imio.be", "createItemRequest").pyclass
 
