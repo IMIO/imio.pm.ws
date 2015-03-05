@@ -5,6 +5,7 @@ Changelog
 ----------------
 - Added item creation date and modification date in ItemInfo (getItemInfo and searchItems)
 - Added package version in the testConnection call
+- Added SOAP call to getMeetingsAcceptingItems
 
 1.2 (2015-02-27)
 ----------------
