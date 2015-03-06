@@ -41,6 +41,11 @@ class WS4PMTestCase(PloneMeetingTestCase):
         self.changeUser('admin')
         self._removeConfigObjectsFor(self.meetingConfig)
         self._removeConfigObjectsFor(self.meetingConfig2)
+        # make sure 'detailedDescription' optional field is selected for both configs
+        itemAttrs = self.meetingConfig.getUsedItemAttributes()
+        self.meetingConfig.setUsedItemAttributes(itemAttrs + ('detailedDescription', ))
+        itemAttrs = self.meetingConfig2.getUsedItemAttributes()
+        self.meetingConfig2.setUsedItemAttributes(itemAttrs + ('detailedDescription', ))
         # use the 'plonegov-assembly' MeetingConfig that use real categories,
         # not useGroupsAsCategories, even if it could be changed during a test
         self.meetingConfig = self.meetingConfig2
@@ -50,6 +55,9 @@ class WS4PMTestCase(PloneMeetingTestCase):
         """
           Helper method for creating an item using the SOAP method createItem
         """
+        # make sure we enabled the 'detailedDescription' optional field
+        itemAttrs = self.meetingConfig.getUsedItemAttributes()
+        self.meetingConfig.setUsedItemAttributes(itemAttrs + ('detailedDescription', ))
         req = createItemRequest()
         req._meetingConfigId = self.usedMeetingConfigId
         req._proposingGroupId = 'developers'
@@ -57,6 +65,7 @@ class WS4PMTestCase(PloneMeetingTestCase):
         CreationData._title = 'My new item title'
         CreationData._category = 'development'
         CreationData._description = '<p>Description</p>'
+        CreationData._detailedDescription = '<p>Detailed description</p>'
         CreationData._decision = '<p>Décision</p>'
         req._creationData = CreationData
         return req

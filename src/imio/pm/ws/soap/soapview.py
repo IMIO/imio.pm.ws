@@ -368,6 +368,7 @@ class SOAPView(BrowserView):
                 itemInfo._modification_date = localtime(item.modified())
                 itemInfo._category = item.getCategory()
                 itemInfo._description = item.getRawDescription()
+                itemInfo._detailedDescription = item.getRawDetailedDescription()
                 itemInfo._decision = item.getRawDecision(keepWithNext=False)
                 itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
                 itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)

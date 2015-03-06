@@ -4,5 +4,6 @@ MAIN_DATA_FROM_ITEM_SCHEMA = ['title',
                               'id',
                               'category',
                               'description',
+                              'detailedDescription',
                               'decision',
                               'externalIdentifier', ]

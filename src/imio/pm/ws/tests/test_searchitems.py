@@ -85,6 +85,7 @@ class testSOAPSearchItems(WS4PMTestCase):
     <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
+    <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
@@ -130,6 +131,7 @@ class testSOAPSearchItems(WS4PMTestCase):
     <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
+    <detailedDescription/>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>presented</review_state>
     <meeting_date>%s</meeting_date>
@@ -146,6 +148,7 @@ class testSOAPSearchItems(WS4PMTestCase):
     <modification_date>%s</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
+    <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>

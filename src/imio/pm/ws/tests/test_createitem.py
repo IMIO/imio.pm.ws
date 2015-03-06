@@ -68,8 +68,9 @@ SOAPAction: /
 """<SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest>""" \
 """<meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId>""" \
 """<creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category>""" \
-"""<description>&lt;p&gt;Description&lt;/p&gt;</description><decision>""" \
-"""D\xc3\xa9cision&lt;strong&gt;wrongTagd&lt;/p&gt;</decision></creationData></ns1:createItemRequest>""" \
+"""<description>&lt;p&gt;Description&lt;/p&gt;</description>""" \
+"""<detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>""" \
+"""<decision>D\xc3\xa9cision&lt;strong&gt;wrongTagd&lt;/p&gt;</decision></creationData></ns1:createItemRequest>""" \
 """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting')
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
@@ -227,7 +228,9 @@ SOAPAction: /
 """<ns1:createItemRequest><meetingConfigId>plonegov-assembly</meetingConfigId>""" \
 """<proposingGroupId>developers</proposingGroupId><creationData xsi:type="ns1:CreationData">""" \
 """<title>My new item title</title><category>development</category>""" \
-"""<description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Décision&lt;/p&gt;</decision>""" \
+"""<description>&lt;p&gt;Description&lt;/p&gt;</description>""" \
+"""<detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>""" \
+"""<decision>&lt;p&gt;Décision&lt;/p&gt;</decision>""" \
 """<annexes xsi:type="ns1:AnnexInfo"><title>%s</title><annexTypeId>%s</annexTypeId><filename>%s</filename><file>
 %s</file></annexes></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % \
 ('pmCreator1', 'meeting', annex._title, annex._annexTypeId, annex._filename, base64.encodestring(annex._file))
@@ -352,7 +355,9 @@ SOAPAction: /
 """<SOAP-ENV:Header></SOAP-ENV:Header><SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:createItemRequest>""" \
 """<meetingConfigId>plonegov-assembly</meetingConfigId><proposingGroupId>developers</proposingGroupId>""" \
 """<creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category>""" \
-"""<description>&lt;p&gt;Description&lt;/p&gt;</description><decision>&lt;p&gt;Décision&lt;/p&gt;</decision>""" \
+"""<description>&lt;p&gt;Description&lt;/p&gt;</description>""" \
+"""<detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>""" \
+"""<decision>&lt;p&gt;Décision&lt;/p&gt;</decision>""" \
 """%s</creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" \
 % ('pmCreator1', 'meeting', annexesEnveloppePart)
         result = """POST /plone/createItemRequest HTTP/1.0
