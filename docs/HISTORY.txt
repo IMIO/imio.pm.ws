@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.4 (unreleased)
+1.4 (2015-03-06)
 ----------------
 - Calling getItemInfos will now also return the 'detailedDescription'
   as it can be used when creating an item
