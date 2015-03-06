@@ -11,6 +11,7 @@ from AccessControl.SecurityManagement import getSecurityManager, setSecurityMana
 from zope.i18n import translate
 from Products.Five import BrowserView
 from Products.PloneMeeting import PloneMeetingError
+from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
 from Products.PloneMeeting.interfaces import IAnnexable
 from Products.PloneMeeting.MeetingItem import MeetingItem
 from imio.pm.ws.soap.basetypes import AnnexInfo
@@ -370,6 +371,8 @@ class SOAPView(BrowserView):
                 itemInfo._description = item.getRawDescription()
                 itemInfo._detailedDescription = item.getRawDetailedDescription()
                 itemInfo._decision = item.getRawDecision(keepWithNext=False)
+                preferred = item.getPreferredMeeting()
+                itemInfo._preferredMeeting = not preferred == ITEM_NO_PREFERRED_MEETING_VALUE and preferred or ''
                 itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
                 itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)
                 itemInfo._absolute_url = item.absolute_url()
@@ -613,6 +616,13 @@ class SOAPView(BrowserView):
                data[field]:
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "The optional field '%s' is not activated in this configuration!" % field)
+
+        # raise if we pass an preferredMeeting that is not a meeting accepting items
+        if data['preferredMeeting'] and not data['preferredMeeting'] in \
+           [meetingBrain.UID for meetingBrain in mc.getMeetingsAcceptingItems()]:
+            raise ZSI.Fault(ZSI.Fault.Client,
+                            "The given preferred meeting UID (%s) is not a meeting accepting items!"
+                            % data['preferredMeeting'])
 
         try:
             # if we are creating an item inTheNameOf, use this user for the rest of the process

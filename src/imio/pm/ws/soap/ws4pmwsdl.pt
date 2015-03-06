@@ -126,12 +126,12 @@
                 </xsd:complexType>
             </xsd:element>
             <xsd:element name="meetingsAcceptingItemsRequest" type="tns:MeetingsAcceptingItemsRequest"/>
-                <xsd:complexType name="MeetingsAcceptingItemsRequest">
-                    <xsd:sequence>
-                        <xsd:element name="meetingConfigId" type="xsd:string" maxOccurs="1" minOccurs="1"/>
-                        <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
-                    </xsd:sequence>
-                </xsd:complexType>
+            <xsd:complexType name="MeetingsAcceptingItemsRequest">
+                <xsd:sequence>
+                    <xsd:element name="meetingConfigId" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                    <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
             <xsd:element name="meetingsAcceptingItemsResponse">
                 <xsd:complexType>
                     <xsd:sequence>
@@ -183,6 +183,7 @@
                     <xsd:element name="detailedDescription" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="motivation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="decision" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="preferredMeeting" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="10"/>
                 </xsd:sequence>
@@ -215,6 +216,7 @@
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="detailedDescription" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="decision" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="preferredMeeting" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="review_state" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="absolute_url" type="xsd:string" minOccurs="1" maxOccurs="1"/>

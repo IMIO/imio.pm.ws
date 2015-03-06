@@ -519,6 +519,27 @@ SOAPAction: /
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
 
+    def test_ws_createItemWithPreferredMeeting(self):
+        """
+          It is possible to specify a preferred meeting, but the given
+          preferred meeting UID must be a meeting accepting items.
+        """
+        self.changeUser('pmManager')
+        # create a fresh meeting that will accept items
+        meeting = self.create('Meeting', date='2015/01/01')
+        req = self._prepareCreationData()
+        req._creationData._preferredMeeting = 'unexisting_meeting_UID'
+        responseHolder = createItemResponse()
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+                          "The given preferred meeting UID (unexisting_meeting_UID) is not a meeting accepting items!")
+        req._creationData._preferredMeeting = meeting.UID()
+        response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        # an item has been created with correct preferredMeeting
+        item = self.portal.portal_catalog(UID=response._UID)[0].getObject()
+        self.assertTrue(item.getPreferredMeeting() == meeting.UID())
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite

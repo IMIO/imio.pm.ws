@@ -86,6 +86,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
+    <preferredMeeting/>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -124,6 +125,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription/>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
+    <preferredMeeting/>
     <review_state>presented</review_state>
     <meeting_date>%s</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
@@ -206,6 +208,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
+    <preferredMeeting/>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -236,6 +239,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
+    <preferredMeeting/>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
@@ -285,6 +289,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
+    <preferredMeeting/>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
