@@ -28,6 +28,7 @@ import ZSI
 import magic
 from magic import MagicException
 from zope.i18n import translate
+from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
 from Products.PloneMeeting.interfaces import IAnnexable
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import createItemResponse
@@ -539,6 +540,11 @@ SOAPAction: /
         # an item has been created with correct preferredMeeting
         item = self.portal.portal_catalog(UID=response._UID)[0].getObject()
         self.assertTrue(item.getPreferredMeeting() == meeting.UID())
+        # if no preferredMeeting is provided, the default value 'whatever' is used
+        req._creationData._preferredMeeting = None
+        response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        item = self.portal.portal_catalog(UID=response._UID)[0].getObject()
+        self.assertTrue(item.getPreferredMeeting() == ITEM_NO_PREFERRED_MEETING_VALUE)
 
 
 def test_suite():

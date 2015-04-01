@@ -617,8 +617,11 @@ class SOAPView(BrowserView):
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "The optional field '%s' is not activated in this configuration!" % field)
 
-        # raise if we pass an preferredMeeting that is not a meeting accepting items
-        if data['preferredMeeting'] and not data['preferredMeeting'] in \
+        # raise if we pass a preferredMeeting that is not a meeting accepting items
+        if not data['preferredMeeting']:
+            data['preferredMeeting'] = ITEM_NO_PREFERRED_MEETING_VALUE
+        if not data['preferredMeeting'] == ITEM_NO_PREFERRED_MEETING_VALUE and \
+           not data['preferredMeeting'] in \
            [meetingBrain.UID for meetingBrain in mc.getMeetingsAcceptingItems()]:
             raise ZSI.Fault(ZSI.Fault.Client,
                             "The given preferred meeting UID (%s) is not a meeting accepting items!"
