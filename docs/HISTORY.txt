@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.5 (unreleased)
+1.5 (2015-04-01)
 ----------------
 - If no 'preferredMeeting' is provided when creating an item, use 'whatever'
   or created item is not consistent
