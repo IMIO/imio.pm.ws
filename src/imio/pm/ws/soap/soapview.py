@@ -776,7 +776,8 @@ class SOAPView(BrowserView):
                 if not mr_mimetype:
                     warning_message = translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
                                                 domain='imio.pm.ws',
-                                                mapping={'annex_path': (annex_filename or annex_title),
+                                                mapping={'annex_path': unicode((annex_filename or annex_title),
+                                                                               'utf-8'),
                                                          'item_path': item.absolute_url_path()},
                                                 context=portal.REQUEST)
                     logger.warning(warning_message)
@@ -786,7 +787,8 @@ class SOAPView(BrowserView):
                     warning_message = translate(NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
                                                 domain='imio.pm.ws',
                                                 mapping={'mime': mr_mimetype[0].normalized(),
-                                                         'annex_path': (annex_filename or annex_title),
+                                                         'annex_path': unicode((annex_filename or annex_title),
+                                                                               'utf-8'),
                                                          'item_path': item.absolute_url_path()},
                                                 context=portal.REQUEST)
                     logger.warning(warning_message)
@@ -799,7 +801,8 @@ class SOAPView(BrowserView):
                         warning_message = translate(MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
                                                     domain='imio.pm.ws',
                                                     mapping={'mime': mr_mimetype[0].normalized(),
-                                                             'annex_path': (annex_filename or annex_title),
+                                                             'annex_path': unicode((annex_filename or annex_title),
+                                                                                   'utf-8'),
                                                              'item_path': item.absolute_url_path()},
                                                     context=portal.REQUEST)
                         logger.warning(warning_message)
