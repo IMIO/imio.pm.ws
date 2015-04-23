@@ -399,8 +399,8 @@ SOAPAction: /
         """
           Test that during item creation, if non blocker errors occur (warnings), it is displayed in the response
         """
-        #if the proposed HTML of one of the rich field is wrong
-        #it is reworked by BeautifulSoup and a warning is displayed
+        # if the proposed HTML of one of the rich field is wrong
+        # it is reworked by BeautifulSoup and a warning is displayed
         self.changeUser('pmCreator1')
         req = self._prepareCreationData()
         wrongHTML = '<p>Wrong HTML<strong></p></strong>'
@@ -421,16 +421,16 @@ SOAPAction: /
                                          'creator': 'pmCreator1'},
                                 context=self.request))
         self.assertEquals(expected, resp)
-        #now test warnings around file mimetype
-        data = {'title': 'My annex',
-                'filename': 'notValidFileNameNoExtension',
+        # now test warnings around file mimetype
+        data = {'title': 'My annex with spécial char and no filename',
+                'filename': '',
                 'file': 'octetStreamTestFile.bin',
                 'annexTypeId': 'budget-analysis'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
-        #several extensions found and no valid filename extension, the annex is not created and a warning is added
+        # several extensions found and no valid filename extension, the annex is not created and a warning is added
         newItem, response = self._createItem(req)
         resp = deserialize(response)
-        #2 warnings are returned
+        # 2 warnings are returned
         expected = """<ns1:createItemResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
             """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
@@ -449,10 +449,11 @@ SOAPAction: /
        translate(MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
                  domain='imio.pm.ws',
                  mapping={'mime': 'application/octet-stream',
-                          'annex_path': 'notValidFileNameNoExtension',
+                          'annex_path': unicode(data['title'], 'utf-8'),
                           'item_path': newItem.absolute_url_path()},
                  context=self.request)
        )
+        expected = expected.encode('utf-8')
         self.assertEquals(expected, resp)
 
     def test_ws_createItemInTheNameOf(self):
