@@ -458,10 +458,11 @@ SOAPAction: /
        translate(MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
                  domain='imio.pm.ws',
                  mapping={'mime': 'application/octet-stream',
-                          'annex_path': data['title'],
+                          'annex_path': unicode(data['title'], 'utf-8'),
                           'item_path': newItem.absolute_url_path()},
                  context=self.request)
        )
+        expected = expected.encode('utf-8')
         self.assertEquals(expected, resp)
 
     def test_ws_createItemInTheNameOf(self):
