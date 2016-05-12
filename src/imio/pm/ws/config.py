@@ -7,3 +7,5 @@ MAIN_DATA_FROM_ITEM_SCHEMA = ['title',
                               'detailedDescription',
                               'decision',
                               'externalIdentifier', ]
+
+POD_TEMPLATE_ID_PATTERN = '{0}__format__{1}'

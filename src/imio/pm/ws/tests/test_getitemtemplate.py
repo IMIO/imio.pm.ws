@@ -25,8 +25,7 @@
 import os
 import zipfile
 import ZSI
-from appy.pod.renderer import NO_PY_PATH
-from Products.PloneMeeting.PodTemplate import POD_ERROR
+from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import getItemTemplateRequest, getItemTemplateResponse
 from imio.pm.ws.soap.soapview import SOAPView
@@ -69,21 +68,25 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         self.changeUser('pmCreator1')
         mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
         wrongTemplate = mc.podtemplates.agendaTemplate
-        req._templateId = wrongTemplate.getId()
+        req._templateId = '%s__format__%s' % (wrongTemplate.getId(), 'odt')
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, 'You can not access this template!')
         # if everything is correct, we receive the rendered template
-        req._templateId = mc.podtemplates.itemTemplate.getId()
+        req._templateId = '%s__format__%s' % (mc.podtemplates.itemTemplate.getId(), 'odt')
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         renderedTemplate = SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         # check that the rendered file correspond to the newItem's data
         self._isCorrectlyRenderedTemplate(renderedTemplate, newItem)
         # test if PloneMeeting raise a PloneMeetingError
         # for example, trying to generate a PDF when Ooo is not in server mode
-        mc.podtemplates.itemTemplate.setPodFormat('pdf')
+        mc.podtemplates.itemTemplate.pod_formats = ['pdf']
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, 'PloneMeetingError : %s' % POD_ERROR % NO_PY_PATH % 'pdf')
+        self.assertEquals(cm.exception.string,
+                          "Exception : Asked output format 'odt' is not available for template 'itemTemplate'!")
 
     def test_ws_getItemTemplateInTheNameOf(self):
         """
@@ -109,7 +112,7 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         newItemUID = newItem.UID()
         req._itemUID = newItemUID
         mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
-        req._templateId = mc.podtemplates.itemTemplate.getId()
+        req._templateId = '%s__format__%s' % (mc.podtemplates.itemTemplate.getId(), 'odt')
         req._inTheNameOf = 'pmCreator1'
         # the current user can get item template inTheNameOf himself
         responseHolder = getItemTemplateResponse()
@@ -121,6 +124,7 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
                           "a template for an item 'inTheNameOf'!")
         # now as MeetingManager, it works
         self.changeUser('pmManager')
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         renderedTemplate = SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         # check that the rendered file correspond to the newItem's data
         self._isCorrectlyRenderedTemplate(renderedTemplate, newItem)
@@ -129,11 +133,13 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
         # now inTheNameOf a user that can not access newItem
         req._inTheNameOf = 'pmCreator2'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
                           "You can not access this item!")
         req._inTheNameOf = 'unexistingUserId'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,

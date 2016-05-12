@@ -25,6 +25,7 @@
 from time import localtime
 import ZSI
 from ZSI.TCtimes import gDateTime
+from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import searchItemsRequest, searchItemsResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
@@ -251,18 +252,21 @@ class testSOAPSearchItems(WS4PMTestCase):
         self.assertTrue(result._itemInfo[0].UID == item1.UID() and len(result._itemInfo) == 1)
         # 'pmCreator2' can get infos about item2
         self.changeUser('pmCreator2')
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         # only one result and about item2
         self.assertTrue(result._itemInfo[0].UID == item2.UID() and len(result._itemInfo) == 1)
         # None of 'pmCreatorx' can searchItems inTheNameOf
         req._inTheNameOf = 'pmCreator1'
         self.changeUser('pmCreator1')
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
                           "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
         req._inTheNameOf = 'pmCreator2'
         self.changeUser('pmCreator2')
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
@@ -270,6 +274,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         # now working examples with a 'Manager'
         self.changeUser('pmManager')
         req._inTheNameOf = None
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         # both items are returned
         self.assertTrue(len(result._itemInfo) == 2)
@@ -282,11 +287,13 @@ class testSOAPSearchItems(WS4PMTestCase):
         self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
         # now searchItems inTheNameOf 'pmCreator1'
         req._inTheNameOf = 'pmCreator1'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertTrue(len(result._itemInfo) == 1)
         self.assertTrue(result._itemInfo[0].UID == item1.UID())
         # now searchItems inTheNameOf 'pmCreator2'
         req._inTheNameOf = 'pmCreator2'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertTrue(len(result._itemInfo) == 1)
         self.assertTrue(result._itemInfo[0].UID == item2.UID())

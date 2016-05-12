@@ -24,6 +24,7 @@
 
 
 import ZSI
+from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import getConfigInfosRequest, getConfigInfosResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
@@ -145,17 +146,20 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         self.changeUser('pmManager')
         req._userToShowCategoriesFor = 'unexistingUserId'
         # the userToShowCategoriesFor must exists!
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
                           "Trying to get avaialble categories for an unexisting user 'unexistingUserId'!")
         # now get it.  The 'subproducts' category is only available to vendors (pmCreator2)
         req._userToShowCategoriesFor = 'pmCreator1'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         response = SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
         resp = deserialize(response)
         # for 'pmCreator1', subproducts is not available
         self.assertFalse('<id>subproducts</id>' in resp)
         req._userToShowCategoriesFor = 'pmCreator2'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         response = SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
         resp = deserialize(response)
         # but for 'pmCreator2', subproducts is available

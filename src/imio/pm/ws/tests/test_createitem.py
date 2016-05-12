@@ -30,6 +30,7 @@ from magic import MagicException
 from zope.i18n import translate
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
 from Products.PloneMeeting.interfaces import IAnnexable
+from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import createItemResponse
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
@@ -489,6 +490,7 @@ SOAPAction: /
         self.assertEquals(newItem.owner_info()['id'], 'pmCreator2')
         # with those data but with a non 'Manager'/'MeetingManager', it fails
         self.changeUser('pmCreator1')
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
@@ -496,6 +498,7 @@ SOAPAction: /
         # now use the MeetingManager but specify a proposingGroup the inTheNameOf user can not create for
         self.changeUser('pmManager')
         req._proposingGroupId = 'developers'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "'pmCreator2' can not create items for the 'developers' group!")
@@ -503,6 +506,7 @@ SOAPAction: /
         req._inTheNameOf = 'unexistingUserId'
         # set back correct proposingGroupId
         req._proposingGroupId = 'vendors'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
@@ -517,6 +521,7 @@ SOAPAction: /
         self.portal.Members.manage_delObjects(ids=['pmCreator2'])
         self.changeUser('pmManager')
         req._inTheNameOf = 'pmCreator2'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")

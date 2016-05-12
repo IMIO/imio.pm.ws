@@ -3,9 +3,7 @@ Changelog
 
 1.6 (unreleased)
 ----------------
-
-- Nothing changed yet.
-
+- Adapted code regarding changes in PloneMeeting 4
 
 1.5 (2015-04-01)
 ----------------

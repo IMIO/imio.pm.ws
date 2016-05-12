@@ -23,6 +23,7 @@
 #
 
 import ZSI
+from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import checkIsLinkedRequest, checkIsLinkedResponse
 from imio.pm.ws.soap.soapview import SOAPView
@@ -60,12 +61,14 @@ class testSOAPCheckIsLinked(WS4PMTestCase):
         # first check for anotherexternalIdentifier
         checkIsLinkedReq._meetingConfigId = None
         checkIsLinkedReq._externalIdentifier = 'my-unexisting-external-identifier'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         res = SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
                                                                            checkIsLinkedResponseHolder)
         self.assertFalse(res._isLinked)
         # passing a wrong meetingConfigId will raise a ZSI.Fault
         # first check for anotherexternalIdentifier
         checkIsLinkedReq._meetingConfigId = 'wrong-meeting-config-id'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
                                                                          checkIsLinkedResponseHolder)
@@ -74,6 +77,7 @@ class testSOAPCheckIsLinked(WS4PMTestCase):
         # now with the values corresponding to the created item
         checkIsLinkedReq._meetingConfigId = 'plonegov-assembly'
         checkIsLinkedReq._externalIdentifier = 'my-external-identifier'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         res = SOAPView(self.portal, checkIsLinkedReq).checkIsLinkedRequest(checkIsLinkedReq,
                                                                            checkIsLinkedResponseHolder)
         self.assertTrue(res._isLinked)

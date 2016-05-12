@@ -28,10 +28,12 @@ from time import localtime
 import ZSI
 from ZSI.TCtimes import gDateTime
 from Products.PloneMeeting.interfaces import IAnnexable
+from imio.helpers.cache import cleanRamCacheFor
+from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
+from imio.pm.ws.soap.soapview import SOAPView
+from imio.pm.ws.tests.WS4PMTestCase import serializeRequest
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import getItemInfosRequest, getItemInfosResponse
-from imio.pm.ws.tests.WS4PMTestCase import serializeRequest
-from imio.pm.ws.soap.soapview import SOAPView
 
 
 class testSOAPGetItemInfos(WS4PMTestCase):
@@ -340,9 +342,11 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertTrue(len(resp._itemInfo[0]._templates) == 1)
         mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
         # the returned template correspond to the one present in the 'plonemeeting-assembly' meetingConfig
-        self.assertTrue(resp._itemInfo[0]._templates[0]._templateId == mc.podtemplates.itemTemplate.getId())
-        self.assertTrue(resp._itemInfo[0]._templates[0]._templateFilename, 'Mynewitemtitle-Meetingitem')
-        self.assertTrue(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
+        self.assertEqual(resp._itemInfo[0]._templates[0]._templateId,
+                         POD_TEMPLATE_ID_PATTERN.format(mc.podtemplates.itemTemplate.getId(),
+                                                        mc.podtemplates.itemTemplate.pod_formats[0]))
+        self.assertEqual(resp._itemInfo[0]._templates[0]._templateFilename, u'Item.odt')
+        self.assertEqual(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
 
     def test_ws_getItemInfosInTheNameOf(self):
         """
@@ -369,6 +373,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # now begin, we need to be a 'MeetingManager' or 'Manager' to
         # getItemInfos(inTheNameOf)
         req._inTheNameOf = 'pmCreator1'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
@@ -377,6 +382,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.changeUser('pmManager')
         # a MeetingManager can get informations inTheNameOf 'pmCreator1'
         # and it will return relevant result as 'pmCreator1' can see the item
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertTrue(result._itemInfo[0].UID == item.UID())
         # as we switch user while using inTheNameOf, make sure we have
@@ -384,10 +390,12 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
         # as 'pmCreator2', we can not get item informations
         req._inTheNameOf = 'pmCreator2'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertTrue(result._itemInfo == [])
         # now for an unexisting inTheNameOf userid
         req._inTheNameOf = 'unexistingUserId'
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,

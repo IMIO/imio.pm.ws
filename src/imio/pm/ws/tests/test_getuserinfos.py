@@ -23,6 +23,7 @@
 #
 
 import ZSI
+from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase, deserialize
 from imio.pm.ws.WS4PM_client import getUserInfosRequest, getUserInfosResponse
 from imio.pm.ws.soap.soapview import SOAPView
@@ -50,6 +51,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
                           "user informations for another user than 'pmCreator1'!")
         self.changeUser('pmManager')
         # pmManager can get informations for another user as it is a MeetingManager
+        cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         response = SOAPView(self.portal, req).getUserInfosRequest(req, responseHolder)
         self.assertTrue(response._fullname == 'M. PMCreator Two')
 

@@ -1,28 +1,35 @@
 import ZSI
 import logging
-logger = logging.getLogger('WS4PM')
 import magic
 from magic import MagicException
 from BeautifulSoup import BeautifulSoup
 from HTMLParser import HTMLParser
 from lxml.html.clean import Cleaner
+from time import localtime
+from DateTime import DateTime
 from AccessControl import Unauthorized
-from AccessControl.SecurityManagement import getSecurityManager, setSecurityManager, newSecurityManager
+from AccessControl.SecurityManagement import getSecurityManager
+from AccessControl.SecurityManagement import newSecurityManager
+from AccessControl.SecurityManagement import setSecurityManager
 from zope.i18n import translate
+from plone import api
 from Products.Five import BrowserView
 from Products.PloneMeeting import PloneMeetingError
+from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
 from Products.PloneMeeting.interfaces import IAnnexable
 from Products.PloneMeeting.MeetingItem import MeetingItem
+from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
+from imio.pm.ws.config import MAIN_DATA_FROM_ITEM_SCHEMA
+from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
 from imio.pm.ws.soap.basetypes import AnnexInfo
 from imio.pm.ws.soap.basetypes import BasicInfo
 from imio.pm.ws.soap.basetypes import ConfigInfo
 from imio.pm.ws.soap.basetypes import ItemInfo
 from imio.pm.ws.soap.basetypes import MeetingInfo
 from imio.pm.ws.soap.basetypes import TemplateInfo
-from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME, MAIN_DATA_FROM_ITEM_SCHEMA
-from time import localtime
-from DateTime import DateTime
+
+logger = logging.getLogger('WS4PM')
 
 WRONG_HTML_WARNING = "HTML used for creating the item at '${item_path}' by '${creator}' was not valid. " \
                      "Used corrected HTML."
@@ -150,14 +157,14 @@ class SOAPView(BrowserView):
           Test current connection state
         '''
         portal = self.context
-        isAnon = portal.portal_membership.isAnonymousUser()
 
         # in case this method is accessed without valid credrentials, raise Unauthorized
-        if isAnon:
+        if api.user.is_anonymous():
             raise Unauthorized
 
         logger.info('Test connection SOAP made at "%s".' % portal.absolute_url_path())
-        version = portal.portal_setup.getVersionForProfile('imio.pm.ws:default')
+        portal_setup = api.portal.get_tool('portal_setup')
+        version = portal_setup.getVersionForProfile('imio.pm.ws:default')
         return True, version
 
     def _checkIsLinked(self, meetingConfigId, externalIdentifier):
@@ -172,7 +179,7 @@ class SOAPView(BrowserView):
                             "You need to be 'Manager' or 'MeetingManager' to check if an element is linked to an item!")
 
         # perform the unrestrictedSearchResult
-        tool = portal.portal_plonemeeting
+        tool = api.portal.get_tool('portal_plonemeeting')
         # if a meetingConfigId is given, check that it exists
         query = {}
         if meetingConfigId:
@@ -181,7 +188,8 @@ class SOAPView(BrowserView):
                 raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
             query['portal_type'] = mc.getItemTypeName()
         query['externalIdentifier'] = externalIdentifier
-        brains = portal.portal_catalog.unrestrictedSearchResults(**query)
+        catalog = api.portal.get_tool('portal_catalog')
+        brains = catalog.unrestrictedSearchResults(**query)
 
         logger.info('checkIsLinked SOAP made at "%s".' % portal.absolute_url_path())
         if brains:
@@ -197,8 +205,8 @@ class SOAPView(BrowserView):
           connected user.
         '''
         portal = self.context
-        member = portal.portal_membership.getAuthenticatedMember()
-        tool = portal.portal_plonemeeting
+        member = api.user.get_current()
+        tool = api.portal.get_tool('portal_plonemeeting')
 
         # passing a userToShowCategoriesFor is only available to 'Manager' and 'MeetingManager'
         if userToShowCategoriesFor:
@@ -252,8 +260,7 @@ class SOAPView(BrowserView):
           Returns informations about the given userId.  If p_showGroups is True,
           it will also returns the list of groups the user is part of
         '''
-        portal = self.context
-        member = portal.portal_membership.getAuthenticatedMember()
+        member = api.user.get_current()
         memberId = member.getId()
 
         # a member can get infos for himself
@@ -268,7 +275,7 @@ class SOAPView(BrowserView):
 
         # if getting user informations about the currently connected user
         # or the connected user is MeetingManager/Manager, proceed!
-        user = portal.portal_membership.getMemberById(userId)
+        user = api.user.get(userId)
 
         if not user:
             raise ZSI.Fault(ZSI.Fault.Client,
@@ -281,8 +288,10 @@ class SOAPView(BrowserView):
             # if a particular suffix is defined, we use it, it will
             # returns only groups the user is member of with the defined
             # suffix, either it will returns every groups the user is member of
-            tool = portal.portal_plonemeeting
-            groups = tool.getGroupsForUser(userId=userId, suffix=suffix)
+            tool = api.portal.get_tool('portal_plonemeeting')
+            # backward compatibility, getGroupsForUser received 'suffix' before but 'suffixes' now
+            suffixes = suffix and [suffix] or []
+            groups = tool.getGroupsForUser(userId=userId, suffixes=suffixes)
             for group in groups:
                 basicInfo = BasicInfo()
                 basicInfo._UID = group.UID()
@@ -304,7 +313,7 @@ class SOAPView(BrowserView):
         '''
         portal = self.context
 
-        member = portal.portal_membership.getAuthenticatedMember()
+        member = api.user.get_current()
 
         params = {}
         # remove leading '_' in searchParams
@@ -324,17 +333,18 @@ class SOAPView(BrowserView):
         # - the user we want to get informations for exists
         if inTheNameOf:
             if not self._mayAccessAdvancedFunctionnalities():
-                raise ZSI.Fault(ZSI.Fault.Client,
-                                "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
-                raise ZSI.Fault(ZSI.Fault.Client,
-                                "Trying to get item informations 'inTheNameOf' an unexisting user '%s'!"
-                                % inTheNameOf)
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "Trying to get item informations 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
         memberId = member.getId()
 
-        tool = portal.portal_plonemeeting
+        tool = api.portal.get_tool('portal_plonemeeting')
         mc = None
         if 'meetingConfigId' in params and not 'portal_type' in params:
             #check that the given meetingConfigId exists
@@ -353,8 +363,10 @@ class SOAPView(BrowserView):
 
             # force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
             params['meta_type'] = 'MeetingItem'
-            brains = portal.portal_catalog(**params)
+            catalog = api.portal.get_tool('portal_catalog')
+            brains = catalog(**params)
             noDate = DateTime('1950/01/01 00:00:00 UTC')
+            wfTool = api.portal.get_tool('portal_workflow')
             for brain in brains:
                 # XXX for now we still need to wake up the item because we do not have the meeting's date
                 # on the brain, this could be great to manage ticket http://trac.imio.be/trac/ticket/4176 so
@@ -373,7 +385,7 @@ class SOAPView(BrowserView):
                 itemInfo._decision = item.getRawDecision(keepWithNext=False)
                 preferred = item.getPreferredMeeting()
                 itemInfo._preferredMeeting = not preferred == ITEM_NO_PREFERRED_MEETING_VALUE and preferred or ''
-                itemInfo._review_state = portal.portal_workflow.getInfoFor(item, 'review_state')
+                itemInfo._review_state = wfTool.getInfoFor(item, 'review_state')
                 itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)
                 itemInfo._absolute_url = item.absolute_url()
                 itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
@@ -411,14 +423,15 @@ class SOAPView(BrowserView):
                     if not mc:
                         # we need the item's meetingConfig
                         mc = tool.getMeetingConfig(item)
-                    templates = mc.getAvailablePodTemplates(item)
+                    templates = self._availablePodTemplates(item)
                     for template in templates:
-                        templateInfo = TemplateInfo()
-                        templateInfo._title = template.Title()
-                        templateInfo._templateFormat = template.getPodFormat()
-                        templateInfo._templateId = template.getId()
-                        templateInfo._templateFilename = template._getFileName(item)
-                        itemInfo._templates.append(templateInfo)
+                        for pod_format in template.pod_formats:
+                            templateInfo = TemplateInfo()
+                            templateInfo._title = template.Title()
+                            templateInfo._templateFormat = pod_format
+                            templateInfo._templateId = POD_TEMPLATE_ID_PATTERN.format(template.getId(), pod_format)
+                            templateInfo._templateFilename = template.odt_file.filename
+                            itemInfo._templates.append(templateInfo)
                 logger.info('Item at %s SOAP accessed by "%s".' %
                             (item.absolute_url_path(), memberId))
                 res.append(itemInfo,)
@@ -433,8 +446,7 @@ class SOAPView(BrowserView):
           Generates a POD template p_templateId on p_itemUID
         '''
         portal = self.context
-        member = portal.portal_membership.getAuthenticatedMember()
-
+        member = api.user.get_current()
         # if we specify in the request that we want to get a template of an item
         # for another user, we need to check that :
         # - user getting the template is 'MeetingManager' or 'Manager'
@@ -457,17 +469,17 @@ class SOAPView(BrowserView):
                 newSecurityManager(portal.REQUEST, member)
 
             # search for the item, this will also check if the user can actually access it
-            brains = portal.portal_catalog(UID=itemUID)
+            catalog = api.portal.get_tool('portal_catalog')
+            brains = catalog(UID=itemUID)
             if not brains:
                 raise ZSI.Fault(ZSI.Fault.Client, "You can not access this item!")
 
             # check that the template is available to the member
             item = brains[0].getObject()
-            mc = portal.portal_plonemeeting.getMeetingConfig(item)
-            templates = mc.getAvailablePodTemplates(item)
+            templates = self._availablePodTemplates(item)
             theTemplate = None
             for template in templates:
-                if template.getId() == templateId:
+                if template.getId() == templateId.split(POD_TEMPLATE_ID_PATTERN.format('', ''))[0]:
                     theTemplate = template
                     break
             if not theTemplate:
@@ -475,13 +487,15 @@ class SOAPView(BrowserView):
 
             # we can access the item and the template, proceed!
             # generate the template and return the result
-            member = portal.portal_membership.getAuthenticatedMember()
             logger.info('Template at "%s" for item at "%s" SOAP accessed by "%s".' %
                         (template.absolute_url_path(), item.absolute_url_path(), member.getId()))
             try:
-                res = theTemplate.generateDocument(item, forBrowser=False)
-            except PloneMeetingError, e:
-                raise ZSI.Fault(ZSI.Fault.Client, "PloneMeetingError : %s" % e.message)
+                view = item.restrictedTraverse('@@document-generation')
+                item.REQUEST.set('template_uid', theTemplate.UID())
+                item.REQUEST.set('output_format', templateId.split(POD_TEMPLATE_ID_PATTERN.format('', ''))[1])
+                res = view()
+            except Exception, e:
+                raise ZSI.Fault(ZSI.Fault.Client, "Exception : %s" % e.message)
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
@@ -502,8 +516,8 @@ class SOAPView(BrowserView):
         '''
         '''
         portal = self.context
-        member = portal.portal_membership.getAuthenticatedMember()
-        tool = portal.portal_plonemeeting
+        member = api.user.get_current()
+        tool = api.portal.get_tool('portal_plonemeeting')
 
         # if we specify in the request that we want to get infos about an item
         # for another user, we need to check that :
@@ -521,7 +535,6 @@ class SOAPView(BrowserView):
                                 % inTheNameOf)
         memberId = member.getId()
 
-        tool = portal.portal_plonemeeting
         cfg = getattr(tool, meetingConfigId or '', None)
         if not cfg or not cfg.meta_type == 'MeetingConfig':
             raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
@@ -557,10 +570,10 @@ class SOAPView(BrowserView):
           Create an item with given parameters
         '''
         portal = self.context
-        tool = portal.portal_plonemeeting
+        tool = api.portal.get_tool('portal_plonemeeting')
 
         warnings = []
-        member = portal.portal_membership.getAuthenticatedMember()
+        member = api.user.get_current()
 
         # if we specify in the request that we want to create an item
         # for another user, we need to check that :
@@ -584,7 +597,7 @@ class SOAPView(BrowserView):
 
         # check that the user is a creator for given proposingGroupId
         # get the MeetingGroups for wich inTheNameOfMemberId is creator
-        userGroups = tool.getGroupsForUser(userId=memberId, suffix="creators")
+        userGroups = tool.getGroupsForUser(userId=memberId, suffixes=["creators"])
         proposingGroup = [group for group in userGroups if group.getId() == proposingGroupId]
         if not proposingGroup:
             raise ZSI.Fault(ZSI.Fault.Client,
@@ -626,6 +639,10 @@ class SOAPView(BrowserView):
             raise ZSI.Fault(ZSI.Fault.Client,
                             "The given preferred meeting UID (%s) is not a meeting accepting items!"
                             % data['preferredMeeting'])
+
+        # externalIdentifier is indexed, it can not be None
+        if not data['externalIdentifier']:
+            data['externalIdentifier'] = ''
 
         try:
             # if we are creating an item inTheNameOf, use this user for the rest of the process
@@ -715,8 +732,10 @@ class SOAPView(BrowserView):
             # manage externalIdentifier
             externalIdentifier = False
             field = item.getField(EXTERNAL_IDENTIFIER_FIELD_NAME)
+            # can not be None as it is indexed
+            externalIdentifier = data['externalIdentifier'] or ''
             if data['externalIdentifier']:
-                #we received an externalIdentifier, use it!
+                # we received an externalIdentifier, use it!
                 field.getMutator(item)(data['externalIdentifier'])
                 externalIdentifier = True
             else:
@@ -761,7 +780,8 @@ class SOAPView(BrowserView):
                     magic_mimetype = mime.from_buffer(annex_file)
                 except MagicException:
                     # in case there is an error with magic trying to find annex mimetype, we pass
-                    # we will have magic_mimetype=None and so will try to use file extension to determinate it here under
+                    # we will have magic_mimetype=None and so will try to use file extension to
+                    # determinate it here under
                     pass
                 mr_mimetype = ()
                 if magic_mimetype:
@@ -821,7 +841,9 @@ class SOAPView(BrowserView):
                 lastInsertedAnnex.getFile().setContentType(mr_mimetype[0].normalized())
 
             # change the comment in the item's add a line in the item's history
-            review_history = item.workflow_history[item.getWorkflowName()]
+            wfTool = api.portal.get_tool('portal_workflow')
+            itemWFId = wfTool.getWorkflowsFor(item)[0].getId()
+            review_history = item.workflow_history[itemWFId]
             review_history[0]['comments'] = translate(ITEM_SOAP_CREATED_COMMENT,
                                                       domain='imio.pm.ws',
                                                       context=portal.REQUEST)
@@ -843,11 +865,19 @@ class SOAPView(BrowserView):
           By default, the given user must be 'MeetingManager' for a
           MeetingConfig to be able to use 'inTheNameOf' or a 'Manager'.
         '''
-        if self.context.portal_plonemeeting.userIsAmong('meetingmanagers') or \
-           self.context.portal_membership.getAuthenticatedMember().has_role('Manager'):
+        tool = api.portal.get_tool('portal_plonemeeting')
+        if tool.userIsAmong('meetingmanagers') or tool.isManager(self.context, realManagers=True):
             return True
 
         return False
+
+    def _availablePodTemplates(self, item):
+        """ """
+        viewlet = PMDocumentGeneratorLinksViewlet(item,
+                                                  item.REQUEST,
+                                                  None,
+                                                  None)
+        return viewlet.get_generable_templates()
 
 
 class WS4PMWSDL(BrowserView):
