@@ -13,8 +13,8 @@ from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import setSecurityManager
 from zope.i18n import translate
 from plone import api
+from Products.Archetypes.atapi import RichWidget
 from Products.Five import BrowserView
-from Products.PloneMeeting import PloneMeetingError
 from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
 from Products.PloneMeeting.interfaces import IAnnexable
@@ -644,6 +644,28 @@ class SOAPView(BrowserView):
         if not data['externalIdentifier']:
             data['externalIdentifier'] = ''
 
+        # manage extraAttrs, check if it exist, if so, add it to data
+        # for now, we only accept TextFields
+        for extraAttr in creationData._extraAttrs:
+            key = extraAttr._key
+            value = extraAttr._value
+            # the given extraAttr must be in the item schema
+            if not key in MeetingItem.schema:
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "The extraAttr '%s' was not found the the MeetingItem schema!" % key)
+            field = MeetingItem.schema[key]
+            # only support XHTML TextField at the moment, aka field using RichWidget
+            # others will need validation
+            if not isinstance(field.widget, RichWidget):
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "The extraAttr '%s' must correspond to a field using a 'RichWidget' "
+                    "in the MeetingItem schema!" % key)
+            # avoid overriding a value
+            if not key in data:
+                data[key] = value
+
         try:
             # if we are creating an item inTheNameOf, use this user for the rest of the process
             if inTheNameOf:
@@ -754,6 +776,7 @@ class SOAPView(BrowserView):
                                             context=portal.REQUEST)
                 logger.warning(warning_message)
                 warnings.append(warning_message)
+
             # existing annex types
             fileTypes = mc.getFileTypes()
             for annex in creationData._annexes:

@@ -25,6 +25,7 @@
 import base64
 import unittest2 as unittest
 import ZSI
+from ZSI.schema import GTD
 import magic
 from magic import MagicException
 from zope.i18n import translate
@@ -551,6 +552,40 @@ SOAPAction: /
         response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         item = self.portal.portal_catalog(UID=response._UID)[0].getObject()
         self.assertTrue(item.getPreferredMeeting() == ITEM_NO_PREFERRED_MEETING_VALUE)
+
+    def test_ws_createItemWithExtraAttrs(self):
+        """
+          It is possible to specify arbitraty extraAttrs so we may create items even
+          when using a specific profile adding is own fields.  For now it only works with
+          XHTML TextFields.
+        """
+        self.changeUser('pmManager')
+        req = self._prepareCreationData()
+        ExtraAttr = GTD('http://ws4pm.imio.be', 'ExtraAttr')('').pyclass()
+        ExtraAttr._key = 'unexisting_key'
+        ExtraAttr._value = '<p>XHTML content</p>'
+        req._creationData._extraAttrs = [ExtraAttr]
+        responseHolder = createItemResponse()
+
+        # key must be found in the MeetingItem's schema
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(cm.exception.string,
+                          "The extraAttr 'unexisting_key' was not found the the MeetingItem schema!")
+
+        # only works with RichText fields
+        req._creationData._extraAttrs[0]._key = 'privacy'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(
+            cm.exception.string,
+            "The extraAttr 'privacy' must correspond to a field using a 'RichWidget' in the MeetingItem schema!")
+
+        # working example, use RichText field 'notes'
+        req._creationData._extraAttrs[0]._key = 'notes'
+        response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        item = self.portal.portal_catalog(UID=response._UID)[0].getObject()
+        self.assertEqual(item.getNotes(), '<p>XHTML content</p>')
 
 
 def test_suite():

@@ -4,8 +4,8 @@ Changelog
 1.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Added possibility to pass aribitraty extra attributes when creating an item,
+  for now it must correspond to an existing RichText field
 
 1.6 (2016-05-13)
 ----------------

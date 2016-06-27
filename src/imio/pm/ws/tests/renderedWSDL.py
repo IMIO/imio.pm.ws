@@ -178,7 +178,14 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8"?>
                     <xsd:element name="decision" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="preferredMeeting" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="extraAttrs" type="tns:ExtraAttr" minOccurs="0" maxOccurs="10"/>
                     <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="10"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="ExtraAttr">
+                <xsd:sequence>
+                    <xsd:element name="key" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="value" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:complexType name="AnnexInfo">
