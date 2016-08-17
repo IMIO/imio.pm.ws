@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.8 (unreleased)
+1.8 (2016-08-17)
 ----------------
 
 - Make sure history is saved when we patch it to change the creation comment
