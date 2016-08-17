@@ -870,7 +870,7 @@ class SOAPView(BrowserView):
             review_history[0]['comments'] = translate(ITEM_SOAP_CREATED_COMMENT,
                                                       domain='imio.pm.ws',
                                                       context=portal.REQUEST)
-            review_history._p_changed = True
+            item.workflow_history._p_changed = True
 
             logger.info('Item at "%s"%s SOAP created by "%s".' %
                         (item.absolute_url_path(),
