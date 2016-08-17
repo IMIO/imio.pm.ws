@@ -719,26 +719,12 @@ class SOAPView(BrowserView):
                     warnWrongHTML = True
                     data[htmlFieldId] = renderedSoupContents
 
-            # we create the item to be able to check the category here above...
-            itemId = destFolder.invokeFactory(type_name, **data)
-            item = getattr(destFolder, itemId)
-            # processForm calls at_post_create_script too
-            # this is necessary before adding annexes
-            item.at_post_create_script()
-
-            # HTML fields were not set by invokeFactory, set it...
-            for htmlFieldId in htmlFieldIds:
-                # use 'text/x-html-safe' mimetype when creating the item
-                field = item.getField(htmlFieldId)
-                field.getMutator(item)(data[htmlFieldId], mimetype='text/x-html-safe')
-
             # check that if category is mandatory (getUseGroupsAsCategories is False), it is given
             # and that given category is available
             # if we are not using categories, just ensure that we received an empty category
-            availableCategories = not mc.getUseGroupsAsCategories() and item.listCategories().keys() or ['', ]
+            availableCategories = not mc.getUseGroupsAsCategories() and \
+                [cat.getId() for cat in mc.getCategories()] or ['', ]
             if not data['category'] in availableCategories:
-                # delete the created item and raise an error
-                item.aq_inner.aq_parent.manage_delObjects(ids=[itemId, ])
                 # special message if category mandatory and not given
                 if not mc.getUseGroupsAsCategories() and not data['category']:
                     raise ZSI.Fault(ZSI.Fault.Client, "In this config, category is mandatory!")
@@ -749,7 +735,20 @@ class SOAPView(BrowserView):
                 elif not mc.getUseGroupsAsCategories():
                     raise ZSI.Fault(ZSI.Fault.Client, "'%s' is not available for the '%s' group!" %
                                     (data['category'], proposingGroupId))
+
+            # we create the item to be able to check the category here above...
+            itemId = destFolder.invokeFactory(type_name, **data)
+            item = getattr(destFolder, itemId)
             item.setCategory(data['category'])
+            # processForm calls at_post_create_script too
+            # this is necessary before adding annexes
+            item.at_post_create_script()
+
+            # HTML fields were not set by invokeFactory, set it...
+            for htmlFieldId in htmlFieldIds:
+                # use 'text/x-html-safe' mimetype when creating the item
+                field = item.getField(htmlFieldId)
+                field.getMutator(item)(data[htmlFieldId], mimetype='text/x-html-safe')
 
             # manage externalIdentifier
             externalIdentifier = False

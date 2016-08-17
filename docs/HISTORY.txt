@@ -5,6 +5,8 @@ Changelog
 ----------------
 
 - Make sure history is saved when we patch it to change the creation comment
+- Do no more create the item before checking for category validity, this could lead
+  to problem where item was not deletable (validated while created for example)
 
 1.7 (2016-08-03)
 ----------------
