@@ -4,8 +4,7 @@ Changelog
 1.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Make sure history is saved when we patch it to change the creation comment
 
 1.7 (2016-08-03)
 ----------------
