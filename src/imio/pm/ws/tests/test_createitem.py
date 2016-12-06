@@ -30,7 +30,7 @@ import magic
 from magic import MagicException
 from zope.i18n import translate
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
-from Products.PloneMeeting.interfaces import IAnnexable
+from Products.PloneMeeting.utils import get_annexes
 from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import createItemResponse
@@ -210,15 +210,15 @@ SOAPAction: /
         """
           Test SOAP service behaviour when creating items with one annex
         """
-        #by default no item exists
+        # by default no item exists
         self.changeUser('pmCreator1')
         req = self._prepareCreationData()
         data = {'title': 'My annex 1', 'filename': 'smallTestFile.pdf', 'file': 'smallTestFile.pdf'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
         annex = req._creationData._annexes[0]
-        #Serialize the request so it can be easily tested
+        # Serialize the request so it can be easily tested
         request = serializeRequest(req)
-        #This is what the sent enveloppe should looks like
+        # This is what the sent enveloppe should looks like
         expected = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
@@ -245,16 +245,17 @@ SOAPAction: /
 %s""" % ('pmCreator1', 'meeting', request)
         self.assertEquals(expected, result)
         newItem, response = self._createItem(req)
-        #now check the created item have the annex
-        annexes = IAnnexable(newItem).getAnnexes()
-        #the annex is actually created
+        # now check the created item have the annex
+        annexes = get_annexes(newItem)
+        # the annex is actually created
         self.failUnless(len(annexes) == 1)
-        #the annex mimetype is correct
+        # the annex mimetype is correct
         annex = annexes[0]
-        self.failUnless(annex.getContentType() == 'application/pdf')
-        #the annex metadata are ok
-        self.failUnless(annex.Title() == 'My annex 1' and
-                        annex.getMeetingFileType(theRealObject=True).getId() == 'financial-analysis')
+        self.failUnless(annex.file.contentType == 'application/pdf')
+        # the annex metadata are ok
+        self.assertEqual(annex.Title(), 'My annex 1')
+        self.assertEqual(annex.content_category,
+                         'annexes_types_-_item_annexes_-_financial-analysis')
 
     @unittest.skip("This test is skipped, remove decorator if you use libmagic/file < 5.10")
     def test_ws_createItemWithAnnexNotRecognizedByLibmagicRequest(self):
@@ -274,11 +275,11 @@ SOAPAction: /
         self.assertRaises(MagicException, magic.Magic(mime=True).from_buffer, annex._file)
         newItem, response = self._createItem(req)
         # the annex is nevertheless created and correctly recognized because it had a correct file extension
-        annexes = IAnnexable(newItem).getAnnexes()
+        annexes = get_annexes(newItem)
         self.failUnless(len(annexes) == 1)
         # the annex mimetype is correct
         annex = annexes[0]
-        self.failUnless(annex.getContentType() == 'application/msword')
+        self.failUnless(annex.file.contentType == 'application/msword')
         # the annex metadata are ok
         self.failUnless(annex.Title() == 'My crashing created annex' and
                         annex.getMeetingFileType().getId() == 'financial-analysis')
@@ -288,7 +289,7 @@ SOAPAction: /
                 'file': 'file_crash_libmagic.doc'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
         newItem2, response = self._createItem(req)
-        self.failUnless(len(IAnnexable(newItem2).getAnnexes()) == 0)
+        self.failUnless(len(get_annexes(newItem2)) == 0)
         # a warning specifying that annex was not added because mimetype could
         # not reliabily be found is added in the response
         self.assertEquals(response._warnings, [translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
@@ -371,29 +372,29 @@ SOAPAction: /
 %s""" % ('pmCreator1', 'meeting', request)
         self.assertEquals(expected, result)
         newItem, response = self._createItem(req)
-        annexes = newItem.objectValues('MeetingFile')
+        annexes = get_annexes(newItem)
         # 4 annexes are actually created
         self.failUnless(len(annexes) == 4)
         #the annexes mimetype are corrects
-        self.failUnless(annexes[0].getContentType() == 'application/pdf')
-        self.failUnless(annexes[1].getContentType() == 'application/vnd.oasis.opendocument.text')
-        self.failUnless(annexes[2].getContentType() == 'application/msword')
-        self.failUnless(annexes[3].getContentType() == 'application/octet-stream')
+        self.failUnless(annexes[0].file.contentType == 'application/pdf')
+        self.failUnless(annexes[1].file.contentType == 'application/vnd.oasis.opendocument.text')
+        self.failUnless(annexes[2].file.contentType == 'application/msword')
+        self.failUnless(annexes[3].file.contentType == 'application/octet-stream')
         # the annexes metadata are ok
         self.failUnless(annexes[0].Title() == 'My annex 1' and
-                        annexes[0].getMeetingFileType(theRealObject=True).getId() == 'financial-analysis')
+                        annexes[0].content_category == 'annexes_types_-_item_annexes_-_financial-analysis')
         self.failUnless(annexes[1].Title() == 'My annex 2' and
-                        annexes[1].getMeetingFileType(theRealObject=True).getId() == 'budget-analysis')
+                        annexes[1].content_category == 'annexes_types_-_item_annexes_-_budget-analysis')
         # meetingFileType is back to default one when a wrong file type is given in the annexInfo
         self.failUnless(annexes[2].Title() == 'My annex 3' and
-                        annexes[2].getMeetingFileType(theRealObject=True).getId() == 'financial-analysis')
+                        annexes[2].content_category == 'annexes_types_-_item_annexes_-_financial-analysis')
         self.failUnless(annexes[3].Title() == 'My annex 6' and
-                        annexes[3].getMeetingFileType(theRealObject=True).getId() == 'budget-analysis')
+                        annexes[3].content_category == 'annexes_types_-_item_annexes_-_budget-analysis')
         # annexes filename are the ones defined in the 'filename', either it is generated
-        self.failUnless(annexes[0].getFile().filename == 'smallTestFile.pdf')
-        self.failUnless(annexes[1].getFile().filename == 'arbitraryFilename.odt')
-        self.failUnless(annexes[2].getFile().filename == 'largeTestFile.doc')
-        self.failUnless(annexes[3].getFile().filename == 'validExtension.bin')
+        self.failUnless(annexes[0].file.filename == u'smallTestFile.pdf')
+        self.failUnless(annexes[1].file.filename == u'arbitraryFilename.odt')
+        self.failUnless(annexes[2].file.filename == u'largeTestFile.doc')
+        self.failUnless(annexes[3].file.filename == u'validExtension.bin')
         # now try to create an item with an annex that has no file
         # when file attribute is not provided, the annex is not created
         data = {'title': 'My annex 7',
@@ -402,7 +403,7 @@ SOAPAction: /
         req._creationData._annexes = [self._prepareAnnexInfo(**data), ]
         self.assertEquals(req._creationData._annexes[0]._file, None)
         newItem, response = self._createItem(req)
-        annexes = newItem.objectValues('MeetingFile')
+        annexes = get_annexes(newItem)
         # no annexes have been added
         self.assertEquals(len(annexes), 0)
 

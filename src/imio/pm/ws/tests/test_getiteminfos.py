@@ -27,7 +27,11 @@ import os
 from time import localtime
 import ZSI
 from ZSI.TCtimes import gDateTime
-from Products.PloneMeeting.interfaces import IAnnexable
+from plone import api
+from plone import namedfile
+from Products.CMFPlone.utils import safe_unicode
+from Products.PloneMeeting.utils import get_annexes
+from collective.iconifiedcategory.utils import calculate_category_id
 from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
 from imio.pm.ws.soap.soapview import SOAPView
@@ -182,17 +186,19 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         """
           Test that getting an item with a given UID returns valuable informations and linked annexes
         """
+        cfg = self.meetingConfig
         self.changeUser('pmCreator1')
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga')) == 0)
-        #prepare data for a default item
+        # prepare data for a default item
         req = self._prepareCreationData()
-        #add one annex
+        # add one annex
         data = {'title': 'My annex 1', 'filename': 'smallTestFile.pdf', 'file': 'smallTestFile.pdf'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
-        #create the item
+        # create the item
         newItem, reponse = self._createItem(req)
+        newItemId = newItem.getId()
         newItemUID = newItem.UID()
-        #get informations about the item, by default 'showAnnexes' is False
+        # get informations about the item, by default 'showAnnexes' is False
         resp = self._getItemInfos(newItemUID)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
@@ -201,7 +207,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
-    <id>my-new-item-title</id>
+    <id>%s</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
     <creation_date>%s</creation_date>
@@ -213,17 +219,21 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferredMeeting/>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/%s</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
 """ % (newItemUID,
+       newItemId,
        gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
+       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+       newItemId)
         #annexes are not shown by default
         self.assertEquals(expected, resp)
         #now with 'showAnnexes=True'
+        financial_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('financial-analysis'))
+        item_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('item-annex'))
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
@@ -232,7 +242,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
-    <id>my-new-item-title</id>
+    <id>%s</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
     <creation_date>%s</creation_date>
@@ -244,12 +254,12 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferredMeeting/>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/%s</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My annex 1</title>
-      <annexTypeId>financial-analysis</annexTypeId>
+      <annexTypeId>%s</annexTypeId>
       <filename>smallTestFile.pdf</filename>
       <file>
 %s</file>
@@ -257,23 +267,28 @@ class testSOAPGetItemInfos(WS4PMTestCase):
   </itemInfo>
 </ns1:getItemInfosResponse>
 """ % (newItemUID,
+       newItemId,
        gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
        gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
-       base64.encodestring(IAnnexable(newItem).getAnnexes()[0].getFile().data))
-        #one annex is shown
+       newItemId,
+       financial_annex_type_id,
+       base64.encodestring(get_annexes(newItem)[0].file.data))
+        # one annex is shown
         self.assertEquals(expected, resp)
-        #now check with several (2) annexes...
-        annex_type = getattr(self.meetingConfig.meetingfiletypes, 'item-annex')
-        afile = open(os.path.join(os.path.dirname(__file__), 'mediumTestFile.odt'))
+        # now check with several (2) annexes...
+        afile = open(os.path.join(os.path.dirname(__file__),
+                                  'mediumTestFile.odt'))
         annex_file = afile.read()
         afile.close()
-        kwargs = {'filename': 'myBeautifulTestFile.odt'}
-        IAnnexable(newItem).addAnnex('myBeautifulTestFile.odt',
-                                     'My BeautifulTestFile title',
-                                     annex_file,
-                                     False,
-                                     annex_type.UID(),
-                                     **kwargs)
+        api.content.create(
+            title='My BeautifulTestFile title',
+            type='annex',
+            file=namedfile.NamedBlobFile(
+                annex_file,
+                filename=safe_unicode(u'myBeautifulTestFile.odt')),
+            container=newItem,
+            content_category=item_annex_type_id)
+
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
@@ -282,7 +297,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
-    <id>my-new-item-title</id>
+    <id>%s</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
     <creation_date>%s</creation_date>
@@ -294,19 +309,19 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferredMeeting/>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/%s</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My annex 1</title>
-      <annexTypeId>financial-analysis</annexTypeId>
+      <annexTypeId>%s</annexTypeId>
       <filename>smallTestFile.pdf</filename>
       <file>
 %s</file>
     </annexes>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My BeautifulTestFile title</title>
-      <annexTypeId>item-annex</annexTypeId>
+      <annexTypeId>%s</annexTypeId>
       <filename>myBeautifulTestFile.odt</filename>
       <file>
 %s</file>
@@ -314,11 +329,15 @@ class testSOAPGetItemInfos(WS4PMTestCase):
   </itemInfo>
 </ns1:getItemInfosResponse>
 """ % (newItemUID,
+       newItemId,
        gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
        gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
-       base64.encodestring(IAnnexable(newItem).getAnnexesByType(relatedTo='item', realAnnexes=True)[0][0].getFile().data),
-       base64.encodestring(IAnnexable(newItem).getAnnexesByType(relatedTo='item', realAnnexes=True)[1][0].getFile().data))
-        #2 annexes are shown
+       newItemId,
+       financial_annex_type_id,
+       base64.encodestring(get_annexes(newItem)[0].file.data),
+       item_annex_type_id,
+       base64.encodestring(get_annexes(newItem)[1].file.data))
+        # 2 annexes are shown
         self.assertEquals(expected, resp)
 
     def test_ws_getItemInfosWithTemplatesRequest(self):

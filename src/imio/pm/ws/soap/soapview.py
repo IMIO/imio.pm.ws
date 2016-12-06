@@ -13,12 +13,15 @@ from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import setSecurityManager
 from zope.i18n import translate
 from plone import api
+from plone import namedfile
 from Products.Archetypes.atapi import RichWidget
+from Products.CMFPlone.utils import safe_unicode
 from Products.Five import BrowserView
 from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
-from Products.PloneMeeting.interfaces import IAnnexable
 from Products.PloneMeeting.MeetingItem import MeetingItem
+from Products.PloneMeeting.utils import get_annexes
+from collective.iconifiedcategory.utils import calculate_category_id
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
 from imio.pm.ws.config import MAIN_DATA_FROM_ITEM_SCHEMA
 from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
@@ -410,15 +413,13 @@ class SOAPView(BrowserView):
                     # add the creator fullname
                     itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
                 if showAnnexes:
-                    for groupOfAnnexesByType in IAnnexable(item).getAnnexesByType(relatedTo='item',
-                                                                                  realAnnexes=True):
-                        for annex in groupOfAnnexesByType:
-                            annexInfo = AnnexInfo()
-                            annexInfo._title = annex.Title()
-                            annexInfo._annexTypeId = annex.getMeetingFileType(theRealObject=True).getId()
-                            annexInfo._filename = annex.getFile().filename
-                            annexInfo._file = annex.getFile().data
-                            itemInfo._annexes.append(annexInfo)
+                    for annex in get_annexes(item, portal_types=['annex']):
+                        annexInfo = AnnexInfo()
+                        annexInfo._title = annex.Title()
+                        annexInfo._annexTypeId = annex.content_category
+                        annexInfo._filename = annex.file.filename
+                        annexInfo._file = annex.file.data
+                        itemInfo._annexes.append(annexInfo)
                 if showTemplates:
                     if not mc:
                         # we need the item's meetingConfig
@@ -777,7 +778,7 @@ class SOAPView(BrowserView):
                 warnings.append(warning_message)
 
             # existing annex types
-            fileTypes = mc.getFileTypes()
+            annexTypeIds = mc.annexes_types.item_annexes.objectIds()
             for annex in creationData._annexes:
                 annex_title = annex._title
                 annex_type_id = annex._annexTypeId
@@ -785,14 +786,10 @@ class SOAPView(BrowserView):
                 validFileName = annex_filename and len(annex_filename.split('.')) == 2
                 # if annex._file is None, we turn it to an empty string
                 annex_file = annex._file or ''
-                # we have an annex_type_id, find relevant MeetingFileType object
-                # getFileTypes returns a dict with as 'id' the fileType UID
-                fileTypeIds = [fileType['absolute_url'].split('/')[-1] for fileType in fileTypes]
-                if not annex_type_id or not annex_type_id in fileTypeIds:
-                    # take the first available annex fileType that is the default one
-                    annex_type = fileTypes[0]['meetingFileTypeObjectUID']
-                else:
-                    annex_type = getattr(mc.meetingfiletypes, annex_type_id).UID()
+                if not annex_type_id or not annex_type_id in annexTypeIds:
+                    # take the first available annexType that is the default one
+                    annex_type_id = annexTypeIds[0]
+                annex_type = getattr(mc.annexes_types.item_annexes, annex_type_id)
                 # manage mimetype manually
                 # as we receive base64 encoded binary, mimetypes registry can not handle this correctly...
                 mr = self.context.mimetypes_registry
@@ -855,12 +852,13 @@ class SOAPView(BrowserView):
                     # we have the file extension, generate a filename
                     annex_filename = "annex.%s" % mr_mimetype[0].extensions[0]
                 # now that we have everything we need, proceed with annex creation
-                kwargs = {}
-                kwargs['filename'] = annex_filename
-                IAnnexable(item).addAnnex(annex_filename, annex_title, annex_file, False, annex_type, **kwargs)
-                itemAnnexes = item.objectValues('MeetingFile')
-                lastInsertedAnnex = itemAnnexes[-1]
-                lastInsertedAnnex.getFile().setContentType(mr_mimetype[0].normalized())
+                api.content.create(
+                    title=annex_title,
+                    type='annex',
+                    file=namedfile.NamedBlobFile(annex_file,
+                                                 filename=safe_unicode(annex_filename)),
+                    container=item,
+                    content_category=calculate_category_id(annex_type))
 
             # change the comment in the item's add a line in the item's history
             wfTool = api.portal.get_tool('portal_workflow')

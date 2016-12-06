@@ -4,8 +4,7 @@ Changelog
 1.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Adapted code regarding integration of imio.annex into Products.PloneMeeting
 
 1.8 (2016-08-17)
 ----------------
