@@ -100,9 +100,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID,
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
+""" % (
+            newItemUID,
+            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
         self.assertEquals(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
@@ -139,10 +140,11 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (itemInMeeting.UID(),
-       gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
-       meetingDate)
+""" % (
+            itemInMeeting.UID(),
+            gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
+            gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
+            meetingDate)
         self.assertEquals(expected, resp)
         # if the item with this UID has not been found (user can not access or item does not exists),
         # an empty response is returned
@@ -196,7 +198,6 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
         # create the item
         newItem, reponse = self._createItem(req)
-        newItemId = newItem.getId()
         newItemUID = newItem.UID()
         # get informations about the item, by default 'showAnnexes' is False
         resp = self._getItemInfos(newItemUID)
@@ -224,11 +225,12 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID,
-       newItemId,
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
-       newItemId)
+""" % (
+            newItemUID,
+            newItem.getId(),
+            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+            newItem.getId())
         #annexes are not shown by default
         self.assertEquals(expected, resp)
         #now with 'showAnnexes=True'
@@ -266,13 +268,14 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID,
-       newItemId,
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
-       newItemId,
-       financial_annex_type_id,
-       base64.encodestring(get_annexes(newItem)[0].file.data))
+""" % (
+            newItemUID,
+            newItem.getId(),
+            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+            newItem.getId(),
+            financial_annex_type_id,
+            base64.encodestring(get_annexes(newItem)[0].file.data))
         # one annex is shown
         self.assertEquals(expected, resp)
         # now check with several (2) annexes...
@@ -287,7 +290,9 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                 annex_file,
                 filename=safe_unicode(u'myBeautifulTestFile.odt')),
             container=newItem,
-            content_category=item_annex_type_id)
+            content_category=item_annex_type_id,
+            to_print=False,
+            confidential=False)
 
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
@@ -328,15 +333,16 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (newItemUID,
-       newItemId,
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
-       newItemId,
-       financial_annex_type_id,
-       base64.encodestring(get_annexes(newItem)[0].file.data),
-       item_annex_type_id,
-       base64.encodestring(get_annexes(newItem)[1].file.data))
+""" % (
+            newItemUID,
+            newItem.getId(),
+            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+            newItem.getId(),
+            financial_annex_type_id,
+            base64.encodestring(get_annexes(newItem)[0].file.data),
+            item_annex_type_id,
+            base64.encodestring(get_annexes(newItem)[1].file.data))
         # 2 annexes are shown
         self.assertEquals(expected, resp)
 

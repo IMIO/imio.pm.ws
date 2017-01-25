@@ -14,6 +14,7 @@ from AccessControl.SecurityManagement import setSecurityManager
 from zope.i18n import translate
 from plone import api
 from plone import namedfile
+from plone.dexterity.utils import createContentInContainer
 from Products.Archetypes.atapi import RichWidget
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five import BrowserView
@@ -852,13 +853,15 @@ class SOAPView(BrowserView):
                     # we have the file extension, generate a filename
                     annex_filename = "annex.%s" % mr_mimetype[0].extensions[0]
                 # now that we have everything we need, proceed with annex creation
-                api.content.create(
+                createContentInContainer(
+                    container=item,
+                    portal_type='annex',
                     title=annex_title,
-                    type='annex',
                     file=namedfile.NamedBlobFile(annex_file,
                                                  filename=safe_unicode(annex_filename)),
-                    container=item,
-                    content_category=calculate_category_id(annex_type))
+                    content_category=calculate_category_id(annex_type),
+                    to_print=False,
+                    confidential=False)
 
             # change the comment in the item's add a line in the item's history
             wfTool = api.portal.get_tool('portal_workflow')
