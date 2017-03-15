@@ -890,7 +890,7 @@ class SOAPView(BrowserView):
           MeetingConfig to be able to use 'inTheNameOf' or a 'Manager'.
         '''
         tool = api.portal.get_tool('portal_plonemeeting')
-        if tool.userIsAmong('meetingmanagers') or tool.isManager(self.context, realManagers=True):
+        if tool.userIsAmong(['meetingmanagers']) or tool.isManager(self.context, realManagers=True):
             return True
 
         return False
