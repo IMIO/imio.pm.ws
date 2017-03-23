@@ -4,8 +4,9 @@ Changelog
 2.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Adapted code now that ToolPloneMeeting.userIsAmong receives a list of suffixes
+  instead one single suffix before.
+  [gbastien]
 
 2.0 (2017-01-25)
 ----------------
