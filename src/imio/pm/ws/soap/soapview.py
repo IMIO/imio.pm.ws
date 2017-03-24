@@ -29,6 +29,7 @@ from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
 from imio.pm.ws.soap.basetypes import AnnexInfo
 from imio.pm.ws.soap.basetypes import BasicInfo
 from imio.pm.ws.soap.basetypes import ConfigInfo
+from imio.pm.ws.soap.basetypes import GroupInfo
 from imio.pm.ws.soap.basetypes import ItemInfo
 from imio.pm.ws.soap.basetypes import MeetingInfo
 from imio.pm.ws.soap.basetypes import TemplateInfo
@@ -75,8 +76,8 @@ class SOAPView(BrowserView):
           This is the accessed SOAP method for getting informations about the configuration
           This will return a list of key elements of the config with the type of element
         '''
-        response._configInfo = self._getConfigInfos(request._showCategories,
-                                                    request._userToShowCategoriesFor)
+        response._configInfo, response._groupInfo = \
+            self._getConfigInfos(request._showCategories, request._userToShowCategoriesFor)
         return response
 
     def getUserInfosRequest(self, request, response):
@@ -225,15 +226,15 @@ class SOAPView(BrowserView):
                                 "Trying to get avaialble categories for an unexisting user '%s'!" %
                                 userToShowCategoriesFor)
 
-        res = []
         # MeetingConfigs
+        config_infos = []
         for config in tool.getActiveConfigs():
             configInfo = ConfigInfo()
             configInfo._UID = config.UID()
             configInfo._id = config.getId()
             configInfo._title = config.Title()
             configInfo._description = config.Description()
-            configInfo._type = config.portal_type
+            configInfo._itemPositiveDecidedStates = config.getItemPositiveDecidedStates()
             # only return categories if the meetingConfig uses it
             if showCategories and not config.getUseGroupsAsCategories():
                 for category in config.getCategories(userId=userToShowCategoriesFor):
@@ -243,22 +244,22 @@ class SOAPView(BrowserView):
                     basicInfo._title = category.Title()
                     basicInfo._description = category.Description()
                     configInfo._categories.append(basicInfo)
-            res.append(configInfo)
+            config_infos.append(configInfo)
 
         # MeetingGroups
+        group_infos = []
         for group in tool.getMeetingGroups():
-            configInfo = ConfigInfo()
-            configInfo._UID = group.UID()
-            configInfo._id = group.getId()
-            configInfo._title = group.Title()
-            configInfo._description = group.Description()
-            configInfo._type = group.portal_type
-            res.append(configInfo)
+            groupInfo = GroupInfo()
+            groupInfo._UID = group.UID()
+            groupInfo._id = group.getId()
+            groupInfo._title = group.Title()
+            groupInfo._description = group.Description()
+            group_infos.append(groupInfo)
 
         memberId = member.getId()
         logger.info('Configuration parameters at "%s" SOAP accessed by "%s".' %
                     (tool.absolute_url_path(), memberId))
-        return res
+        return config_infos, group_infos
 
     def _getUserInfos(self, userId, showGroups, suffix=None):
         '''

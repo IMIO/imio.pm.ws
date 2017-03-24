@@ -48,6 +48,7 @@
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="configInfo" type="tns:ConfigInfo" maxOccurs="unbounded" minOccurs="0"/>
+                        <xsd:element name="groupInfo" type="tns:GroupInfo" maxOccurs="unbounded" minOccurs="0"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -163,8 +164,16 @@
                     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="type" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="itemPositiveDecidedStates" type="xsd:array" minOccurs="1" maxOccurs="unbounded"/>
                     <xsd:element name="categories" type="tns:BasicInfo" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="GroupInfo">
+                <xsd:sequence>
+                    <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:complexType name="BasicInfo">
@@ -173,7 +182,6 @@
                     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="suffix" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:complexType name="CreationData">

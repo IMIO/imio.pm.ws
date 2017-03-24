@@ -68,25 +68,43 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
                    """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
                    """xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
                    """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">"""
-        elements = self.tool.getActiveConfigs() + self.tool.getMeetingGroups()
-        # content
-        for element in elements:
+        # _configInfo
+        for cfg in self.tool.getActiveConfigs():
             expected += """
   <configInfo xsi:type="ns1:ConfigInfo">
     <UID>%s</UID>
     <id>%s</id>
     <title>%s</title>
+    <description>%s</description>%s
+  </configInfo>""" % (cfg.UID(),
+                      cfg.getId(),
+                      cfg.Title(),
+                      cfg.Description(),
+                      self._getItemPositiveDecidedStatesFromConfig(cfg))
+        # _groupInfo
+        for grp in self.tool.getMeetingGroups():
+            expected += """
+  <groupInfo xsi:type="ns1:GroupInfo">
+    <UID>%s</UID>
+    <id>%s</id>
+    <title>%s</title>
     <description>%s</description>
-    <type>%s</type>
-  </configInfo>""" % (element.UID(),
-                      element.getId(),
-                      element.Title(),
-                      element.Description(),
-                      element.portal_type)
+  </groupInfo>""" % (grp.UID(),
+                     grp.getId(),
+                     grp.Title(),
+                     grp.Description())
         # footer.  Empty description is represented like <description/>
         expected = expected.replace('<description></description>', '<description/>') \
             + "\n</ns1:getConfigInfosResponse>\n"
         self.assertEquals(expected, resp)
+
+        # elements are correctly stored
+        cfg = self.tool.getActiveConfigs()[0]
+        self.assertEqual(response._configInfo[0]._id, cfg.id)
+        self.assertEqual(response._configInfo[0]._title, cfg.Title())
+        # especially _itemPositiveDecidedStates that is an array
+        self.assertEqual(response._configInfo[0]._itemPositiveDecidedStates,
+                         cfg.getItemPositiveDecidedStates())
 
     def test_ws_showCategories(self):
         """
@@ -105,22 +123,32 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
                    """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
                    """xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
                    """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">"""
-        elements = self.tool.getActiveConfigs() + self.tool.getMeetingGroups()
-        # content
-        for element in elements:
+        # _configInfo
+        for cfg in self.tool.getActiveConfigs():
             expected += """
   <configInfo xsi:type="ns1:ConfigInfo">
     <UID>%s</UID>
     <id>%s</id>
     <title>%s</title>
+    <description>%s</description>%s%s
+  </configInfo>""" % (cfg.UID(),
+                      cfg.getId(),
+                      cfg.Title(),
+                      cfg.Description(),
+                      self._getItemPositiveDecidedStatesFromConfig(cfg),
+                      self._getResultCategoriesForConfig(cfg))
+        # _groupInfo
+        for grp in self.tool.getMeetingGroups():
+            expected += """
+  <groupInfo xsi:type="ns1:GroupInfo">
+    <UID>%s</UID>
+    <id>%s</id>
+    <title>%s</title>
     <description>%s</description>
-    <type>%s</type>%s
-  </configInfo>""" % (element.UID(),
-                      element.getId(),
-                      element.Title(),
-                      element.Description(),
-                      element.portal_type,
-                      self._getResultCategoriesForConfig(element))
+  </groupInfo>""" % (grp.UID(),
+                     grp.getId(),
+                     grp.Title(),
+                     grp.Description())
         # footer.  Empty description is represented like <description/>
         expected = expected.replace('<description></description>', '<description/>') \
             + "\n</ns1:getConfigInfosResponse>\n"
@@ -184,6 +212,18 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
     </categories>""" % (cat.UID(), cat.getId(), cat.Title(), cat.Description())
         # Empty description is represented like <description/>
         result = result.replace('<description></description>', '<description/>')
+        return result
+
+    def _getItemPositiveDecidedStatesFromConfig(self, config):
+        """
+          Helper method for generating result displayed
+          about MeetingConfig.itemPositiveDecidedStates
+        """
+        result = ""
+        for state in config.getItemPositiveDecidedStates():
+            result += """
+    <itemPositiveDecidedStates xsi:type="xsd:string">%s</itemPositiveDecidedStates>""" \
+        % (state)
         return result
 
 

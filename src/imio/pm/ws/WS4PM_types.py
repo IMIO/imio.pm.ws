@@ -231,7 +231,7 @@ class ns0:
         type = (schema, "ConfigInfo")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ConfigInfo_Def.schema
-            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="type", aname="_type", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","BasicInfo",lazy=False)(pname="categories", aname="_categories", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.AnyType(pname="itemPositiveDecidedStates", aname="_itemPositiveDecidedStates", minOccurs=1, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","BasicInfo",lazy=False)(pname="categories", aname="_categories", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -245,10 +245,33 @@ class ns0:
                     self._id = None
                     self._title = None
                     self._description = None
-                    self._type = None
+                    self._itemPositiveDecidedStates = []
                     self._categories = []
                     return
             Holder.__name__ = "ConfigInfo_Holder"
+            self.pyclass = Holder
+
+    class GroupInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
+        schema = "http://ws4pm.imio.be"
+        type = (schema, "GroupInfo")
+        def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
+            ns = ns0.GroupInfo_Def.schema
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="id", aname="_id", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="title", aname="_title", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="description", aname="_description", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            self.attribute_typecode_dict = attributes or {}
+            if extend: TClist += ofwhat
+            if restrict: TClist = ofwhat
+            ZSI.TCcompound.ComplexType.__init__(self, None, TClist, pname=pname, inorder=0, **kw)
+            class Holder:
+                __metaclass__ = pyclass_type
+                typecode = self
+                def __init__(self):
+                    # pyclass
+                    self._UID = None
+                    self._id = None
+                    self._title = None
+                    self._description = None
+                    return
+            Holder.__name__ = "GroupInfo_Holder"
             self.pyclass = Holder
 
     class BasicInfo_Def(ZSI.TCcompound.ComplexType, TypeDefinition):
@@ -519,7 +542,7 @@ class ns0:
         schema = "http://ws4pm.imio.be"
         def __init__(self, **kw):
             ns = ns0.getConfigInfosResponse_Dec.schema
-            TClist = [GTD("http://ws4pm.imio.be","ConfigInfo",lazy=False)(pname="configInfo", aname="_configInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [GTD("http://ws4pm.imio.be","ConfigInfo",lazy=False)(pname="configInfo", aname="_configInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","GroupInfo",lazy=False)(pname="groupInfo", aname="_groupInfo", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded"))]
             kw["pname"] = (u'http://ws4pm.imio.be', u'getConfigInfosResponse')
             kw["aname"] = "_getConfigInfosResponse"
             self.attribute_typecode_dict = {}
@@ -530,6 +553,7 @@ class ns0:
                 def __init__(self):
                     # pyclass
                     self._configInfo = []
+                    self._groupInfo = []
                     return
             Holder.__name__ = "getConfigInfosResponse_Holder"
             self.pyclass = Holder
