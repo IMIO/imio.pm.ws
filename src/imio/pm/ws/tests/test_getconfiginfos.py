@@ -102,9 +102,24 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         cfg = self.tool.getActiveConfigs()[0]
         self.assertEqual(response._configInfo[0]._id, cfg.id)
         self.assertEqual(response._configInfo[0]._title, cfg.Title())
-        # especially _itemPositiveDecidedStates that is an array
+
+    def test_ws_getConfigInfosItemPositiveDecidedStates(self):
+        """This will return the MeetingConfig.itemPositiveDecidedStates."""
+        self.changeUser('pmCreator1')
+        req = getConfigInfosRequest()
+        responseHolder = getConfigInfosResponse()
+        response = SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
+        cfg = self.tool.getActiveConfigs()[0]
+        # we have defined itemPositiveDecidedStates
+        self.assertTrue(cfg.getItemPositiveDecidedStates())
         self.assertEqual(response._configInfo[0]._itemPositiveDecidedStates,
                          cfg.getItemPositiveDecidedStates())
+        self.assertTrue(deserialize(response))
+        # works if no itemPositiveDecidedStates defined
+        cfg.setItemPositiveDecidedStates(())
+        response = SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
+        self.assertEqual(response._configInfo[0]._itemPositiveDecidedStates, ())
+        self.assertTrue(deserialize(response))
 
     def test_ws_showCategories(self):
         """

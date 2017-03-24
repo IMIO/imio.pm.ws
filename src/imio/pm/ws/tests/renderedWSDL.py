@@ -157,7 +157,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8"?>
                     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="itemPositiveDecidedStates" type="xsd:array" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element name="itemPositiveDecidedStates" type="xsd:array" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="categories" type="tns:BasicInfo" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>
