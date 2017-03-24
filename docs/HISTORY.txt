@@ -7,6 +7,9 @@ Changelog
 - Adapted code now that ToolPloneMeeting.userIsAmong receives a list of suffixes
   instead one single suffix before.
   [gbastien]
+- Added parameter 'cleanHtml' to createItem that is '1' by default and that will
+  enable or disable Html cleaning when item is created.
+  [gbastien]
 
 2.0 (2017-01-25)
 ----------------
@@ -28,7 +31,7 @@ Changelog
 
 1.6 (2016-05-13)
 ----------------
-- Adapted code regarding changes in PloneMeeting 4
+- Adapted code regarding changes in Products.PloneMeeting 4
 
 1.5 (2015-04-01)
 ----------------

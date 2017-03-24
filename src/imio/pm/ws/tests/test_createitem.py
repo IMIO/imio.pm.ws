@@ -73,7 +73,8 @@ SOAPAction: /
 """<creationData xsi:type="ns1:CreationData"><title>My new item title</title><category>development</category>""" \
 """<description>&lt;p&gt;Description&lt;/p&gt;</description>""" \
 """<detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>""" \
-"""<decision>D\xc3\xa9cision&lt;strong&gt;wrongTagd&lt;/p&gt;</decision></creationData></ns1:createItemRequest>""" \
+"""<decision>D\xc3\xa9cision&lt;strong&gt;wrongTagd&lt;/p&gt;</decision></creationData><cleanHtml>true</cleanHtml>""" \
+"""</ns1:createItemRequest>""" \
 """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting')
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
@@ -235,8 +236,9 @@ SOAPAction: /
 """<detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>""" \
 """<decision>&lt;p&gt;Décision&lt;/p&gt;</decision>""" \
 """<annexes xsi:type="ns1:AnnexInfo"><title>%s</title><annexTypeId>%s</annexTypeId><filename>%s</filename><file>
-%s</file></annexes></creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" % \
-('pmCreator1', 'meeting', annex._title, annex._annexTypeId, annex._filename, base64.encodestring(annex._file))
+%s</file></annexes></creationData><cleanHtml>true</cleanHtml></ns1:createItemRequest>""" \
+"""</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % ('pmCreator1', 'meeting', annex._title, annex._annexTypeId,
+                                              annex._filename, base64.encodestring(annex._file))
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
@@ -362,7 +364,7 @@ SOAPAction: /
 """<description>&lt;p&gt;Description&lt;/p&gt;</description>""" \
 """<detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>""" \
 """<decision>&lt;p&gt;Décision&lt;/p&gt;</decision>""" \
-"""%s</creationData></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" \
+"""%s</creationData><cleanHtml>true</cleanHtml></ns1:createItemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>""" \
 % ('pmCreator1', 'meeting', annexesEnveloppePart)
         result = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
@@ -452,19 +454,20 @@ SOAPAction: /
   <warnings>%s</warnings>
   <warnings>%s</warnings>
 </ns1:createItemResponse>
-""" % (newItem.UID(),
-       translate(WRONG_HTML_WARNING,
-                 domain='imio.pm.ws',
-                 mapping={'item_path': newItem.absolute_url_path(),
-                          'creator': 'pmCreator1'},
-                 context=self.request),
-       translate(MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
-                 domain='imio.pm.ws',
-                 mapping={'mime': 'application/octet-stream',
-                          'annex_path': unicode(data['title'], 'utf-8'),
-                          'item_path': newItem.absolute_url_path()},
-                 context=self.request)
-       )
+""" % (
+            newItem.UID(),
+            translate(
+                WRONG_HTML_WARNING,
+                domain='imio.pm.ws',
+                mapping={'item_path': newItem.absolute_url_path(),
+                         'creator': 'pmCreator1'},
+                context=self.request),
+            translate(MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
+                      domain='imio.pm.ws',
+                      mapping={'mime': 'application/octet-stream',
+                               'annex_path': unicode(data['title'], 'utf-8'),
+                               'item_path': newItem.absolute_url_path()},
+                      context=self.request))
         expected = expected.encode('utf-8')
         self.assertEquals(expected, resp)
 
@@ -587,6 +590,24 @@ SOAPAction: /
         response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         item = self.portal.portal_catalog(UID=response._UID)[0].getObject()
         self.assertEqual(item.getNotes(), '<p>XHTML content</p>')
+
+    def test_ws_createItemCleanHtml(self):
+        """
+          It is possible to disable cleanHtml (enabled by default),
+          this will not clean HTML data while creating the item.
+        """
+        # by default no item exists
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+        req._creationData._description = '<p style="font-size: 11pt">Description sample text</p>'
+        # cleanHtml enabled
+        self.assertEqual(req._cleanHtml, 1)
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.Description(), '<p>Description sample text</p>')
+        # cleanHtml disabled
+        req._cleanHtml = 0
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.Description(), '<p style="font-size: 11pt">Description sample text</p>')
 
 
 def test_suite():
