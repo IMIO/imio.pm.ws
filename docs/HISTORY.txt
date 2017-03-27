@@ -7,8 +7,8 @@ Changelog
 - Adapted code now that ToolPloneMeeting.userIsAmong receives a list of suffixes
   instead one single suffix before.
   [gbastien]
-- Added parameter 'cleanHtml' to createItem '1' by default and that will enable
-  or disable Html cleaning when item is created.
+- Added parameter 'cleanHtml' to createItem method that is True by default and 
+  that will enable or disable Html cleaning when item is created.
   [gbastien]
 - getConfigInfos now returns also MeetingConfig.itemPositiveDecidedStates as an
   array.
