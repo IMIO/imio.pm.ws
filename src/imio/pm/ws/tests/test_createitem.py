@@ -257,7 +257,7 @@ SOAPAction: /
         # the annex metadata are ok
         self.assertEqual(annex.Title(), 'My annex 1')
         self.assertEqual(annex.content_category,
-                         'annexes_types_-_item_annexes_-_financial-analysis')
+                         'plonegov-assembly-annexes_types_-_item_annexes_-_financial-analysis')
 
     @unittest.skip("This test is skipped, remove decorator if you use libmagic/file < 5.10")
     def test_ws_createItemWithAnnexNotRecognizedByLibmagicRequest(self):
@@ -383,15 +383,19 @@ SOAPAction: /
         self.failUnless(annexes[2].file.contentType == 'application/msword')
         self.failUnless(annexes[3].file.contentType == 'application/octet-stream')
         # the annexes metadata are ok
-        self.failUnless(annexes[0].Title() == 'My annex 1' and
-                        annexes[0].content_category == 'annexes_types_-_item_annexes_-_financial-analysis')
-        self.failUnless(annexes[1].Title() == 'My annex 2' and
-                        annexes[1].content_category == 'annexes_types_-_item_annexes_-_budget-analysis')
+        self.failUnless(
+            annexes[0].Title() == 'My annex 1' and
+            annexes[0].content_category == 'plonegov-assembly-annexes_types_-_item_annexes_-_financial-analysis')
+        self.failUnless(
+            annexes[1].Title() == 'My annex 2' and
+            annexes[1].content_category == 'plonegov-assembly-annexes_types_-_item_annexes_-_budget-analysis')
         # meetingFileType is back to default one when a wrong file type is given in the annexInfo
-        self.failUnless(annexes[2].Title() == 'My annex 3' and
-                        annexes[2].content_category == 'annexes_types_-_item_annexes_-_financial-analysis')
-        self.failUnless(annexes[3].Title() == 'My annex 6' and
-                        annexes[3].content_category == 'annexes_types_-_item_annexes_-_budget-analysis')
+        self.failUnless(
+            annexes[2].Title() == 'My annex 3' and
+            annexes[2].content_category == 'plonegov-assembly-annexes_types_-_item_annexes_-_financial-analysis')
+        self.failUnless(
+            annexes[3].Title() == 'My annex 6' and
+            annexes[3].content_category == 'plonegov-assembly-annexes_types_-_item_annexes_-_budget-analysis')
         # annexes filename are the ones defined in the 'filename', either it is generated
         self.failUnless(annexes[0].file.filename == u'smallTestFile.pdf')
         self.failUnless(annexes[1].file.filename == u'arbitraryFilename.odt')

@@ -4,8 +4,8 @@ Changelog
 2.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Fixed tests regarding new format used for annex.content_category.
+  [gbastien]
 
 2.1 (2017-03-27)
 ----------------
