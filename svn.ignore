@@ -14,8 +14,9 @@ include
 lib
 logrotate.conf
 parts
+products
 python-eggs
-src
+src/*
 var
 versions-picked.cfg
 local
