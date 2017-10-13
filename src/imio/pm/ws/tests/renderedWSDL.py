@@ -226,6 +226,7 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8"?>
                     <xsd:element name="detailedDescription" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="decision" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="preferredMeeting" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="preferred_meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="review_state" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="absolute_url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
