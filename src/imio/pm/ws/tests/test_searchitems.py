@@ -137,6 +137,7 @@ class testSOAPSearchItems(WS4PMTestCase):
     <detailedDescription/>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <preferredMeeting/>
+    <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>presented</review_state>
     <meeting_date>%s</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
@@ -155,6 +156,7 @@ class testSOAPSearchItems(WS4PMTestCase):
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
     <preferredMeeting/>
+    <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/my-new-item-title</absolute_url>
