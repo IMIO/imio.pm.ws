@@ -4,7 +4,8 @@ Changelog
 2.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add preferred_meeting_date attribute on ItemInfos.
+  [sdelcourt]
 
 
 2.2 (2017-08-04)
