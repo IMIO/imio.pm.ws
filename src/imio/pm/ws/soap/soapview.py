@@ -370,6 +370,7 @@ class SOAPView(BrowserView):
             # force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
             params['meta_type'] = 'MeetingItem'
             catalog = api.portal.get_tool('portal_catalog')
+            uid_catalog = api.portal.get_tool('uid_catalog')
             brains = catalog(**params)
             noDate = DateTime('1950/01/01 00:00:00 UTC')
             wfTool = api.portal.get_tool('portal_workflow')
@@ -391,7 +392,7 @@ class SOAPView(BrowserView):
                 itemInfo._decision = item.getRawDecision(keepWithNext=False)
                 preferred = item.getPreferredMeeting()
                 itemInfo._preferredMeeting = not preferred == ITEM_NO_PREFERRED_MEETING_VALUE and preferred or ''
-                preferredMeeting_brains = uid_catalog.searchResults(UID=preferred))
+                preferredMeeting_brains = uid_catalog.searchResults(UID=preferred)
                 preferredMeeting = preferredMeeting_brains and preferredMeeting_brains[0].getObject()
                 itemInfo._preferred_meeting_date = localtime(preferredMeeting.getDate() or noDate)
                 itemInfo._review_state = wfTool.getInfoFor(item, 'review_state')
