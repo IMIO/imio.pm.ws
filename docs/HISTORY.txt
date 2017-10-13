@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.3 (unreleased)
+2.3 (2017-10-13)
 ----------------
 
 - Add preferred_meeting_date attribute on ItemInfos.
