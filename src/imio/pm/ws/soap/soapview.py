@@ -393,8 +393,8 @@ class SOAPView(BrowserView):
                 preferred = item.getPreferredMeeting()
                 itemInfo._preferredMeeting = not preferred == ITEM_NO_PREFERRED_MEETING_VALUE and preferred or ''
                 preferredMeeting_brains = uid_catalog.searchResults(UID=preferred)
-                preferredMeeting = preferredMeeting_brains and preferredMeeting_brains[0].getObject()
-                itemInfo._preferred_meeting_date = localtime(preferredMeeting.getDate() or noDate)
+                preferredMeeting = preferredMeeting_brains and preferredMeeting_brains[0].getObject() or None
+                itemInfo._preferred_meeting_date = localtime(preferredMeeting and preferredMeeting.getDate() or noDate)
                 itemInfo._review_state = wfTool.getInfoFor(item, 'review_state')
                 itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)
                 itemInfo._absolute_url = item.absolute_url()
