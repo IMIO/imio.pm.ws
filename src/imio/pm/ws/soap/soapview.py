@@ -352,8 +352,8 @@ class SOAPView(BrowserView):
 
         tool = api.portal.get_tool('portal_plonemeeting')
         mc = None
-        if 'meetingConfigId' in params and not 'portal_type' in params:
-            #check that the given meetingConfigId exists
+        if 'meetingConfigId' in params and 'portal_type' not in params:
+            # check that the given meetingConfigId exists
             meetingConfigId = params['meetingConfigId']
             mc = getattr(tool, meetingConfigId, None)
             if not mc or not mc.meta_type == 'MeetingConfig':
@@ -632,8 +632,8 @@ class SOAPView(BrowserView):
         activatedOptionalItemFields = mc.getUsedItemAttributes()
         for field in data:
             # if the field is an optional field that is not used and that has a value (contains data), we raise
-            if field in optionalItemFields and not \
-               field in activatedOptionalItemFields and \
+            if field in optionalItemFields and \
+               field not in activatedOptionalItemFields and \
                data[field]:
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "The optional field '%s' is not activated in this configuration!" % field)
@@ -658,7 +658,7 @@ class SOAPView(BrowserView):
             key = extraAttr._key
             value = extraAttr._value
             # the given extraAttr must be in the item schema
-            if not key in MeetingItem.schema:
+            if key not in MeetingItem.schema:
                 raise ZSI.Fault(
                     ZSI.Fault.Client,
                     "The extraAttr '%s' was not found the the MeetingItem schema!" % key)
@@ -671,7 +671,7 @@ class SOAPView(BrowserView):
                     "The extraAttr '%s' must correspond to a field using a 'RichWidget' "
                     "in the MeetingItem schema!" % key)
             # avoid overriding a value
-            if not key in data:
+            if key not in data:
                 data[key] = value
 
         try:
@@ -794,7 +794,7 @@ class SOAPView(BrowserView):
                 validFileName = annex_filename and len(annex_filename.split('.')) == 2
                 # if annex._file is None, we turn it to an empty string
                 annex_file = annex._file or ''
-                if not annex_type_id or not annex_type_id in annexTypeIds:
+                if not annex_type_id or annex_type_id not in annexTypeIds:
                     # take the first available annexType that is the default one
                     annex_type_id = annexTypeIds[0]
                 annex_type = getattr(mc.annexes_types.item_annexes, annex_type_id)
