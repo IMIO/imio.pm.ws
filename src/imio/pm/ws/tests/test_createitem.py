@@ -327,7 +327,7 @@ SOAPAction: /
                  'filename': 'emptyTestFile.txt',
                  'file': 'emptyTestFile.txt',
                  'annexTypeId': 'budget-analysis'}
-        # a file that will have several extensions found in mimetyps_registry
+        # a file that will have several extensions found in mimetypes_registry
         # is not handled if no valid filename is provided
         data5 = {'title': 'My annex 5',
                  'filename': 'notValidFileNameNoExtension',
@@ -349,7 +349,7 @@ SOAPAction: /
             annexesEnveloppePart = annexesEnveloppePart + """<annexes xsi:type="ns1:AnnexInfo"><title>%s</title>""" \
                 """<annexTypeId>%s</annexTypeId><filename>%s</filename><file>
 %s</file></annexes>""" % (annex._title, annex._annexTypeId, annex._filename, base64.encodestring(annex._file))
-        #This is what the sent enveloppe should looks like
+        # This is what the sent enveloppe should looks like
         expected = """POST /plone/createItemRequest HTTP/1.0
 Authorization: Basic %s:%s
 Content-Length: 102
@@ -377,7 +377,7 @@ SOAPAction: /
         annexes = get_annexes(newItem)
         # 4 annexes are actually created
         self.failUnless(len(annexes) == 4)
-        #the annexes mimetype are corrects
+        # the annexes mimetype are corrects
         self.failUnless(annexes[0].file.contentType == 'application/pdf')
         self.failUnless(annexes[1].file.contentType == 'application/vnd.oasis.opendocument.text')
         self.failUnless(annexes[2].file.contentType == 'application/msword')
@@ -458,20 +458,19 @@ SOAPAction: /
   <warnings>%s</warnings>
   <warnings>%s</warnings>
 </ns1:createItemResponse>
-""" % (
-            newItem.UID(),
-            translate(
+""" % (newItem.UID(), translate(
                 WRONG_HTML_WARNING,
                 domain='imio.pm.ws',
                 mapping={'item_path': newItem.absolute_url_path(),
                          'creator': 'pmCreator1'},
                 context=self.request),
-            translate(MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
-                      domain='imio.pm.ws',
-                      mapping={'mime': 'application/octet-stream',
-                               'annex_path': unicode(data['title'], 'utf-8'),
-                               'item_path': newItem.absolute_url_path()},
-                      context=self.request))
+                translate(
+                    MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING,
+                    domain='imio.pm.ws',
+                    mapping={'mime': 'application/octet-stream',
+                             'annex_path': unicode(data['title'], 'utf-8'),
+                             'item_path': newItem.absolute_url_path()},
+                    context=self.request))
         expected = expected.encode('utf-8')
         self.assertEquals(expected, resp)
 

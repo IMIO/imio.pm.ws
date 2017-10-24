@@ -23,6 +23,7 @@
 #
 
 from AccessControl import Unauthorized
+from plone import api
 from plone.app.testing import logout
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import testConnectionRequest, testConnectionResponse
@@ -47,7 +48,18 @@ class testSOAPConnection(WS4PMTestCase):
         self.changeUser('pmManager')
         response = SOAPView(self.portal, req).testConnectionRequest(req, responseHolder)
         self.assertEquals(response._connectionState, True)
-        version = self.portal.portal_setup.getVersionForProfile('imio.pm.ws:default')
+
+    def test_ws_connection_version(self):
+        """
+          The testConnection method will return the WS version
+        """
+        # try without being connected
+        self.changeUser('pmManager')
+        req = testConnectionRequest()
+        responseHolder = testConnectionResponse()
+        response = SOAPView(self.portal, req).testConnectionRequest(req, responseHolder)
+
+        version = api.env.get_distribution('imio.pm.ws')._version
         self.assertEquals(response._version, version)
 
 

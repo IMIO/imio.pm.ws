@@ -169,8 +169,7 @@ class SOAPView(BrowserView):
             raise Unauthorized
 
         logger.info('Test connection SOAP made at "%s".' % portal.absolute_url_path())
-        portal_setup = api.portal.get_tool('portal_setup')
-        version = portal_setup.getVersionForProfile('imio.pm.ws:default')
+        version = api.env.get_distribution('imio.pm.ws')._version
         return True, version
 
     def _checkIsLinked(self, meetingConfigId, externalIdentifier):

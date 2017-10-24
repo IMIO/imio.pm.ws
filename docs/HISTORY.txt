@@ -4,15 +4,16 @@ Changelog
 2.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- testConnection.version now returns the distribution version (2.4) and not
+  the GenericSetup version (2000) that only changes when an upgrade step is
+  required.
+  [gbastien]
 
 2.3 (2017-10-13)
 ----------------
 
 - Add preferred_meeting_date attribute on ItemInfos.
   [sdelcourt]
-
 
 2.2 (2017-08-04)
 ----------------
