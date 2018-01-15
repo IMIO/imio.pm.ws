@@ -5,6 +5,7 @@
                   xmlns:tns="http://ws4pm.imio.be"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
                   targetNamespace="http://ws4pm.imio.be"
                   tal:define="portal_url context/@@plone_portal_state/portal_url">
     <wsdl:types>
@@ -158,13 +159,16 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:simpleType name="List">
+                <xsd:restriction base="xsd:string" />
+            </xsd:simpleType>
             <xsd:complexType name="ConfigInfo">
                 <xsd:sequence>
                     <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="itemPositiveDecidedStates" type="xsd:array" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="itemPositiveDecidedStates" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="categories" type="tns:BasicInfo" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>

@@ -126,7 +126,9 @@ SOAPAction: /
         HTML = "<p style='padding-left: 5em'>My HTML</p><p>&#xa0;</p>"
         req._creationData._decision = HTML
         newItem, response = self._createItem(req)
-        self.assertTrue(newItem.getDecision(keepWithNext=False) == '<p>My HTML</p><p>\xc2\xa0</p>')
+        self.assertEqual(
+            newItem.getDecision(keepWithNext=False),
+            '<p>My HTML</p><p>\xc2\xa0</p>')
 
     def test_ws_createItemRaisedZSIFaults(self):
         """

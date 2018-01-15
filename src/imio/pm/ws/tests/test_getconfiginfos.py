@@ -237,7 +237,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
         result = ""
         for state in config.getItemPositiveDecidedStates():
             result += """
-    <itemPositiveDecidedStates xsi:type="xsd:string">%s</itemPositiveDecidedStates>""" \
+    <itemPositiveDecidedStates>%s</itemPositiveDecidedStates>""" \
         % (state)
         return result
 

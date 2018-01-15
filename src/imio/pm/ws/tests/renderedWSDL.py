@@ -1,5 +1,5 @@
 renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws4pm.imio.be" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ws4pm.imio.be">
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws4pm.imio.be" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://ws4pm.imio.be">
     <wsdl:types>
         <xsd:schema targetNamespace="http://ws4pm.imio.be">
             <xsd:element name="testConnectionRequest" type="tns:TestConnectionRequest"/>
@@ -151,13 +151,16 @@ renderedWSDL = u"""<?xml version="1.0" encoding="UTF-8"?>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:simpleType name="List">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
             <xsd:complexType name="ConfigInfo">
                 <xsd:sequence>
                     <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="itemPositiveDecidedStates" type="xsd:array" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="itemPositiveDecidedStates" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="categories" type="tns:BasicInfo" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>

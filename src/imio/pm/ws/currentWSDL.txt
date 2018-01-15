@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws4pm.imio.be" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="WS4PM" targetNamespace="http://ws4pm.imio.be">
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws4pm.imio.be" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://www.w3.org/2001/06/soap-encoding" name="WS4PM" targetNamespace="http://ws4pm.imio.be">
     <wsdl:types>
         <xsd:schema targetNamespace="http://ws4pm.imio.be">
             <xsd:element name="testConnectionRequest" type="tns:TestConnectionRequest"/>
@@ -33,7 +33,7 @@
             <xsd:element name="getConfigInfosRequest" type="tns:ConfigInfosRequest"/>
             <xsd:complexType name="ConfigInfosRequest">
                 <xsd:sequence>
-                    <xsd:element name="showCategories" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="showCategories" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="false"/>
                     <xsd:element name="userToShowCategoriesFor" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
@@ -151,13 +151,16 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:simpleType name="List">
+                <xsd:restriction base="xsd:string" />
+            </xsd:simpleType> 
             <xsd:complexType name="ConfigInfo">
                 <xsd:sequence>
                     <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="itemPositiveDecidedStates" type="xsd:array" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="itemPositiveDecidedStates" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="categories" type="tns:BasicInfo" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>
@@ -226,6 +229,7 @@
                     <xsd:element name="detailedDescription" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="decision" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="preferredMeeting" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="preferred_meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="review_state" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="absolute_url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
