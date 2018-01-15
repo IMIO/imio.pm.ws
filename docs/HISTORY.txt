@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.5 (unreleased)
+2.5 (2018-01-15)
 ----------------
 
 - Use a simpleType 'List' for the 'ConfigInfo.itemPositiveDecidedStates' data
