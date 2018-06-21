@@ -32,48 +32,41 @@
            provides="archetypes.schemaextender.interfaces.ISchemaExtender"
            name="imio.pm.ws.externalidentifier" />
 
-  <five:implements
-    class=".WS4PM_server.testConnectionRequest"
-    interface=".interfaces.ITestConnectionRequest"
-  />
+  <class class=".WS4PM_server.testConnectionRequest">
+    <implements interface=".interfaces.ITestConnectionRequest" />
+  </class>
 
-  <five:implements
-    class=".WS4PM_server.checkIsLinkedRequest"
-    interface=".interfaces.ICheckIsLinkedRequest"
-  />
+  <class class=".WS4PM_server.checkIsLinkedRequest">
+    <implements interface=".interfaces.ICheckIsLinkedRequest" />
+  </class>
 
-  <five:implements
-    class=".WS4PM_server.getConfigInfosRequest"
-    interface=".interfaces.IConfigInfosRequest"
-  />
+  <class class=".WS4PM_server.getConfigInfosRequest">
+    <implements interface=".interfaces.IConfigInfosRequest" />
+  </class>
 
-  <five:implements
-    class=".WS4PM_server.getUserInfosRequest"
-    interface=".interfaces.IUserInfosRequest"
-  />
+  <class class=".WS4PM_server.getUserInfosRequest">
+    <implements interface=".interfaces.IUserInfosRequest" />
+  </class>
 
-  <five:implements
-    class=".WS4PM_server.getItemInfosRequest"
-    interface=".interfaces.IItemInfosRequest"
-  />
+  <class class=".WS4PM_server.getItemInfosRequest">
+    <implements interface=".interfaces.IItemInfosRequest" />
+  </class>
 
-  <five:implements
-    class=".WS4PM_server.getItemTemplateRequest"
-    interface=".interfaces.IItemTemplateRequest"
-  />
+  <class class=".WS4PM_server.getItemTemplateRequest">
+    <implements interface=".interfaces.IItemTemplateRequest" />
+  </class>
 
-  <five:implements
-    class=".WS4PM_server.searchItemsRequest"
-    interface=".interfaces.ISearchItemsRequest"
-  />
-  <five:implements
-    class=".WS4PM_server.meetingsAcceptingItemsRequest"
-    interface=".interfaces.IMeetingsAcceptingItemsRequest"
-  />
-  <five:implements
-    class=".WS4PM_server.createItemRequest"
-    interface=".interfaces.ICreateItemRequest"
-  />
+  <class class=".WS4PM_server.searchItemsRequest">
+    <implements interface=".interfaces.ISearchItemsRequest" />
+  </class>
+
+  <class class=".WS4PM_server.meetingsAcceptingItemsRequest">
+    <implements interface=".interfaces.IMeetingsAcceptingItemsRequest" />
+  </class>
+
+  <class class=".WS4PM_server.createItemRequest">
+    <implements interface=".interfaces.ICreateItemRequest" />
+  </class>
 
   <soap:view
     for="Products.CMFPlone.interfaces.IPloneSiteRoot"
