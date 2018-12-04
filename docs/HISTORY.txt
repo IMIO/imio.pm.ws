@@ -7,6 +7,8 @@ Changelog
 - Adapted to changes in Products.PloneMeeting following integration of
   collective.contact.
   [gbastien]
+- Manage 'category_title' using MeetingItem.getCategory(theObject=True).
+  [gbastien]
 
 2.5 (2018-01-15)
 ----------------

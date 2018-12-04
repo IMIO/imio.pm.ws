@@ -417,8 +417,7 @@ class SOAPView(BrowserView):
                                                                                 domain='plone',
                                                                                 context=portal.REQUEST)
                     # add the category title
-                    itemInfo._extraInfos['category_title'] = item.displayValue(item.listCategories(),
-                                                                               item.getCategory())
+                    itemInfo._extraInfos['category_title'] = item.getCategory(theObject=True).Title()
                     # add the creator fullname
                     itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
                 if showAnnexes:
@@ -517,8 +516,8 @@ class SOAPView(BrowserView):
           Returns fields considered as 'extraInfos' aka not main informations
         """
         res = []
-        for field in item.Schema().filterFields(isMetadata=False):
-            if not field.getName() in MAIN_DATA_FROM_ITEM_SCHEMA:
+        for field in item.schema.filterFields(isMetadata=False):
+            if field.getName() not in MAIN_DATA_FROM_ITEM_SCHEMA:
                 res.append(field)
         return res
 
