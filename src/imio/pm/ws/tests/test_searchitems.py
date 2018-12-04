@@ -232,7 +232,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         """
         # put pmManager in the 'vendors_creators' so he can have
         # access to itemcreated items of 'pmCreator2'
-        self.portal.portal_groups.addPrincipalToGroup('pmManager', 'vendors_creators')
+        self.portal.portal_groups.addPrincipalToGroup('pmManager', self.vendors_creators)
         SAME_TITLE = 'sameTitleForBothItems'
         # create an item by 'pmCreator1'
         self.changeUser('pmCreator1')

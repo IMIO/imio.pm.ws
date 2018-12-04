@@ -1,28 +1,12 @@
-import ZSI
-import logging
-import magic
-from magic import MagicException
-from BeautifulSoup import BeautifulSoup
-from HTMLParser import HTMLParser
-from lxml.html.clean import Cleaner
-from time import localtime
-from DateTime import DateTime
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import setSecurityManager
-from zope.i18n import translate
-from plone import api
-from plone import namedfile
-from plone.dexterity.utils import createContentInContainer
-from Products.Archetypes.atapi import RichWidget
-from Products.CMFPlone.utils import safe_unicode
-from Products.Five import BrowserView
-from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
-from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
-from Products.PloneMeeting.MeetingItem import MeetingItem
-from Products.PloneMeeting.utils import get_annexes
+from BeautifulSoup import BeautifulSoup
+from collective.contact.plonegroup.utils import get_organizations
 from collective.iconifiedcategory.utils import calculate_category_id
+from DateTime import DateTime
+from HTMLParser import HTMLParser
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
 from imio.pm.ws.config import MAIN_DATA_FROM_ITEM_SCHEMA
 from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
@@ -33,6 +17,25 @@ from imio.pm.ws.soap.basetypes import GroupInfo
 from imio.pm.ws.soap.basetypes import ItemInfo
 from imio.pm.ws.soap.basetypes import MeetingInfo
 from imio.pm.ws.soap.basetypes import TemplateInfo
+from lxml.html.clean import Cleaner
+from magic import MagicException
+from plone import api
+from plone import namedfile
+from plone.dexterity.utils import createContentInContainer
+from Products.Archetypes.atapi import RichWidget
+from Products.CMFPlone.utils import safe_unicode
+from Products.Five import BrowserView
+from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
+from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
+from Products.PloneMeeting.MeetingItem import MeetingItem
+from Products.PloneMeeting.utils import get_annexes
+from time import localtime
+from zope.i18n import translate
+
+import logging
+import magic
+import ZSI
+
 
 logger = logging.getLogger('WS4PM')
 
@@ -203,7 +206,7 @@ class SOAPView(BrowserView):
 
     def _getConfigInfos(self, showCategories=False, userToShowCategoriesFor=None):
         '''
-          Returns key informations about the configuration : active MeetingGroups and MeetingConfigs
+          Returns key informations about the configuration : active Organizations and MeetingConfigs
           If p_showCategories is given, we return also available categories.  We return every available
           categories by default or categories available to the p_userToShowCategoriesFor userId.
           Ony a Manager/MeetingManager can give a userToShowCategoriesFor, by default it will be the currently
@@ -245,14 +248,14 @@ class SOAPView(BrowserView):
                     configInfo._categories.append(basicInfo)
             config_infos.append(configInfo)
 
-        # MeetingGroups
+        # organizations
         group_infos = []
-        for group in tool.getMeetingGroups():
+        for org in get_organizations():
             groupInfo = GroupInfo()
-            groupInfo._UID = group.UID()
-            groupInfo._id = group.getId()
-            groupInfo._title = group.Title()
-            groupInfo._description = group.Description()
+            groupInfo._UID = org.UID()
+            groupInfo._id = org.getId()
+            groupInfo._title = org.Title()
+            groupInfo._description = org.Description()
             group_infos.append(groupInfo)
 
         memberId = member.getId()
@@ -263,7 +266,7 @@ class SOAPView(BrowserView):
     def _getUserInfos(self, userId, showGroups, suffix=None):
         '''
           Returns informations about the given userId.  If p_showGroups is True,
-          it will also returns the list of groups the user is part of
+          it will also returns the list of organizations the user is member of.
         '''
         member = api.user.get_current()
         memberId = member.getId()
@@ -294,15 +297,15 @@ class SOAPView(BrowserView):
             # returns only groups the user is member of with the defined
             # suffix, either it will returns every groups the user is member of
             tool = api.portal.get_tool('portal_plonemeeting')
-            # backward compatibility, getGroupsForUser received 'suffix' before but 'suffixes' now
+            # backward compatibility, get_orgs_for_user received 'suffix' before but 'suffixes' now
             suffixes = suffix and [suffix] or []
-            groups = tool.getGroupsForUser(userId=userId, suffixes=suffixes)
-            for group in groups:
+            orgs = tool.get_orgs_for_user(user_id=userId, suffixes=suffixes)
+            for org in orgs:
                 basicInfo = BasicInfo()
-                basicInfo._UID = group.UID()
-                basicInfo._id = group.getId()
-                basicInfo._title = group.Title()
-                basicInfo._description = group.Description()
+                basicInfo._UID = org.UID()
+                basicInfo._id = org.getId()
+                basicInfo._title = org.Title()
+                basicInfo._description = org.Description()
                 userGroups.append(basicInfo)
 
         return user.getProperty('fullname'), user.getProperty('email'), userGroups
@@ -604,11 +607,12 @@ class SOAPView(BrowserView):
 
         # check that the user is a creator for given proposingGroupId
         # get the MeetingGroups for wich inTheNameOfMemberId is creator
-        userGroups = tool.getGroupsForUser(userId=memberId, suffixes=["creators"])
-        proposingGroup = [group for group in userGroups if group.getId() == proposingGroupId]
+        userOrgs = tool.get_orgs_for_user(user_id=memberId, suffixes=['creators'])
+        proposingGroup = [org for org in userOrgs if org.getId() == proposingGroupId]
         if not proposingGroup:
             raise ZSI.Fault(ZSI.Fault.Client,
                             "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
+        proposingGroup = proposingGroup[0]
 
         # title is mandatory!
         if not creationData.__dict__['_title']:
@@ -688,7 +692,7 @@ class SOAPView(BrowserView):
                                 "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
 
             type_name = mc.getItemTypeName()
-            data.update({'proposingGroup': proposingGroupId,
+            data.update({'proposingGroup': proposingGroup.UID(),
                          'id': portal.generateUniqueId(type_name), })
 
             # find htmlFieldIds we will have to check/clean

@@ -39,7 +39,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
           Test that getting informations about another user is not possible
           except if the connected user is MeetingManager or Manager
         """
-        #any PM user can have his own informations
+        # any PM user can have his own informations
         self.changeUser('pmCreator1')
         req = getUserInfosRequest()
         req._userId = 'pmCreator2'
@@ -72,7 +72,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
         """
           Test that getting informations about a user returns valuable informations
         """
-        #any PM user can have his own informations
+        # any PM user can have his own informations
         self.changeUser('pmCreator1')
         req = getUserInfosRequest()
         req._userId = 'pmCreator1'
@@ -123,7 +123,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
     <title>Vendors</title>
     <description/>
   </groups>
-</ns1:getUserInfosResponse>\n""" % (self.tool.developers.UID(), self.tool.vendors.UID())
+</ns1:getUserInfosResponse>\n""" % (self.developers_uid, self.vendors_uid)
         self.assertEquals(expected, resp)
         # if we specify a particular suffix, only groups of this suffix are returned
         req._suffix = 'creators'
@@ -144,7 +144,7 @@ class testSOAPGetUserInfos(WS4PMTestCase):
     <title>Developers</title>
     <description/>
   </groups>
-</ns1:getUserInfosResponse>\n""" % (self.tool.developers.UID(), )
+</ns1:getUserInfosResponse>\n""" % (self.developers_uid, )
 
 
 def test_suite():

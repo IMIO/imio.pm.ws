@@ -4,8 +4,9 @@ Changelog
 2.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Adapted to changes in Products.PloneMeeting following integration of
+  collective.contact.
+  [gbastien]
 
 2.5 (2018-01-15)
 ----------------

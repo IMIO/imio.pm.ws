@@ -24,6 +24,7 @@
 
 
 import ZSI
+from collective.contact.plonegroup.utils import get_organizations
 from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import getConfigInfosRequest, getConfigInfosResponse
@@ -82,7 +83,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
                       cfg.Description(),
                       self._getItemPositiveDecidedStatesFromConfig(cfg))
         # _groupInfo
-        for grp in self.tool.getMeetingGroups():
+        for grp in get_organizations():
             expected += """
   <groupInfo xsi:type="ns1:GroupInfo">
     <UID>%s</UID>
@@ -153,7 +154,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
                       self._getItemPositiveDecidedStatesFromConfig(cfg),
                       self._getResultCategoriesForConfig(cfg))
         # _groupInfo
-        for grp in self.tool.getMeetingGroups():
+        for grp in get_organizations():
             expected += """
   <groupInfo xsi:type="ns1:GroupInfo">
     <UID>%s</UID>
