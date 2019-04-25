@@ -200,6 +200,12 @@
     provides="z3c.soap.interfaces.IZSIResponseType"
   />
 
+  <!-- override plone.transformchain transformer to not apply on SOAP requests -->
+  <unconfigure package="plone.transformchain">
+    <utility factory=".transformer.Transformer" />
+  </unconfigure>
+  <utility factory=".overrides.SoapAwareTransformer" />
+
   <genericsetup:registerProfile
     name="default"
     title="Webservices for PloneMeeting"
