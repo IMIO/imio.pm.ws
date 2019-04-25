@@ -17,6 +17,7 @@
   <include package="z3c.soap" file="meta.zcml" />
   <!-- include the zope2.SOAPAccess permission -->
   <include package="z3c.soap" file="configure.zcml" />
+  <include package="z3c.unconfigure" file="meta.zcml"/>
 
   <!--permission
     id="ws4pm.SOAPAccess"
