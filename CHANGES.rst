@@ -6,6 +6,7 @@ Changelog
 
 - Override plone.transformchain transformer to not apply on SOAP request.
   [gbastien]
+- Jenkinsfile for CI [odelaere]
 
 2.6 (2018-12-04)
 ----------------
