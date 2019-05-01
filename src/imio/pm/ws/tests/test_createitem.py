@@ -23,7 +23,7 @@
 #
 
 import base64
-import unittest2 as unittest
+import unittest
 import ZSI
 from ZSI.schema import GTD
 import magic
