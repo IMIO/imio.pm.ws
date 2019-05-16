@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.7 (unreleased)
+2.7 (2019-05-16)
 ----------------
 
 - Override plone.transformchain transformer to not apply on SOAP request.
