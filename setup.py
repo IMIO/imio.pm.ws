@@ -11,8 +11,10 @@ setup(name='imio.pm.ws',
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
-        "Programming Language :: Python",
         "Framework :: Plone",
+        "Framework :: Plone :: 4.3",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
         ],
       keywords='',
       author='Gauthier Bastien',
