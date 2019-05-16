@@ -1,6 +1,6 @@
 graft src/imio
 graft docs
-include *.cfg *.rst *.in
+include *.cfg *.rst *.in *.txt
 include *.py
 include .coveragerc
 include .travis.yml
