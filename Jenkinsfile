@@ -13,51 +13,28 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                cache(maxCacheSize: 850,
-                      caches: [[$class: 'ArbitraryFileCache', excludes: '', path: "${WORKSPACE}/eggs"]]){
-
+                cache(maxCacheSize: 850, caches: [[$class: 'ArbitraryFileCache', excludes: '', path: "${WORKSPACE}/eggs"]]){
                     script {
                         sh "make bootstrap"
                         sh "bin/python bin/buildout -c jenkins.cfg"
                     }
                 }
-                stash 'workspace'
             }
         }
-
-        stage('Run Tests') {
-            parallel {
-                stage('Unit Test') {
-                    steps {
-                        dir('unit_test') {
-                            unstash 'workspace'
-                            sh "bin/python bin/test"
-                        }
-                    }
-
+        stage('Code Analysis') {
+            steps {
+		        script {
+		            sh "bin/python bin/code-analysis"
+		            warnings canComputeNew: false, canResolveRelativePaths: false, parserConfigurations: [[parserName: 'Pep8', pattern: '**/parts/code-analysis/flake8.log']]
                 }
-                stage('Code Analysis') {
-                    steps {
-                        dir('code_analysis') {
-                            unstash 'workspace'
-                            script {
-                                sh "bin/python bin/code-analysis"
-                                warnings canComputeNew: false, canResolveRelativePaths: false, parserConfigurations: [[parserName: 'Pep8', pattern: '**/parts/code-analysis/flake8.log']]
-                            }
-                        }
-                    }
-                }
-                stage('Test Coverage') {
-                    steps {
-                        dir('test_coverage') {
-                            unstash 'workspace'
-                            script {
-                                sh "bin/python bin/coverage run --source=imio.pm.ws bin/test"
-                                sh 'bin/python bin/coverage xml -i'
-                                cobertura coberturaReportFile: '**/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII'
-                            }
-                        }
-                    }
+            }
+        }
+        stage('Test Coverage') {
+            steps {
+                script {
+                    sh "bin/python bin/coverage run --source=imio.pm.ws bin/test"
+                    sh 'bin/python bin/coverage xml -i'
+                    cobertura coberturaReportFile: '**/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII'
                 }
             }
         }
