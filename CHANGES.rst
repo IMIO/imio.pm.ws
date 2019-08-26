@@ -4,8 +4,13 @@ Changelog
 2.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- In createItem, added possibility define associatedGroups and groupsInCharge
+  as lists of organization UIDs.
+  [gbastien]
+- Added parameter 'wfState' to createItem making it possible to set an item to
+  a defined WF state. This rely on MeetingConfig.transitionsForPresentingAnItem
+  so it is only possible to trigger transitions until 'present'.
+  [gbastien]
 
 2.7 (2019-05-16)
 ----------------

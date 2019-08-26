@@ -614,6 +614,71 @@ SOAPAction: /
         newItem, response = self._createItem(req)
         self.assertEqual(newItem.Description(), '<p style="font-size: 11pt">Description sample text</p>')
 
+    def test_ws_createItemGroupsInCharge(self):
+        """
+          Test when passing groupsInCharge while creating the item.
+        """
+        cfg = self.meetingConfig
+        cfg.setUsedItemAttributes(['description', 'detailedDescription'])
+        # by default no item exists
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+
+        # while passing no correct data
+        req._creationData._groupsInCharge = [self.vendors_uid, 'unknown_uid']
+        responseHolder = createItemResponse()
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        # optional field not enabled
+        self.assertEquals(
+            cm.exception.string,
+            "The optional field 'groupsInCharge' is not activated in this configuration!")
+        # enable optional field, will fail because unknown_uid
+        cfg.setUsedItemAttributes(cfg.getUsedItemAttributes() + ('groupsInCharge', ))
+
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(
+            cm.exception.string,
+            'The groupsInCharge data contains wrong values: "unknown_uid"!')
+
+        # now with correct data
+        req._creationData._groupsInCharge = [self.vendors_uid, self.developers_uid]
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.getGroupsInCharge(), (self.vendors_uid, self.developers_uid))
+
+    def test_ws_createItemAssociatedGroups(self):
+        """
+          Test when passing associatedGroups while creating the item.
+        """
+        cfg = self.meetingConfig
+        cfg.setUsedItemAttributes(['description', 'detailedDescription'])
+        # by default no item exists
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+
+        # while passing no correct data
+        req._creationData._associatedGroups = [self.vendors_uid, 'unknown_uid']
+        responseHolder = createItemResponse()
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        # optional field not enabled
+        self.assertEquals(
+            cm.exception.string,
+            "The optional field 'associatedGroups' is not activated in this configuration!")
+        # enable optional field, will fail because unknown_uid
+        cfg.setUsedItemAttributes(cfg.getUsedItemAttributes() + ('associatedGroups', ))
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(
+            cm.exception.string,
+            'The associatedGroups data contains wrong values: "unknown_uid"!')
+
+        # now with correct data
+        req._creationData._associatedGroups = [self.vendors_uid, self.developers_uid]
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.getAssociatedGroups(), (self.vendors_uid, self.developers_uid))
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite
