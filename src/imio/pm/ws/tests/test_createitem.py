@@ -22,23 +22,26 @@
 # 02110-1301, USA.
 #
 
-import base64
-import unittest
-import ZSI
-from ZSI.schema import GTD
-import magic
-from magic import MagicException
-from zope.i18n import translate
-from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
-from Products.PloneMeeting.utils import get_annexes
+from DateTime import DateTime
 from imio.helpers.cache import cleanRamCacheFor
-from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_client import createItemResponse
-from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
+from imio.pm.ws.soap.soapview import MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING
+from imio.pm.ws.soap.soapview import MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING
 from imio.pm.ws.soap.soapview import SOAPView
 from imio.pm.ws.soap.soapview import WRONG_HTML_WARNING
-from imio.pm.ws.soap.soapview import MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING
-from imio.pm.ws.soap.soapview import MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING
+from imio.pm.ws.tests.WS4PMTestCase import deserialize
+from imio.pm.ws.tests.WS4PMTestCase import serializeRequest
+from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+from imio.pm.ws.WS4PM_client import createItemResponse
+from magic import MagicException
+from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
+from Products.PloneMeeting.utils import get_annexes
+from zope.i18n import translate
+from ZSI.schema import GTD
+
+import base64
+import magic
+import unittest
+import ZSI
 
 
 class testSOAPCreateItem(WS4PMTestCase):
@@ -679,10 +682,49 @@ SOAPAction: /
         newItem, response = self._createItem(req)
         self.assertEqual(newItem.getAssociatedGroups(), (self.vendors_uid, self.developers_uid))
 
+    def test_ws_createItemWfState(self):
+        """
+          Test when passing wfState while creating the item.
+        """
+        cfg = self.meetingConfig
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+
+        # while passing no correct data
+        req._wfState = 'unknown_state'
+        responseHolder = createItemResponse()
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(
+            cm.exception.string,
+            'Given wfState "unknown_state" is not reachable regarding current configuration!')
+
+        # correct wfState 'validated'
+        req._wfState = 'validated'
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.queryState(), 'validated')
+
+        # wfState 'presented' with no available meeting
+        req._wfState = 'presented'
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEquals(
+            cm.exception.string,
+            "Could not trigger the 'present' transition while setting item to 'presented' workflow state! "
+            "Make sure a meeting accepting items exists in configuration 'plonegov-assembly'!")
+
+        # wfState 'presented' with available meeting
+        self.changeUser('pmManager')
+        meeting = self.create('Meeting', date=DateTime('2019/08/27'))
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.queryState(), 'presented')
+        self.assertTrue(newItem in meeting.getItems())
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
-    # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
+    # add a prefix because we heritate from testMeeting and we
+    # do not want every tests of testMeeting to be run here...
     suite.addTest(makeSuite(testSOAPCreateItem, prefix='test_ws_'))
     return suite

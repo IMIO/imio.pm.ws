@@ -934,7 +934,7 @@ class SOAPView(BrowserView):
                     raise ZSI.Fault(
                         ZSI.Fault.Client,
                         "Given wfState \"{0}\" is not reachable regarding "
-                        "current configuration!".format(data['wfState']))
+                        "current configuration!".format(wfState))
                 # trigger transitions
                 wf_comment = _('wf_transition_triggered_by_application')
                 with api.env.adopt_roles(roles=['Manager']):
