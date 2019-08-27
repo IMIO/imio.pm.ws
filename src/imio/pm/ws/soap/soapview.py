@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager
 from AccessControl.SecurityManagement import newSecurityManager
@@ -7,6 +9,7 @@ from collective.contact.plonegroup.utils import get_organizations
 from collective.iconifiedcategory.utils import calculate_category_id
 from DateTime import DateTime
 from HTMLParser import HTMLParser
+from imio.helpers.content import get_vocab
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
 from imio.pm.ws.config import MAIN_DATA_FROM_ITEM_SCHEMA
 from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
@@ -23,12 +26,15 @@ from plone import api
 from plone import namedfile
 from plone.dexterity.utils import createContentInContainer
 from Products.Archetypes.atapi import RichWidget
+from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five import BrowserView
 from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
+from Products.PloneMeeting.config import PMMessageFactory as _
 from Products.PloneMeeting.MeetingItem import MeetingItem
 from Products.PloneMeeting.utils import get_annexes
+from Products.PloneMeeting.utils import org_id_to_uid
 from time import localtime
 from zope.i18n import translate
 
@@ -158,6 +164,7 @@ class SOAPView(BrowserView):
                                                              request._proposingGroupId,
                                                              request._creationData,
                                                              request._cleanHtml,
+                                                             request._wfState,
                                                              request._inTheNameOf)
         return response
 
@@ -574,7 +581,13 @@ class SOAPView(BrowserView):
                 setSecurityManager(oldsm)
         return res
 
-    def _createItem(self, meetingConfigId, proposingGroupId, creationData, cleanHtml=True, inTheNameOf=None):
+    def _createItem(self,
+                    meetingConfigId,
+                    proposingGroupId,
+                    creationData,
+                    cleanHtml=True,
+                    wfState=None,
+                    inTheNameOf=None):
         '''
           Create an item with given parameters
         '''
@@ -600,18 +613,20 @@ class SOAPView(BrowserView):
         memberId = member.getId()
 
         # check that the given meetingConfigId exists
-        mc = getattr(tool, meetingConfigId, None)
-        if not mc or not mc.meta_type == 'MeetingConfig':
+        cfg = getattr(tool, meetingConfigId, None)
+        if not cfg or not cfg.meta_type == 'MeetingConfig':
             raise ZSI.Fault(ZSI.Fault.Client, "Unknown meetingConfigId : '%s'!" % meetingConfigId)
 
         # check that the user is a creator for given proposingGroupId
+        # proposingGroupId may be an organization id (backward compatibility) or an organization UID
         # get the MeetingGroups for wich inTheNameOfMemberId is creator
-        userOrgs = tool.get_orgs_for_user(user_id=memberId, suffixes=['creators'])
-        proposingGroup = [org for org in userOrgs if org.getId() == proposingGroupId]
-        if not proposingGroup:
+        proposingGroupUID = org_id_to_uid(proposingGroupId, raise_on_error=False)
+        if not proposingGroupUID:
+            proposingGroupUID = proposingGroupId
+        userOrgUids = tool.get_orgs_for_user(user_id=memberId, suffixes=['creators'], the_objects=False)
+        if proposingGroupUID not in userOrgUids:
             raise ZSI.Fault(ZSI.Fault.Client,
                             "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
-        proposingGroup = proposingGroup[0]
 
         # title is mandatory!
         if not creationData.__dict__['_title']:
@@ -630,8 +645,8 @@ class SOAPView(BrowserView):
             data['category'] = ''
 
         # raise if we pass an optional attribute that is not activated in this MeetingConfig
-        optionalItemFields = mc.listUsedItemAttributes()
-        activatedOptionalItemFields = mc.getUsedItemAttributes()
+        optionalItemFields = cfg.listUsedItemAttributes()
+        activatedOptionalItemFields = cfg.getUsedItemAttributes()
         for field in data:
             # if the field is an optional field that is not used and that has a value (contains data), we raise
             if field in optionalItemFields and \
@@ -645,10 +660,35 @@ class SOAPView(BrowserView):
             data['preferredMeeting'] = ITEM_NO_PREFERRED_MEETING_VALUE
         if not data['preferredMeeting'] == ITEM_NO_PREFERRED_MEETING_VALUE and \
            not data['preferredMeeting'] in \
-           [meetingBrain.UID for meetingBrain in mc.getMeetingsAcceptingItems()]:
-            raise ZSI.Fault(ZSI.Fault.Client,
-                            "The given preferred meeting UID (%s) is not a meeting accepting items!"
-                            % data['preferredMeeting'])
+           [meetingBrain.UID for meetingBrain in cfg.getMeetingsAcceptingItems()]:
+            raise ZSI.Fault(
+                ZSI.Fault.Client,
+                "The given preferred meeting UID ({0}) is not a meeting accepting items!".format(
+                    data['preferredMeeting']))
+
+        # validate passed associatedGroups
+        associatedGroups = data['associatedGroups']
+        if associatedGroups:
+            vocab = get_vocab(cfg, 'Products.PloneMeeting.vocabularies.associatedgroupsvocabulary')
+            ag_term_keys = vocab.by_token.keys()
+            difference = tuple(set(associatedGroups).difference(ag_term_keys))
+            if difference:
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "The associatedGroups data contains wrong values: \"{0}\"!".format(
+                        ', '.join(difference)))
+
+        # validate passed groupsInCharge
+        groupsInCharge = data['groupsInCharge']
+        if groupsInCharge:
+            vocab = get_vocab(cfg, 'Products.PloneMeeting.vocabularies.groupsinchargevocabulary')
+            gic_term_keys = vocab.by_token.keys()
+            difference = tuple(set(groupsInCharge).difference(gic_term_keys))
+            if difference:
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "The groupsInCharge data contains wrong values: \"{0}\"!".format(
+                        ', '.join(difference)))
 
         # externalIdentifier is indexed, it can not be None
         if not data['externalIdentifier']:
@@ -690,8 +730,8 @@ class SOAPView(BrowserView):
                 raise ZSI.Fault(ZSI.Fault.Client,
                                 "No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
 
-            type_name = mc.getItemTypeName()
-            data.update({'proposingGroup': proposingGroup.UID(),
+            type_name = cfg.getItemTypeName()
+            data.update({'proposingGroup': proposingGroupUID,
                          'id': portal.generateUniqueId(type_name), })
 
             # find htmlFieldIds we will have to check/clean
@@ -733,17 +773,17 @@ class SOAPView(BrowserView):
             # check that if category is mandatory (getUseGroupsAsCategories is False), it is given
             # and that given category is available
             # if we are not using categories, just ensure that we received an empty category
-            availableCategories = not mc.getUseGroupsAsCategories() and \
-                [cat.getId() for cat in mc.getCategories()] or ['', ]
+            availableCategories = not cfg.getUseGroupsAsCategories() and \
+                [cat.getId() for cat in cfg.getCategories()] or ['', ]
             if not data['category'] in availableCategories:
                 # special message if category mandatory and not given
-                if not mc.getUseGroupsAsCategories() and not data['category']:
+                if not cfg.getUseGroupsAsCategories() and not data['category']:
                     raise ZSI.Fault(ZSI.Fault.Client, "In this config, category is mandatory!")
-                elif mc.getUseGroupsAsCategories() and data['category']:
+                elif cfg.getUseGroupsAsCategories() and data['category']:
                     raise ZSI.Fault(ZSI.Fault.Client, "This config does not use categories, the given '%s' category "
                                                       "can not be used!" % data['category'])
                 # we are using categories but the given one is not in availableCategories
-                elif not mc.getUseGroupsAsCategories():
+                elif not cfg.getUseGroupsAsCategories():
                     raise ZSI.Fault(ZSI.Fault.Client, "'%s' is not available for the '%s' group!" %
                                     (data['category'], proposingGroupId))
 
@@ -788,7 +828,7 @@ class SOAPView(BrowserView):
                 warnings.append(warning_message)
 
             # existing annex types
-            annexTypeIds = mc.annexes_types.item_annexes.objectIds()
+            annexTypeIds = cfg.annexes_types.item_annexes.objectIds()
             for annex in creationData._annexes:
                 annex_title = annex._title
                 annex_type_id = annex._annexTypeId
@@ -799,7 +839,7 @@ class SOAPView(BrowserView):
                 if not annex_type_id or annex_type_id not in annexTypeIds:
                     # take the first available annexType that is the default one
                     annex_type_id = annexTypeIds[0]
-                annex_type = getattr(mc.annexes_types.item_annexes, annex_type_id)
+                annex_type = getattr(cfg.annexes_types.item_annexes, annex_type_id)
                 # manage mimetype manually
                 # as we receive base64 encoded binary, mimetypes registry can not handle this correctly...
                 mr = self.context.mimetypes_registry
@@ -825,8 +865,7 @@ class SOAPView(BrowserView):
                 if not mr_mimetype:
                     warning_message = translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
                                                 domain='imio.pm.ws',
-                                                mapping={'annex_path': unicode((annex_filename or annex_title),
-                                                                               'utf-8'),
+                                                mapping={'annex_path': safe_unicode(annex_filename or annex_title),
                                                          'item_path': item.absolute_url_path()},
                                                 context=portal.REQUEST)
                     logger.warning(warning_message)
@@ -874,13 +913,47 @@ class SOAPView(BrowserView):
 
             # change the comment in the item's add a line in the item's history
             wfTool = api.portal.get_tool('portal_workflow')
-            itemWFId = wfTool.getWorkflowsFor(item)[0].getId()
+            itemWF = wfTool.getWorkflowsFor(item)[0]
+            itemWFId = itemWF.getId()
             review_history = item.workflow_history[itemWFId]
             review_history[0]['comments'] = translate(ITEM_SOAP_CREATED_COMMENT,
                                                       domain='imio.pm.ws',
                                                       context=portal.REQUEST)
             item.workflow_history._p_changed = True
 
+            # manage wfState
+            # validate that one transition selected in MeetingConfig.transitionsForPresentingAnItem
+            # is actually leading to the given wfState
+            if wfState:
+                leadingTransitionId = None
+                for transitionId in cfg.getTransitionsForPresentingAnItem():
+                    transition = itemWF.transitions[transitionId]
+                    if transition.new_state_id == wfState:
+                        leadingTransitionId = transitionId
+                if not leadingTransitionId:
+                    raise ZSI.Fault(
+                        ZSI.Fault.Client,
+                        "Given wfState \"{0}\" is not reachable regarding "
+                        "current configuration!".format(wfState))
+                # trigger transitions
+                wf_comment = _('wf_transition_triggered_by_application')
+                with api.env.adopt_roles(roles=['Manager']):
+                    for tr in cfg.getTransitionsForPresentingAnItem():
+                        try:
+                            wfTool.doActionFor(item, tr, comment=wf_comment)
+                        except WorkflowException:
+                            msg = "Could not trigger the '{0}' transition while " \
+                                "setting item to '{1}' workflow state!".format(tr, wfState)
+                            # additional info if failed to trigger the 'present' transition
+                            if tr == 'present':
+                                msg = msg + " Make sure a meeting accepting items " \
+                                    "exists in configuration '{0}'!".format(cfg.getId())
+                            raise ZSI.Fault(ZSI.Fault.Client, msg)
+
+                        if tr == leadingTransitionId:
+                            break
+
+            # log finally
             logger.info('Item at "%s"%s SOAP created by "%s".' %
                         (item.absolute_url_path(),
                          (externalIdentifier and ' with externalIdentifier "%s"' %
