@@ -85,7 +85,7 @@ Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
 %s""" % ('pmCreator1', 'meeting', request)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
         # now really use the SOAP method to create an item
         newItem, response = self._createItem(req)
         newItemUID = newItem.UID()
@@ -104,7 +104,7 @@ SOAPAction: /
                                       'creator': 'pmCreator1'},
                              context=self.request)
        )
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # the item is actually created
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemUID)) == 1)
         # responseHolder for tests here above
@@ -118,21 +118,6 @@ SOAPAction: /
         obj = self.portal.portal_catalog(portal_type='MeetingItemPga', UID=newItemWithEmptyDecisionUID)[0].getObject()
         self.failIf(obj.getDecision(keepWithNext=False) != '<p></p>')
 
-    def test_ws_createItemCleanHTML(self):
-        """
-          Special characters like &#xa0; in the html breaks PortalTransforms
-          that is why we clean the HTML from wrong characters and styles
-        """
-
-        self.changeUser('pmCreator1')
-        req = self._prepareCreationData()
-        HTML = "<p style='padding-left: 5em'>My HTML</p><p>&#xa0;</p>"
-        req._creationData._decision = HTML
-        newItem, response = self._createItem(req)
-        self.assertEqual(
-            newItem.getDecision(keepWithNext=False),
-            '<p>My HTML</p><p>\xc2\xa0</p>')
-
     def test_ws_createItemRaisedZSIFaults(self):
         """
           Test SOAP service behaviour when creating an item with some wrong arguments
@@ -145,19 +130,19 @@ SOAPAction: /
         req._creationData._title = None
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "A 'title' is mandatory!")
+        self.assertEqual(cm.exception.string, "A 'title' is mandatory!")
         req._creationData._title = 'A valid title'
         # the meetingConfigId must exists
         req._meetingConfigId = 'wrongMeetingConfigId'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
+        self.assertEqual(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
         req._meetingConfigId = self.usedMeetingConfigId
         # the connected user must be able to create an item for the given proposingGroupId
         req._proposingGroupId = 'vendors'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "'pmCreator1' can not create items for the 'vendors' group!")
+        self.assertEqual(cm.exception.string, "'pmCreator1' can not create items for the 'vendors' group!")
         # the connected user must be able to create an item with the given category
         # set back correct proposingGroup
         req._proposingGroupId = 'developers'
@@ -166,22 +151,21 @@ SOAPAction: /
         req._creationData._category = None
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "In this config, category is mandatory!")
+        self.assertEqual(cm.exception.string, "In this config, category is mandatory!")
         # wrong category and useGroupsAsCategories, ZSI.Fault
         self.meetingConfig.setUseGroupsAsCategories(True)
         req._creationData._category = 'wrong-category-id'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "This config does not use categories, the given 'wrong-category-id' "
-                          "category can not be used!")
+        self.assertEqual(cm.exception.string,
+                         "This config does not use categories, the given 'wrong-category-id' "
+                         "category can not be used!")
         # wrong category and actually accepting categories, aka useGroupsAsCategories to False
         self.meetingConfig.setUseGroupsAsCategories(False)
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "'wrong-category-id' is not available for "
-                          "the 'developers' group!")
+        self.assertEqual(cm.exception.string,
+                         "'wrong-category-id' is not available for the 'developers' group!")
         # if the user trying to create an item has no member area, a ZSI.Fault is raised
         # remove the 'pmCreator2' personal area
         self.changeUser('admin')
@@ -190,7 +174,7 @@ SOAPAction: /
         self.changeUser('pmCreator2')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
+        self.assertEqual(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
 
     def test_ws_createItemWithOptionalFields(self):
         """
@@ -205,8 +189,8 @@ SOAPAction: /
         req._creationData._motivation = '<p>Motivation sample text</p>'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "The optional field 'motivation' is not activated in this configuration!")
+        self.assertEqual(cm.exception.string,
+                         "The optional field \"motivation\" is not activated in this configuration!")
         # if we activate it, then the resulting item is correct
         self.meetingConfig.setUsedItemAttributes(self.meetingConfig.getUsedItemAttributes() + ('motivation', ))
         newItem, response = self._createItem(req)
@@ -250,7 +234,7 @@ Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
 %s""" % ('pmCreator1', 'meeting', request)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
         newItem, response = self._createItem(req)
         # now check the created item have the annex
         annexes = get_annexes(newItem)
@@ -299,11 +283,11 @@ SOAPAction: /
         self.failUnless(len(get_annexes(newItem2)) == 0)
         # a warning specifying that annex was not added because mimetype could
         # not reliabily be found is added in the response
-        self.assertEquals(response._warnings, [translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
-                                                         domain='imio.pm.ws',
-                                                         mapping={'annex_path': (data['filename']),
-                                                                  'item_path': newItem2.absolute_url_path()},
-                                                         context=self.portal.REQUEST)])
+        self.assertEqual(response._warnings, [translate(MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING,
+                                                        domain='imio.pm.ws',
+                                                        mapping={'annex_path': (data['filename']),
+                                                                 'item_path': newItem2.absolute_url_path()},
+                                                        context=self.portal.REQUEST)])
 
     def test_ws_createItemWithSeveralAnnexesRequest(self):
         """
@@ -377,7 +361,7 @@ Content-Length: 102
 Content-Type: text/xml
 SOAPAction: /
 %s""" % ('pmCreator1', 'meeting', request)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
         newItem, response = self._createItem(req)
         annexes = get_annexes(newItem)
         # 4 annexes are actually created
@@ -412,11 +396,11 @@ SOAPAction: /
                 'filename': 'validExtension.bin',
                 'annexTypeId': 'budget-analysis'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data), ]
-        self.assertEquals(req._creationData._annexes[0]._file, None)
+        self.assertEqual(req._creationData._annexes[0]._file, None)
         newItem, response = self._createItem(req)
         annexes = get_annexes(newItem)
         # no annexes have been added
-        self.assertEquals(len(annexes), 0)
+        self.assertEqual(len(annexes), 0)
 
     def test_ws_createItemWithWarnings(self):
         """
@@ -443,7 +427,7 @@ SOAPAction: /
                                 mapping={'item_path': newItem.absolute_url_path(),
                                          'creator': 'pmCreator1'},
                                 context=self.request))
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # now test warnings around file mimetype
         data = {'title': 'My annex with spécial char and no filename',
                 'filename': '',
@@ -477,7 +461,7 @@ SOAPAction: /
                              'item_path': newItem.absolute_url_path()},
                     context=self.request))
         expected = expected.encode('utf-8')
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
 
     def test_ws_createItemInTheNameOf(self):
         """
@@ -499,22 +483,22 @@ SOAPAction: /
         self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
         newItem = self.portal.uid_catalog(UID=response._UID)[0].getObject()
         # as the item is really created by the inTheNameOf user, everything is correct
-        self.assertEquals(newItem.Creator(), 'pmCreator2')
-        self.assertEquals(newItem.owner_info()['id'], 'pmCreator2')
+        self.assertEqual(newItem.Creator(), 'pmCreator2')
+        self.assertEqual(newItem.owner_info()['id'], 'pmCreator2')
         # with those data but with a non 'Manager'/'MeetingManager', it fails
         self.changeUser('pmCreator1')
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
+        self.assertEqual(cm.exception.string,
+                         "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
         # now use the MeetingManager but specify a proposingGroup the inTheNameOf user can not create for
         self.changeUser('pmManager')
         req._proposingGroupId = 'developers'
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "'pmCreator2' can not create items for the 'developers' group!")
+        self.assertEqual(cm.exception.string, "'pmCreator2' can not create items for the 'developers' group!")
         # now for an unexisting inTheNameOf userid
         req._inTheNameOf = 'unexistingUserId'
         # set back correct proposingGroupId
@@ -522,8 +506,8 @@ SOAPAction: /
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "Trying to create an item 'inTheNameOf' an unexisting user 'unexistingUserId'!")
+        self.assertEqual(cm.exception.string,
+                         "Trying to create an item 'inTheNameOf' an unexisting user 'unexistingUserId'!")
         # create an itemInTheNameOf a user having no personal area...
         # if the user trying to create an item has no member area, a ZSI.Fault is raised
         # remove the 'pmCreator2' personal area
@@ -537,7 +521,7 @@ SOAPAction: /
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
+        self.assertEqual(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
 
     def test_ws_createItemWithPreferredMeeting(self):
         """
@@ -552,8 +536,8 @@ SOAPAction: /
         responseHolder = createItemResponse()
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "The given preferred meeting UID (unexisting_meeting_UID) is not a meeting accepting items!")
+        self.assertEqual(cm.exception.string,
+                         "The given preferred meeting UID (unexisting_meeting_UID) is not a meeting accepting items!")
         req._creationData._preferredMeeting = meeting.UID()
         response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         # an item has been created with correct preferredMeeting
@@ -582,14 +566,14 @@ SOAPAction: /
         # key must be found in the MeetingItem's schema
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "The extraAttr 'unexisting_key' was not found the the MeetingItem schema!")
+        self.assertEqual(cm.exception.string,
+                         "The extraAttr 'unexisting_key' was not found the the MeetingItem schema!")
 
         # only works with RichText fields
         req._creationData._extraAttrs[0]._key = 'privacy'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(
+        self.assertEqual(
             cm.exception.string,
             "The extraAttr 'privacy' must correspond to a field using a 'RichWidget' in the MeetingItem schema!")
 
@@ -600,6 +584,21 @@ SOAPAction: /
         self.assertEqual(item.getNotes(), '<p>XHTML content</p>')
 
     def test_ws_createItemCleanHtml(self):
+        """
+          Special characters like &#xa0; in the html breaks PortalTransforms
+          that is why we clean the HTML from wrong characters and styles
+        """
+
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+        HTML = "<p style='padding-left: 5em'>My HTML</p><p>&#xa0;</p>"
+        req._creationData._decision = HTML
+        newItem, response = self._createItem(req)
+        self.assertEqual(
+            newItem.getDecision(keepWithNext=False),
+            '<p>My HTML</p><p>\xc2\xa0</p>')
+
+    def test_ws_createItemCleanHtmlEnabledDisabled(self):
         """
           It is possible to disable cleanHtml (enabled by default),
           this will not clean HTML data while creating the item.
@@ -633,17 +632,17 @@ SOAPAction: /
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         # optional field not enabled
-        self.assertEquals(
+        self.assertEqual(
             cm.exception.string,
-            "The optional field 'groupsInCharge' is not activated in this configuration!")
+            "The optional field \"groupsInCharge\" is not activated in this configuration!")
         # enable optional field, will fail because unknown_uid
         cfg.setUsedItemAttributes(cfg.getUsedItemAttributes() + ('groupsInCharge', ))
 
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(
+        self.assertEqual(
             cm.exception.string,
-            'The groupsInCharge data contains wrong values: "unknown_uid"!')
+            'The \"groupsInCharge\" data contains wrong values: "unknown_uid"!')
 
         # now with correct data
         req._creationData._groupsInCharge = [self.vendors_uid, self.developers_uid]
@@ -666,27 +665,62 @@ SOAPAction: /
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         # optional field not enabled
-        self.assertEquals(
+        self.assertEqual(
             cm.exception.string,
-            "The optional field 'associatedGroups' is not activated in this configuration!")
+            "The optional field \"associatedGroups\" is not activated in this configuration!")
         # enable optional field, will fail because unknown_uid
         cfg.setUsedItemAttributes(cfg.getUsedItemAttributes() + ('associatedGroups', ))
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(
+        self.assertEqual(
             cm.exception.string,
-            'The associatedGroups data contains wrong values: "unknown_uid"!')
+            'The \"associatedGroups\" data contains wrong values: "unknown_uid"!')
 
         # now with correct data
         req._creationData._associatedGroups = [self.vendors_uid, self.developers_uid]
         newItem, response = self._createItem(req)
         self.assertEqual(newItem.getAssociatedGroups(), (self.vendors_uid, self.developers_uid))
 
+    def test_ws_createItemOptionalAdvisers(self):
+        """
+          Test when passing associatedGroups while creating the item.
+        """
+        cfg = self.meetingConfig
+        cfg.setUsedItemAttributes(['description', 'detailedDescription'])
+
+        # by default no item exists
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+
+        # while passing no correct data
+        req._creationData._optionalAdvisers = [self.vendors_uid, 'unknown_uid']
+        responseHolder = createItemResponse()
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        # advices not enabled
+        self.assertEqual(
+            cm.exception.string,
+            "The advices functionnality is not enabled for this configuration!")
+        # enable advices, will fail because unknown_uid
+        cfg.setUseAdvices(True)
+        cfg.setSelectableAdvisers([self.developers_uid, self.vendors_uid])
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEqual(
+            cm.exception.string,
+            'The \"optionalAdvisers\" data contains wrong values: "unknown_uid"!')
+
+        # now with correct data
+        req._creationData._optionalAdvisers = [self.developers_uid, self.vendors_uid]
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.getOptionalAdvisers(), (self.developers_uid, self.vendors_uid))
+        self.assertTrue(self.developers_uid in newItem.adviceIndex)
+        self.assertTrue(self.vendors_uid in newItem.adviceIndex)
+
     def test_ws_createItemWfState(self):
         """
           Test when passing wfState while creating the item.
         """
-        cfg = self.meetingConfig
         self.changeUser('pmCreator1')
         req = self._prepareCreationData()
 
@@ -695,7 +729,7 @@ SOAPAction: /
         responseHolder = createItemResponse()
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(
+        self.assertEqual(
             cm.exception.string,
             'Given wfState "unknown_state" is not reachable regarding current configuration!')
 
@@ -708,7 +742,7 @@ SOAPAction: /
         req._wfState = 'presented'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEquals(
+        self.assertEqual(
             cm.exception.string,
             "Could not trigger the 'present' transition while setting item to 'presented' workflow state! "
             "Make sure a meeting accepting items exists in configuration 'plonegov-assembly'!")

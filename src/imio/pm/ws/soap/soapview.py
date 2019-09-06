@@ -653,7 +653,7 @@ class SOAPView(BrowserView):
                field not in activatedOptionalItemFields and \
                data[field]:
                 raise ZSI.Fault(ZSI.Fault.Client,
-                                "The optional field '%s' is not activated in this configuration!" % field)
+                                "The optional field \"%s\" is not activated in this configuration!" % field)
 
         # raise if we pass a preferredMeeting that is not a meeting accepting items
         if not data['preferredMeeting']:
@@ -675,7 +675,7 @@ class SOAPView(BrowserView):
             if difference:
                 raise ZSI.Fault(
                     ZSI.Fault.Client,
-                    "The associatedGroups data contains wrong values: \"{0}\"!".format(
+                    "The \"associatedGroups\" data contains wrong values: \"{0}\"!".format(
                         ', '.join(difference)))
 
         # validate passed groupsInCharge
@@ -687,7 +687,26 @@ class SOAPView(BrowserView):
             if difference:
                 raise ZSI.Fault(
                     ZSI.Fault.Client,
-                    "The groupsInCharge data contains wrong values: \"{0}\"!".format(
+                    "The \"groupsInCharge\" data contains wrong values: \"{0}\"!".format(
+                        ', '.join(difference)))
+
+        # validate passed optionalAdvisers
+        optionalAdvisers = data['optionalAdvisers']
+        if optionalAdvisers:
+            if not cfg.getUseAdvices():
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "The advices functionnality is not enabled for this configuration!")
+
+            # advices are enabled, check if given values are correct
+            vocab = get_vocab(cfg, 'Products.PloneMeeting.vocabularies.itemoptionaladvicesvocabulary',
+                              **{'include_selected': False, 'include_not_selectable_values': False})
+            oa_term_keys = vocab.by_token.keys()
+            difference = tuple(set(optionalAdvisers).difference(oa_term_keys))
+            if difference:
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "The \"optionalAdvisers\" data contains wrong values: \"{0}\"!".format(
                         ', '.join(difference)))
 
         # externalIdentifier is indexed, it can not be None
