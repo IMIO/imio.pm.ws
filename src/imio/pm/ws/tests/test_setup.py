@@ -1,29 +1,7 @@
 # -*- coding: utf-8 -*-
-#
-# File: test_setup.py
-#
-# Copyright (c) 2013 by Imio.be
-#
-# GNU General Public License (GPL)
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-# 02110-1301, USA.
-#
-
 
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+import os
 
 
 class testSetup(WS4PMTestCase):
@@ -35,10 +13,13 @@ class testSetup(WS4PMTestCase):
         """
           Check that the rendered WSDL correspond to what we expect
         """
-        from renderedWSDL import renderedWSDL
         # set self.maxDiff to None to show diffs
         self.maxDiff = None
-        self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), renderedWSDL)
+        currentWSDL = open(os.path.dirname(__file__) + '/../currentWSDL.txt', 'rb')
+        value = currentWSDL.read()
+        value = value.replace('http://ws4pm.imio.be/', self.portal.absolute_url() + '/')
+        value = value.replace('location="http://ws4pm.imio.be', 'location="' + self.portal.absolute_url())
+        self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), value)
 
     def test_ws_uninstall(self):
         """

@@ -96,7 +96,7 @@ class WS4PM(ServiceSOAPBinding):
         request = ps.Parse(getItemTemplateRequest.typecode)
         return request,getItemTemplateResponse()
 
-    soapAction['http://ws4pm.imio.be/searchItems'] = 'soap_getItemTemplate'
+    soapAction['http://ws4pm.imio.be/getItemTemplate'] = 'soap_getItemTemplate'
     root[(getItemTemplateRequest.typecode.nspname,getItemTemplateRequest.typecode.pname)] = 'soap_getItemTemplate'
 
     def soap_searchItems(self, ps, **kw):

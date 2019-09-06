@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <wsdl:definitions xmlns:tal="http://xml.zope.org/namespaces/tal"
                   xmlns:metal="http://xml.zope.org/namespaces/metal"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   xmlns:tns="http://ws4pm.imio.be"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+                  xmlns:soapenc="http://www.w3.org/2001/06/soap-encoding"
+                  name="WS4PM"
                   targetNamespace="http://ws4pm.imio.be"
                   tal:define="portal_url context/@@plone_portal_state/portal_url">
     <wsdl:types>
@@ -200,6 +201,7 @@
                     <xsd:element name="preferredMeeting" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="associatedGroups" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="groupsInCharge" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="optionalAdvisers" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="extraAttrs" type="tns:ExtraAttr" minOccurs="0" maxOccurs="10"/>
                     <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="10"/>

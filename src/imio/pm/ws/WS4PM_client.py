@@ -86,7 +86,7 @@ class WS4PMSOAPBindingSOAP:
         if isinstance(request, getItemTemplateRequest) is False:
             raise TypeError, "%s incorrect request type" % (request.__class__)
         # no input wsaction
-        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/searchItems", **kw)
+        self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getItemTemplate", **kw)
         # no output wsaction
         response = self.binding.Receive(getItemTemplateResponse.typecode)
         return response
