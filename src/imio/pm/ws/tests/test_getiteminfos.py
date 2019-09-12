@@ -124,7 +124,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
     <UID>%s</UID>
-    <id>o3</id>
+    <id>item-2</id>
     <title>My new item title</title>
     <creator>pmManager</creator>
     <creation_date>%s</creation_date>
@@ -137,7 +137,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>presented</review_state>
     <meeting_date>%s</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/o3</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/item-2</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
   </itemInfo>
