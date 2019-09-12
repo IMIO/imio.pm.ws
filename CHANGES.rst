@@ -13,6 +13,8 @@ Changelog
   [gbastien]
 - In createItem, added possibility to define optionalAdvisers.
   [gbastien]
+- Force catalog query in getItemInfos to use 'sort_on=created'.
+  [gbastien]
 
 2.7 (2019-05-16)
 ----------------

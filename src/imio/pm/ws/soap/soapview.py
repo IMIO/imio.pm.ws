@@ -380,6 +380,7 @@ class SOAPView(BrowserView):
             params['meta_type'] = 'MeetingItem'
             catalog = api.portal.get_tool('portal_catalog')
             uid_catalog = api.portal.get_tool('uid_catalog')
+            params['sort_on'] = 'created'
             brains = catalog(**params)
             noDate = DateTime('1950/01/01 00:00:00 UTC')
             wfTool = api.portal.get_tool('portal_workflow')
