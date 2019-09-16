@@ -123,6 +123,9 @@ class SOAPView(BrowserView):
         # remove the '_showAnnexes' from searchParams as it is not a search parameter
         if '_showAnnexes' in params:
             params.pop('_showAnnexes')
+        # remove the '_showAssembly' from searchParams as it is not a search parameter
+        if '_showAssembly' in params:
+            params.pop('_showTemplates')
         # remove the '_showTemplates' from searchParams as it is not a search parameter
         if '_showTemplates' in params:
             params.pop('_showTemplates')
@@ -135,6 +138,7 @@ class SOAPView(BrowserView):
         response._itemInfo = self._getItemInfos(params,
                                                 request.__dict__.get('_showExtraInfos', False),
                                                 request.__dict__.get('_showAnnexes', False),
+                                                request.__dict__.get('_showAssembly', False),
                                                 request.__dict__.get('_showTemplates', False),
                                                 inTheNameOf)
         return response
@@ -321,6 +325,7 @@ class SOAPView(BrowserView):
                       searchParams,
                       showExtraInfos=False,
                       showAnnexes=False,
+                      showAssembly=False,
                       showTemplates=False,
                       inTheNameOf=None):
         '''
@@ -406,7 +411,8 @@ class SOAPView(BrowserView):
                 preferredMeeting = preferredMeeting_brains and preferredMeeting_brains[0].getObject() or None
                 itemInfo._preferred_meeting_date = localtime(preferredMeeting and preferredMeeting.getDate() or noDate)
                 itemInfo._review_state = wfTool.getInfoFor(item, 'review_state')
-                itemInfo._meeting_date = localtime(item.hasMeeting() and item.getMeeting().getDate() or noDate)
+                meeting = item.hasMeeting() and item.getMeeting()
+                itemInfo._meeting_date = localtime(meeting and meeting.getDate() or noDate)
                 itemInfo._absolute_url = item.absolute_url()
                 itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
                 itemInfo._extraInfos = {}
@@ -436,6 +442,35 @@ class SOAPView(BrowserView):
                         annexInfo._filename = annex.file.filename
                         annexInfo._file = annex.file.data
                         itemInfo._annexes.append(annexInfo)
+                if showAssembly and meeting:
+                    # assembly or attendees?  Return a printed representation
+                    assembly_lines = []
+                    if item.getItemAssembly():
+                        for field in item.Schema().filterFields(isMetadata=False):
+                            field_name = field.getName()
+                            if field_name.startswith('itemAssembly') and \
+                               field_name != 'itemAssemblyGuests':
+                                assembly_lines.append(field_name)
+                                assembly_lines.append(field.getAccessor(item)())
+                    else:
+                        # contacts
+                        assembly_lines.append('Attendees')
+                        attendees = item.getAttendees(theObjects=True)
+                        for attendee in attendees:
+                            assembly_lines.append(attendee.get_short_title())
+                        assembly_lines.append('Absents')
+                        absents = item.getItemAbsents(theObjects=True)
+                        for absent in absents:
+                            assembly_lines.append(absent.get_short_title())
+                        assembly_lines.append('Excused')
+                        excused = item.getItemExcused(theObjects=True)
+                        for excused_contact in excused:
+                            assembly_lines.append(excused_contact.get_short_title())
+                    # itemAssemblyGuests used for both
+                    field = item.Schema()['itemAssemblyGuests']
+                    assembly_lines.append('itemAssemblyGuests')
+                    assembly_lines.append(field.getAccessor(item)())
+                    itemInfo._item_assembly = '|'.join(assembly_lines)
                 if showTemplates:
                     if not mc:
                         # we need the item's meetingConfig

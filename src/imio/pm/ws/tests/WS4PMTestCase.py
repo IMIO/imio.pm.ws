@@ -106,6 +106,7 @@ class WS4PMTestCase(PloneMeetingTestCase):
     def _getItemInfos(self,
                       itemUID,
                       showAnnexes=False,
+                      showAssembly=False,
                       showExtraInfos=False,
                       showTemplates=False,
                       toBeDeserialized=True):
@@ -118,10 +119,13 @@ class WS4PMTestCase(PloneMeetingTestCase):
             req._showAnnexes = True
         if showExtraInfos:
             req._showExtraInfos = True
+        if showAssembly:
+            req._showAssembly = True
         if showTemplates:
-            req._showTemplates = True
+            req.showTemplates = True
         responseHolder = getItemInfosResponse()
         response = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        import ipdb; ipdb.set_trace()
         if toBeDeserialized:
             return deserialize(response)
         else:

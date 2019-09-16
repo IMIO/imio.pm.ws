@@ -406,6 +406,33 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertEquals(cm.exception.string,
                           "Trying to get item informations 'inTheNameOf' an unexisting user 'unexistingUserId'!")
 
+    def test_ws_getItemInfosWithShowAssembly(self):
+        """When showAssembly=True, assembly is returned in a text form
+           when using assembly fields or contacts."""
+        self.changeUser('pmManager')
+        meeting = self._createMeetingWithItems()
+        item = meeting.getItemsInOrder()[0]
+        item_uid = item.UID()
+        resp = self._getItemInfos(item_uid, showAssembly=False, toBeDeserialized=False)
+        self.assertIsNone(resp.ItemInfo[0]._item_assembly)
+        # itemAssembly
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertEqual(resp.ItemInfo[0]._item_assembly,
+                         'itemAssembly|<p>Bill Gates, Steve Jobs</p>|itemAssemblyExcused||'
+                         'itemAssemblyAbsents||itemAssemblyGuests|')
+        item.setItemAssembly('Local assembly')
+        item.setItemAssemblyAbsents('Local assembly absents')
+        item.setItemAssemblyExcused('Local assembly excused')
+        item.setItemAssemblyGuests('Local assembly guests')
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertEqual(resp.ItemInfo[0]._item_assembly,
+                         'itemAssembly|<p>Local assembly</p>|'
+                         'itemAssemblyExcused|<p>Local assembly excused</p>|'
+                         'itemAssemblyAbsents|<p>Local assembly absents</p>|'
+                         'itemAssemblyGuests|<p>Local assembly guests</p>')
+        # contacts
+        pass
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite
