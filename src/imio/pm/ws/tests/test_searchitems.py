@@ -22,14 +22,18 @@
 # 02110-1301, USA.
 #
 
-from time import localtime
-import ZSI
-from ZSI.TCtimes import gDateTime
+from DateTime import DateTime
 from imio.helpers.cache import cleanRamCacheFor
-from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_client import searchItemsRequest, searchItemsResponse
-from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
 from imio.pm.ws.soap.soapview import SOAPView
+from imio.pm.ws.tests.WS4PMTestCase import deserialize
+from imio.pm.ws.tests.WS4PMTestCase import serializeRequest
+from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+from imio.pm.ws.WS4PM_client import searchItemsRequest
+from imio.pm.ws.WS4PM_client import searchItemsResponse
+from time import localtime
+from ZSI.TCtimes import gDateTime
+
+import ZSI
 
 
 class testSOAPSearchItems(WS4PMTestCase):
@@ -49,6 +53,9 @@ class testSOAPSearchItems(WS4PMTestCase):
         req._creationData._externalIdentifier = 'my_external_app_identifier'
         # use the SOAP service to create one
         newItem, response = self._createItem(req)
+        # make sure created enough in the past or sort_on 'created' returns random result
+        newItem.setCreationDate(DateTime() - 5)
+        newItem.reindexObject()
         newItemUID = newItem.UID()
         # externalIdentifier is actually set
         self.assertEquals(newItem.externalIdentifier, 'my_external_app_identifier')
@@ -78,12 +85,12 @@ class testSOAPSearchItems(WS4PMTestCase):
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
-    <UID>%s</UID>
+    <UID>{0}</UID>
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
-    <creation_date>%s</creation_date>
-    <modification_date>%s</modification_date>
+    <creation_date>{1}</creation_date>
+    <modification_date>{2}</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
@@ -97,9 +104,9 @@ class testSOAPSearchItems(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:searchItemsResponse>
-""" % (newItemUID,
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
+""".format(newItemUID,
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
         self.assertEquals(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
@@ -126,31 +133,12 @@ class testSOAPSearchItems(WS4PMTestCase):
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
-    <UID>%s</UID>
-    <id>item-2</id>
-    <title>My new item title</title>
-    <creator>pmManager</creator>
-    <creation_date>%s</creation_date>
-    <modification_date>%s</modification_date>
-    <category>development</category>
-    <description>&lt;p&gt;Description&lt;/p&gt;</description>
-    <detailedDescription/>
-    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
-    <preferredMeeting/>
-    <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
-    <review_state>presented</review_state>
-    <meeting_date>%s</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/item-2</absolute_url>
-    <externalIdentifier/>
-    <extraInfos/>
-  </itemInfo>
-  <itemInfo xsi:type="ns1:ItemInfo">
-    <UID>%s</UID>
+    <UID>{0}</UID>
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
-    <creation_date>%s</creation_date>
-    <modification_date>%s</modification_date>
+    <creation_date>{1}</creation_date>
+    <modification_date>{2}</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
@@ -163,14 +151,33 @@ class testSOAPSearchItems(WS4PMTestCase):
     <externalIdentifier>my_external_app_identifier</externalIdentifier>
     <extraInfos/>
   </itemInfo>
+  <itemInfo xsi:type="ns1:ItemInfo">
+    <UID>{3}</UID>
+    <id>item-2</id>
+    <title>My new item title</title>
+    <creator>pmManager</creator>
+    <creation_date>{4}</creation_date>
+    <modification_date>{5}</modification_date>
+    <category>development</category>
+    <description>&lt;p&gt;Description&lt;/p&gt;</description>
+    <detailedDescription/>
+    <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
+    <preferredMeeting/>
+    <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
+    <review_state>presented</review_state>
+    <meeting_date>{6}</meeting_date>
+    <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/item-2</absolute_url>
+    <externalIdentifier/>
+    <extraInfos/>
+  </itemInfo>
 </ns1:searchItemsResponse>
-""" % (itemInMeetingUID,
-       gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
-       meetingDate,
-       newItemUID,
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-       gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
+""".format(newItemUID,
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+                itemInMeetingUID,
+                gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
+                gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
+                meetingDate)
         self.assertEquals(expected, resp)
         # if the search params do not return an existing UID, the response is empty
         req._Title = 'aWrongTitle'

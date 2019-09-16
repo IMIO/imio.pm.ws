@@ -164,7 +164,7 @@ class SOAPView(BrowserView):
                                                              request._proposingGroupId,
                                                              request._creationData,
                                                              request._cleanHtml,
-                                                             request._wfState,
+                                                             request._wfTransitions,
                                                              request._inTheNameOf)
         return response
 
@@ -587,7 +587,7 @@ class SOAPView(BrowserView):
                     proposingGroupId,
                     creationData,
                     cleanHtml=True,
-                    wfState=None,
+                    wfTransitions=[],
                     inTheNameOf=None):
         '''
           Create an item with given parameters
@@ -941,37 +941,22 @@ class SOAPView(BrowserView):
                                                       context=portal.REQUEST)
             item.workflow_history._p_changed = True
 
-            # manage wfState
-            # validate that one transition selected in MeetingConfig.transitionsForPresentingAnItem
-            # is actually leading to the given wfState
-            if wfState:
-                leadingTransitionId = None
-                for transitionId in cfg.getTransitionsForPresentingAnItem():
-                    transition = itemWF.transitions[transitionId]
-                    if transition.new_state_id == wfState:
-                        leadingTransitionId = transitionId
-                if not leadingTransitionId:
-                    raise ZSI.Fault(
-                        ZSI.Fault.Client,
-                        "Given wfState \"{0}\" is not reachable regarding "
-                        "current configuration!".format(wfState))
+            # manage wfTransitions
+            if wfTransitions:
                 # trigger transitions
                 wf_comment = _('wf_transition_triggered_by_application')
                 with api.env.adopt_roles(roles=['Manager']):
-                    for tr in cfg.getTransitionsForPresentingAnItem():
+                    for tr in wfTransitions:
                         try:
                             wfTool.doActionFor(item, tr, comment=wf_comment)
                         except WorkflowException:
-                            msg = "Could not trigger the '{0}' transition while " \
-                                "setting item to '{1}' workflow state!".format(tr, wfState)
+                            msg = "While treating wfTransitions, could not " \
+                                "trigger the '{0}' transition!".format(tr)
                             # additional info if failed to trigger the 'present' transition
                             if tr == 'present':
                                 msg = msg + " Make sure a meeting accepting items " \
                                     "exists in configuration '{0}'!".format(cfg.getId())
                             raise ZSI.Fault(ZSI.Fault.Client, msg)
-
-                        if tr == leadingTransitionId:
-                            break
 
             # log finally
             logger.info('Item at "%s"%s SOAP created by "%s".' %

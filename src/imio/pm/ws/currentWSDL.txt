@@ -140,7 +140,7 @@
                     <xsd:element name="proposingGroupId" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                     <xsd:element name="creationData" type="tns:CreationData"/>
                     <xsd:element name="cleanHtml" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="1"/>
-                    <xsd:element name="wfState" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+                    <xsd:element name="wfTransitions" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
