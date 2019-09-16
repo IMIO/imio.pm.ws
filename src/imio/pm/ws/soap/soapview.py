@@ -123,6 +123,9 @@ class SOAPView(BrowserView):
         # remove the '_showAnnexes' from searchParams as it is not a search parameter
         if '_showAnnexes' in params:
             params.pop('_showAnnexes')
+        # remove the '_annexes_types' from searchParams as it is not a search parameter
+        if '_annexes_types' in params:
+            params.pop('_annexes_types')
         # remove the '_showTemplates' from searchParams as it is not a search parameter
         if '_showTemplates' in params:
             params.pop('_showTemplates')
@@ -135,6 +138,7 @@ class SOAPView(BrowserView):
         response._itemInfo = self._getItemInfos(params,
                                                 request.__dict__.get('_showExtraInfos', False),
                                                 request.__dict__.get('_showAnnexes', False),
+                                                request.__dict__.get('_annexes_types', False),
                                                 request.__dict__.get('_showTemplates', False),
                                                 inTheNameOf)
         return response
@@ -321,10 +325,12 @@ class SOAPView(BrowserView):
                       searchParams,
                       showExtraInfos=False,
                       showAnnexes=False,
+                      annexes_types=[],
                       showTemplates=False,
                       inTheNameOf=None):
         '''
-          Get an item with given searchParams dict.  As the user is connected, the security in portal_catalog do the job
+          Get an item with given searchParams dict.
+          As the user is connected, the security in portal_catalog do the job.
         '''
         portal = self.context
 
