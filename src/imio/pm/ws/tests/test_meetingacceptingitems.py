@@ -22,11 +22,13 @@
 # 02110-1301, USA.
 #
 
-import ZSI
-from time import localtime
-from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_client import meetingsAcceptingItemsRequest, meetingsAcceptingItemsResponse
 from imio.pm.ws.soap.soapview import SOAPView
+from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+from imio.pm.ws.WS4PM_client import meetingsAcceptingItemsRequest
+from imio.pm.ws.WS4PM_client import meetingsAcceptingItemsResponse
+from time import localtime
+
+import ZSI
 
 
 class testSOAPMeetingsAcceptingItems(WS4PMTestCase):

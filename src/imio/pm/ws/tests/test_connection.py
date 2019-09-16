@@ -23,11 +23,12 @@
 #
 
 from AccessControl import Unauthorized
+from imio.pm.ws.soap.soapview import SOAPView
+from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+from imio.pm.ws.WS4PM_client import testConnectionRequest
+from imio.pm.ws.WS4PM_client import testConnectionResponse
 from plone import api
 from plone.app.testing import logout
-from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_client import testConnectionRequest, testConnectionResponse
-from imio.pm.ws.soap.soapview import SOAPView
 
 
 class testSOAPConnection(WS4PMTestCase):

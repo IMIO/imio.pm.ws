@@ -22,11 +22,14 @@
 # 02110-1301, USA.
 #
 
-import ZSI
 from imio.helpers.cache import cleanRamCacheFor
-from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase, deserialize
-from imio.pm.ws.WS4PM_client import getUserInfosRequest, getUserInfosResponse
 from imio.pm.ws.soap.soapview import SOAPView
+from imio.pm.ws.tests.WS4PMTestCase import deserialize
+from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+from imio.pm.ws.WS4PM_client import getUserInfosRequest
+from imio.pm.ws.WS4PM_client import getUserInfosResponse
+
+import ZSI
 
 
 class testSOAPGetUserInfos(WS4PMTestCase):

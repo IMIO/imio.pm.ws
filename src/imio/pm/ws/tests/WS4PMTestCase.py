@@ -20,13 +20,20 @@
 # 02110-1301, USA.
 #
 
-import os
-from ZSI.schema import GTD
-from Products.PloneMeeting.tests.PloneMeetingTestCase import PloneMeetingTestCase
 from imio.pm.ws.soap.soapview import SOAPView
 from imio.pm.ws.testing import WS4PM_PM_TEST_PROFILE_FUNCTIONAL
-from imio.pm.ws.WS4PM_client import createItemRequest, createItemResponse, \
-    searchItemsResponse, getItemInfosRequest, getItemInfosResponse
+from imio.pm.ws.WS4PM_client import createItemRequest
+from imio.pm.ws.WS4PM_client import createItemResponse
+from imio.pm.ws.WS4PM_client import getItemInfosRequest
+from imio.pm.ws.WS4PM_client import getItemInfosResponse
+from imio.pm.ws.WS4PM_client import searchItemsResponse
+from lxml import etree
+from Products.PloneMeeting.tests.PloneMeetingTestCase import PloneMeetingTestCase
+from ZSI import SoapWriter
+from ZSI import TC
+from ZSI.schema import GTD
+
+import os
 
 
 class WS4PMTestCase(PloneMeetingTestCase):
@@ -129,8 +136,6 @@ class WS4PMTestCase(PloneMeetingTestCase):
         return deserialize(response)
 
 
-from lxml import etree
-from ZSI import SoapWriter, TC
 
 
 def serializeRequest(request):

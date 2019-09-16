@@ -11,9 +11,12 @@ __author__ = """Gauthier Bastien <gauthier@imio.be>"""
 __docformat__ = 'plaintext'
 
 
-import logging
-logger = logging.getLogger('imio.pm.ws: setuphandlers')
 from Products.CMFCore.utils import getToolByName
+
+import logging
+
+
+logger = logging.getLogger('imio.pm.ws: setuphandlers')
 
 
 def isNotImioPmWsProfile(context):

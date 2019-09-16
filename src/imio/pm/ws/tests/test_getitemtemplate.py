@@ -22,13 +22,15 @@
 # 02110-1301, USA.
 #
 
+from imio.helpers.cache import cleanRamCacheFor
+from imio.pm.ws.soap.soapview import SOAPView
+from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+from imio.pm.ws.WS4PM_client import getItemTemplateRequest
+from imio.pm.ws.WS4PM_client import getItemTemplateResponse
+
 import os
 import zipfile
 import ZSI
-from imio.helpers.cache import cleanRamCacheFor
-from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_client import getItemTemplateRequest, getItemTemplateResponse
-from imio.pm.ws.soap.soapview import SOAPView
 
 
 class testSOAPGetItemTemplate(WS4PMTestCase):

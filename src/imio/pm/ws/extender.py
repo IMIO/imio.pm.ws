@@ -1,15 +1,13 @@
-from zope.component import adapts
-
-from zope.interface import implements
-from archetypes.schemaextender.interfaces import ISchemaExtender, IBrowserLayerAwareExtender
 from archetypes.schemaextender.field import ExtensionField
-
-from interfaces import IExternalIdentifierable
-
-from Products.Archetypes.public import StringWidget, StringField
-
-from imio.pm.ws.interfaces import IWS4PMLayer
+from archetypes.schemaextender.interfaces import IBrowserLayerAwareExtender
+from archetypes.schemaextender.interfaces import ISchemaExtender
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
+from imio.pm.ws.interfaces import IWS4PMLayer
+from interfaces import IExternalIdentifierable
+from Products.Archetypes.public import StringField
+from Products.Archetypes.public import StringWidget
+from zope.component import adapts
+from zope.interface import implements
 
 
 class ExternalIdentifierStringField(ExtensionField, StringField):
