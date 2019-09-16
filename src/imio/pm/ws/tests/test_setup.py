@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+
 import os
 
 

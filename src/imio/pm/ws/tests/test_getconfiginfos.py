@@ -23,13 +23,16 @@
 #
 
 
-import ZSI
 from collective.contact.plonegroup.utils import get_organizations
 from imio.helpers.cache import cleanRamCacheFor
-from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_client import getConfigInfosRequest, getConfigInfosResponse
-from imio.pm.ws.tests.WS4PMTestCase import serializeRequest, deserialize
 from imio.pm.ws.soap.soapview import SOAPView
+from imio.pm.ws.tests.WS4PMTestCase import deserialize
+from imio.pm.ws.tests.WS4PMTestCase import serializeRequest
+from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
+from imio.pm.ws.WS4PM_client import getConfigInfosRequest
+from imio.pm.ws.WS4PM_client import getConfigInfosResponse
+
+import ZSI
 
 
 class testSOAPGetConfigInfos(WS4PMTestCase):

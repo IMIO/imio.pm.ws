@@ -1,43 +1,23 @@
 # -*- coding: utf-8 -*-
-#
-# File: test_getiteminfos.py
-#
-# Copyright (c) 2013 by Imio.be
-#
-# GNU General Public License (GPL)
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-# 02110-1301, USA.
-#
 
-import base64
-import os
-from time import localtime
-import ZSI
-from ZSI.TCtimes import gDateTime
-from plone import api
-from plone import namedfile
-from Products.CMFPlone.utils import safe_unicode
-from Products.PloneMeeting.utils import get_annexes
 from collective.iconifiedcategory.utils import calculate_category_id
 from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
 from imio.pm.ws.soap.soapview import SOAPView
 from imio.pm.ws.tests.WS4PMTestCase import serializeRequest
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
-from imio.pm.ws.WS4PM_client import getItemInfosRequest, getItemInfosResponse
+from imio.pm.ws.WS4PM_client import getItemInfosRequest
+from imio.pm.ws.WS4PM_client import getItemInfosResponse
+from plone import api
+from plone import namedfile
+from Products.CMFPlone.utils import safe_unicode
+from Products.PloneMeeting.utils import get_annexes
+from time import localtime
+from ZSI.TCtimes import gDateTime
+
+import base64
+import os
+import ZSI
 
 
 class testSOAPGetItemInfos(WS4PMTestCase):
@@ -49,19 +29,19 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         """
           Test that getting an item with a given UID returns valuable informations
         """
-        #by default no item exists
+        # by default no item exists
         self.changeUser('pmCreator1')
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga')) == 0)
-        #use the SOAP service to create one
+        # use the SOAP service to create one
         req = self._prepareCreationData()
         newItem, response = self._createItem(req)
         newItemUID = newItem.UID()
-        #now an item exists, get informations about it
+        # now an item exists, get informations about it
         req = getItemInfosRequest()
         req._UID = newItemUID
-        #Serialize the request so it can be easily tested
+        # Serialize the request so it can be easily tested
         request = serializeRequest(req)
-        #This is what the sent enveloppe should looks like
+        # This is what the sent enveloppe should looks like
         expected = """<SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
             """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
@@ -73,21 +53,21 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
         result = """%s""" % request
         self.assertEquals(expected, result)
-        #now really use the SOAP method to get informations about the item
+        # now really use the SOAP method to get informations about the item
         resp = self._getItemInfos(newItemUID)
-        #the item is not in a meeting so the meeting date is 1950-01-01
+        # the item is not in a meeting so the meeting date is 1950-01-01
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
             """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
             """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
-    <UID>%s</UID>
+    <UID>{0}</UID>
     <id>my-new-item-title</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
-    <creation_date>%s</creation_date>
-    <modification_date>%s</modification_date>
+    <creation_date>{1}</creation_date>
+    <modification_date>{2}</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
@@ -101,10 +81,9 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (
-            newItemUID,
-            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
+""".format(newItemUID,
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
         self.assertEquals(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
@@ -123,12 +102,12 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
-    <UID>%s</UID>
+    <UID>{0}</UID>
     <id>item-2</id>
     <title>My new item title</title>
     <creator>pmManager</creator>
-    <creation_date>%s</creation_date>
-    <modification_date>%s</modification_date>
+    <creation_date>{1}</creation_date>
+    <modification_date>{2}</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription/>
@@ -136,17 +115,16 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferredMeeting/>
     <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>presented</review_state>
-    <meeting_date>%s</meeting_date>
+    <meeting_date>{3}</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/item-2</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (
-            itemInMeeting.UID(),
-            gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
-            gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
-            meetingDate)
+""".format(itemInMeeting.UID(),
+                gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
+                gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
+                meetingDate)
         self.assertEquals(expected, resp)
         # if the item with this UID has not been found (user can not access or item does not exists),
         # an empty response is returned
@@ -159,7 +137,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 """
         self.assertEquals(expected, resp)
-        #item UID the logged in user can not access
+        # item UID the logged in user can not access
         self.changeUser('pmReviewer1')
         resp = self._getItemInfos(newItemUID)
         self.assertEquals(expected, resp)
@@ -171,18 +149,18 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         """
         self.changeUser('pmCreator1')
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga')) == 0)
-        #prepare data for a default item
+        # prepare data for a default item
         req = self._prepareCreationData()
-        #add one annex
+        # add one annex
         data = {'title': 'My annex 1', 'filename': 'smallTestFile.pdf', 'file': 'smallTestFile.pdf'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
-        #create the item
+        # create the item
         newItem, reponse = self._createItem(req)
         newItemUID = newItem.UID()
-        #get informations about the item, by default 'showExtraInfos' is False
+        # get informations about the item, by default 'showExtraInfos' is False
         resp = self._getItemInfos(newItemUID, showExtraInfos=True)
         extraInfosFields = SOAPView(self.portal, req)._getExtraInfosFields(newItem)
-        #check that every field considered as extra informations is returned in the response
+        # check that every field considered as extra informations is returned in the response
         for extraInfosField in extraInfosFields:
             self.failUnless(extraInfosField.getName() in resp)
 
@@ -209,12 +187,12 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" """ \
             """xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
-    <UID>%s</UID>
-    <id>%s</id>
+    <UID>{0}</UID>
+    <id>{1}</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
-    <creation_date>%s</creation_date>
-    <modification_date>%s</modification_date>
+    <creation_date>{2}</creation_date>
+    <modification_date>{3}</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
@@ -223,20 +201,19 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/%s</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/{4}</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (
-            newItemUID,
-            newItem.getId(),
-            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
-            newItem.getId())
-        #annexes are not shown by default
+""".format(newItemUID,
+                newItem.getId(),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+                newItem.getId())
+        # annexes are not shown by default
         self.assertEquals(expected, resp)
-        #now with 'showAnnexes=True'
+        # now with 'showAnnexes=True'
         financial_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('financial-analysis'))
         item_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('item-annex'))
         resp = self._getItemInfos(newItemUID, showAnnexes=True)
@@ -246,12 +223,12 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
-    <UID>%s</UID>
-    <id>%s</id>
+    <UID>{0}</UID>
+    <id>{1}</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
-    <creation_date>%s</creation_date>
-    <modification_date>%s</modification_date>
+    <creation_date>{2}</creation_date>
+    <modification_date>{3}</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
@@ -260,26 +237,25 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/%s</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/{4}</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My annex 1</title>
-      <annexTypeId>%s</annexTypeId>
+      <annexTypeId>{5}</annexTypeId>
       <filename>smallTestFile.pdf</filename>
       <file>
-%s</file>
+{6}</file>
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (
-            newItemUID,
-            newItem.getId(),
-            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
-            newItem.getId(),
-            financial_annex_type_id,
-            base64.encodestring(get_annexes(newItem)[0].file.data))
+""".format(newItemUID,
+                newItem.getId(),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+                newItem.getId(),
+                financial_annex_type_id,
+                base64.encodestring(get_annexes(newItem)[0].file.data))
         # one annex is shown
         self.assertEquals(expected, resp)
         # now check with several (2) annexes...
@@ -305,12 +281,12 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <itemInfo xsi:type="ns1:ItemInfo">
-    <UID>%s</UID>
-    <id>%s</id>
+    <UID>{0}</UID>
+    <id>{1}</id>
     <title>My new item title</title>
     <creator>pmCreator1</creator>
-    <creation_date>%s</creation_date>
-    <modification_date>%s</modification_date>
+    <creation_date>{2}</creation_date>
+    <modification_date>{3}</modification_date>
     <category>development</category>
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription>&lt;p&gt;Detailed description&lt;/p&gt;</detailedDescription>
@@ -319,35 +295,34 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>itemcreated</review_state>
     <meeting_date>1950-01-01T00:00:00.006Z</meeting_date>
-    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/%s</absolute_url>
+    <absolute_url>http://nohost/plone/Members/pmCreator1/mymeetings/plonegov-assembly/{4}</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My annex 1</title>
-      <annexTypeId>%s</annexTypeId>
+      <annexTypeId>{5}</annexTypeId>
       <filename>smallTestFile.pdf</filename>
       <file>
-%s</file>
+{6}</file>
     </annexes>
     <annexes xsi:type="ns1:AnnexInfo">
       <title>My BeautifulTestFile title</title>
-      <annexTypeId>%s</annexTypeId>
+      <annexTypeId>{7}</annexTypeId>
       <filename>myBeautifulTestFile.odt</filename>
       <file>
-%s</file>
+{8}</file>
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
-""" % (
-            newItemUID,
-            newItem.getId(),
-            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
-            gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
-            newItem.getId(),
-            financial_annex_type_id,
-            base64.encodestring(get_annexes(newItem)[0].file.data),
-            item_annex_type_id,
-            base64.encodestring(get_annexes(newItem)[1].file.data))
+""".format(newItemUID,
+                newItem.getId(),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
+                gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
+                newItem.getId(),
+                financial_annex_type_id,
+                base64.encodestring(get_annexes(newItem)[0].file.data),
+                item_annex_type_id,
+                base64.encodestring(get_annexes(newItem)[1].file.data))
         # 2 annexes are shown
         self.assertEquals(expected, resp)
 
@@ -435,6 +410,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
-    # add a prefix because we heritate from testMeeting and we do not want every tests of testMeeting to be run here...
+    # add a prefix because we heritate from testMeeting and
+    # we do not want every tests of testMeeting to be run here...
     suite.addTest(makeSuite(testSOAPGetItemInfos, prefix='test_ws_'))
     return suite
