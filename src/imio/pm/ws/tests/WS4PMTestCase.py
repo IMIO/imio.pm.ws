@@ -125,7 +125,6 @@ class WS4PMTestCase(PloneMeetingTestCase):
             req.showTemplates = True
         responseHolder = getItemInfosResponse()
         response = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
-        import ipdb; ipdb.set_trace()
         if toBeDeserialized:
             return deserialize(response)
         else:
