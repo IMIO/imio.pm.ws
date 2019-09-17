@@ -2,25 +2,11 @@
 
 from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 
-import os
-
 
 class testSetup(WS4PMTestCase):
     """
         Tests the setup : install/uninstall process and WSDL
     """
-
-    def test_ws_renderedWSDL(self):
-        """
-          Check that the rendered WSDL correspond to what we expect
-        """
-        # set self.maxDiff to None to show diffs
-        self.maxDiff = None
-        currentWSDL = open(os.path.dirname(__file__) + '/../currentWSDL.txt', 'rb')
-        value = currentWSDL.read()
-        value = value.replace('http://ws4pm.imio.be/', self.portal.absolute_url() + '/')
-        value = value.replace('location="http://ws4pm.imio.be', 'location="' + self.portal.absolute_url())
-        self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), value)
 
     def test_ws_uninstall(self):
         """

@@ -68,22 +68,22 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         self.assertEquals(cm.exception.string, 'You can not access this item!')
         # if we try to use another template, than one available for this item, a ZSI Fault is raised
         self.changeUser('pmCreator1')
-        mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
-        wrongTemplate = mc.podtemplates.agendaTemplate
+        cfg = self.tool.get(self.usedMeetingConfigId)
+        wrongTemplate = cfg.podtemplates.agendaTemplate
         req._templateId = '%s__format__%s' % (wrongTemplate.getId(), 'odt')
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string, 'You can not access this template!')
         # if everything is correct, we receive the rendered template
-        req._templateId = '%s__format__%s' % (mc.podtemplates.itemTemplate.getId(), 'odt')
+        req._templateId = '{0}__format__{1}'.format(cfg.podtemplates.itemTemplate.getId(), 'odt')
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         renderedTemplate = SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         # check that the rendered file correspond to the newItem's data
         self._isCorrectlyRenderedTemplate(renderedTemplate, newItem)
         # test if PloneMeeting raise a PloneMeetingError
         # for example, trying to generate a PDF when Ooo is not in server mode
-        mc.podtemplates.itemTemplate.pod_formats = ['pdf']
+        cfg.podtemplates.itemTemplate.pod_formats = ['pdf']
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
@@ -113,8 +113,8 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
         req = getItemTemplateRequest()
         newItemUID = newItem.UID()
         req._itemUID = newItemUID
-        mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
-        req._templateId = '%s__format__%s' % (mc.podtemplates.itemTemplate.getId(), 'odt')
+        cfg = self.meetingConfig
+        req._templateId = '%s__format__%s' % (cfg.podtemplates.itemTemplate.getId(), 'odt')
         req._inTheNameOf = 'pmCreator1'
         # the current user can get item template inTheNameOf himself
         responseHolder = getItemTemplateResponse()

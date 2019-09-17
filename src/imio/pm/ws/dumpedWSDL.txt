@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- This file is generated calling @@ws4pm.wsdl._dump_wsdl -->
 <wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws4pm.imio.be" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://www.w3.org/2001/06/soap-encoding" name="WS4PM" targetNamespace="http://ws4pm.imio.be">
     <wsdl:types>
         <xsd:schema targetNamespace="http://ws4pm.imio.be">
@@ -69,7 +70,8 @@
                     <xsd:element name="showExtraInfos" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="showAnnexes" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="annexes_types" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="showTemplates" type="xsd:boolean" maxOccurs="1" minOccurs="0" default="0"/>
+                    <xsd:element name="showAssembly" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="showTemplates" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
@@ -237,6 +239,7 @@
                     <xsd:element name="preferred_meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="review_state" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="item_assembly" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="absolute_url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="extraInfos" type="xsd:anyType"/>
