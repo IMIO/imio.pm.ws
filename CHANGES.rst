@@ -19,7 +19,7 @@ Changelog
   meeting.
   [gbastien]
 - Removed manual handling of currentWSDL.txt.  Now dumpedWSDL.txt is generated
-  calling '@@ws4pm.wsdl._dump_wsdl'.
+  by calling 'http://portal_url/@@ws4pm.wsdl?dump_wsdl:boolean=True'.
   [gbastien]
 
 2.7 (2019-05-16)
