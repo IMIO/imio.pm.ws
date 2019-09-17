@@ -18,6 +18,9 @@ Changelog
   receive the item assembly in the _item_assembly attribute when item is in a
   meeting.
   [gbastien]
+- Removed manual handling of currentWSDL.txt.  Now dumpedWSDL.txt is generated
+  calling '@@ws4pm.wsdl._dump_wsdl'.
+  [gbastien]
 
 2.7 (2019-05-16)
 ----------------

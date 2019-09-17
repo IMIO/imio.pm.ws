@@ -40,6 +40,7 @@ from zope.i18n import translate
 
 import logging
 import magic
+import os
 import ZSI
 
 
@@ -1026,3 +1027,18 @@ class WS4PMWSDL(BrowserView):
     """
       This render the SOAP/WSDL depending on the current portal_url
     """
+
+    def _dump_wsdl(self):
+        """To generate ZSI client/server/types files, we need the WSDL
+           to be stored on the filesystem.
+           This will dump the WSDL under name currentWSDL.txt."""
+        portal = api.portal.get()
+        rendered = self.index()
+        rendered = rendered.replace(portal.absolute_url(), 'http://ws4pm.imio.be')
+        rendered = rendered.replace(
+            '<?xml version="1.0" encoding="utf-8"?>\n',
+            '<?xml version="1.0" encoding="utf-8"?>\n'
+            '<!-- This file is generated calling @@ws4pm.wsdl._dump_wsdl -->\n')
+        dumpedWSDL = open(os.path.dirname(__file__) + '/../dumpedWSDL.txt', 'wb')
+        dumpedWSDL.write("" + rendered)
+        dumpedWSDL.close()
