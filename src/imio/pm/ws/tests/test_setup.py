@@ -17,10 +17,12 @@ class testSetup(WS4PMTestCase):
         # set self.maxDiff to None to show diffs
         self.maxDiff = None
         currentWSDL = open(os.path.dirname(__file__) + '/../currentWSDL.txt', 'rb')
-        value = currentWSDL.read()
-        value = value.replace('http://ws4pm.imio.be/', self.portal.absolute_url() + '/')
-        value = value.replace('location="http://ws4pm.imio.be', 'location="' + self.portal.absolute_url())
-        self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), value)
+        currentWSDL_value = currentWSDL.read()
+        currentWSDL_value = currentWSDL_value.replace(
+            'http://ws4pm.imio.be/', self.portal.absolute_url() + '/')
+        currentWSDL_value = currentWSDL_value.replace(
+            'location="http://ws4pm.imio.be', 'location="' + self.portal.absolute_url())
+        self.assertEquals(self.portal.restrictedTraverse('@@ws4pm.wsdl').index(), currentWSDL_value)
 
     def test_ws_uninstall(self):
         """

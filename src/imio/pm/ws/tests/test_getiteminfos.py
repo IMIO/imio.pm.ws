@@ -343,14 +343,13 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         newItem, reponse = self._createItem(req)
         # get informations about the item, by default 'showTemplates' is False
         resp = self._getItemInfos(newItem.UID(), showTemplates=True, toBeDeserialized=False)
-        # we have templates
-        import ipdb; ipdb.set_trace()
+        # we have 1 template
         self.assertEqual(len(resp._itemInfo[0]._templates), 1)
-        mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
+        cfg = self.meetingConfig
         # the returned template correspond to the one present in the 'plonemeeting-assembly' meetingConfig
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateId,
-                         POD_TEMPLATE_ID_PATTERN.format(mc.podtemplates.itemTemplate.getId(),
-                                                        mc.podtemplates.itemTemplate.pod_formats[0]))
+                         POD_TEMPLATE_ID_PATTERN.format(cfg.podtemplates.itemTemplate.getId(),
+                                                        cfg.podtemplates.itemTemplate.pod_formats[0]))
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateFilename, u'Item.odt')
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
 
