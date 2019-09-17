@@ -49,7 +49,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """<SOAP-ENV:Header></SOAP-ENV:Header>""" \
             """<SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getItemInfosRequest>""" \
             """<UID>%s</UID><showExtraInfos>false</showExtraInfos><showAnnexes>false</showAnnexes>""" \
-            """<showTemplates>false</showTemplates></ns1:getItemInfosRequest>""" \
+            """<showAssembly>false</showAssembly><showTemplates>false</showTemplates></ns1:getItemInfosRequest>""" \
             """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
         result = """%s""" % request
         self.assertEquals(expected, result)
@@ -344,7 +344,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # get informations about the item, by default 'showTemplates' is False
         resp = self._getItemInfos(newItem.UID(), showTemplates=True, toBeDeserialized=False)
         # we have templates
-        self.assertTrue(len(resp._itemInfo[0]._templates) == 1)
+        import ipdb; ipdb.set_trace()
+        self.assertEqual(len(resp._itemInfo[0]._templates), 1)
         mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
         # the returned template correspond to the one present in the 'plonemeeting-assembly' meetingConfig
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateId,

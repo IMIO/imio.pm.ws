@@ -117,19 +117,15 @@ class SOAPView(BrowserView):
           This is an helper method when you just need to access an item you know the UID of
         '''
         params = dict(request.__dict__)
-        # remove the '_showExtraInfos' from searchParams as it is not a search parameter
+        # remove params that are not search parameter
         if '_showExtraInfos' in params:
             params.pop('_showExtraInfos')
-        # remove the '_showAnnexes' from searchParams as it is not a search parameter
         if '_showAnnexes' in params:
             params.pop('_showAnnexes')
-        # remove the '_showAssembly' from searchParams as it is not a search parameter
         if '_showAssembly' in params:
-            params.pop('_showTemplates')
-        # remove the '_showTemplates' from searchParams as it is not a search parameter
+            params.pop('_showAssembly')
         if '_showTemplates' in params:
             params.pop('_showTemplates')
-        # remove the '_inTheNameOf' from searchParams as it is not a search parameter
         inTheNameOf = None
         if '_inTheNameOf' in params:
             inTheNameOf = params['_inTheNameOf']

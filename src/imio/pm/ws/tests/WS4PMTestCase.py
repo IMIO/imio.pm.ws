@@ -102,7 +102,7 @@ class WS4PMTestCase(PloneMeetingTestCase):
         if showAssembly:
             req._showAssembly = True
         if showTemplates:
-            req.showTemplates = True
+            req._showTemplates = True
         responseHolder = getItemInfosResponse()
         response = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         if toBeDeserialized:

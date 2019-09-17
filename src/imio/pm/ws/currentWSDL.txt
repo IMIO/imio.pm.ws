@@ -69,7 +69,7 @@
                     <xsd:element name="showExtraInfos" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="showAnnexes" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="showAssembly" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
-                    <xsd:element name="showTemplates" type="xsd:boolean" maxOccurs="1" minOccurs="0" default="0"/>
+                    <xsd:element name="showTemplates" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:complexType>
@@ -237,7 +237,7 @@
                     <xsd:element name="preferred_meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="review_state" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="item_assembly" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="item_assembly" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="absolute_url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="extraInfos" type="xsd:anyType"/>
