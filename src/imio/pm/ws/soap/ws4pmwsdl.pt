@@ -77,6 +77,7 @@
                     <xsd:element name="UID" type="xsd:string" maxOccurs="1" minOccurs="1"/>
                     <xsd:element name="showExtraInfos" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="showAnnexes" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="include_annex_binary" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="1"/>
                     <xsd:element name="annexes_types" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="showAssembly" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
                     <xsd:element name="showTemplates" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
