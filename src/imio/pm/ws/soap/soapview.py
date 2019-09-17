@@ -1031,7 +1031,7 @@ class WS4PMWSDL(BrowserView):
     def _dump_wsdl(self):
         """To generate ZSI client/server/types files, we need the WSDL
            to be stored on the filesystem.
-           This will dump the WSDL under name currentWSDL.txt."""
+           This will dump the WSDL under name dumpedWSDL.txt."""
         portal = api.portal.get()
         rendered = self.index()
         rendered = rendered.replace(portal.absolute_url(), 'http://ws4pm.imio.be')
