@@ -49,7 +49,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """<SOAP-ENV:Header></SOAP-ENV:Header>""" \
             """<SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getItemInfosRequest>""" \
             """<UID>%s</UID><showExtraInfos>false</showExtraInfos><showAnnexes>false</showAnnexes>""" \
-            """<showTemplates>false</showTemplates></ns1:getItemInfosRequest>""" \
+            """<showAssembly>false</showAssembly><showTemplates>false</showTemplates></ns1:getItemInfosRequest>""" \
             """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
         result = """%s""" % request
         self.assertEquals(expected, result)
@@ -343,13 +343,13 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         newItem, reponse = self._createItem(req)
         # get informations about the item, by default 'showTemplates' is False
         resp = self._getItemInfos(newItem.UID(), showTemplates=True, toBeDeserialized=False)
-        # we have templates
-        self.assertTrue(len(resp._itemInfo[0]._templates) == 1)
-        mc = self.portal.portal_plonemeeting.getMeetingConfig(newItem)
+        # we have 1 template
+        self.assertEqual(len(resp._itemInfo[0]._templates), 1)
+        cfg = self.meetingConfig
         # the returned template correspond to the one present in the 'plonemeeting-assembly' meetingConfig
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateId,
-                         POD_TEMPLATE_ID_PATTERN.format(mc.podtemplates.itemTemplate.getId(),
-                                                        mc.podtemplates.itemTemplate.pod_formats[0]))
+                         POD_TEMPLATE_ID_PATTERN.format(cfg.podtemplates.itemTemplate.getId(),
+                                                        cfg.podtemplates.itemTemplate.pod_formats[0]))
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateFilename, u'Item.odt')
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
 
@@ -405,6 +405,65 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
                           "Trying to get item informations 'inTheNameOf' an unexisting user 'unexistingUserId'!")
+
+    def test_ws_getItemInfosWithShowAssembly(self):
+        """When showAssembly=True, assembly is returned in a text form
+           when using assembly fields or contacts."""
+        self.changeUser('pmManager')
+        # item out of a meeting
+        item = self.create('MeetingItem')
+        item_uid = item.UID()
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertIsNone(resp.ItemInfo[0]._item_assembly)
+
+        # item in a meeting
+        meeting = self._createMeetingWithItems()
+        item = meeting.getItemsInOrder()[0]
+        item_uid = item.UID()
+        # showAssembly=False
+        resp = self._getItemInfos(item_uid, showAssembly=False, toBeDeserialized=False)
+        self.assertIsNone(resp.ItemInfo[0]._item_assembly)
+        # itemAssembly
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertEqual(resp.ItemInfo[0]._item_assembly,
+                         'itemAssembly|<p>Bill Gates, Steve Jobs</p>|itemAssemblyExcused||'
+                         'itemAssemblyAbsents||itemAssemblyGuests|')
+        item.setItemAssembly('Local assembly')
+        item.setItemAssemblyAbsents('Local assembly absents')
+        item.setItemAssemblyExcused('Local assembly excused')
+        item.setItemAssemblyGuests('Local assembly guests')
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertEqual(resp.ItemInfo[0]._item_assembly,
+                         'itemAssembly|<p>Local assembly</p>|'
+                         'itemAssemblyExcused|<p>Local assembly excused</p>|'
+                         'itemAssemblyAbsents|<p>Local assembly absents</p>|'
+                         'itemAssemblyGuests|<p>Local assembly guests</p>')
+        # contacts
+        cfg = self.meetingConfig
+        cfg.setUsedMeetingAttributes(('attendees', 'excused', 'absents', 'signatories', ))
+        ordered_contacts = cfg.getField('orderedContacts').Vocabulary(cfg).keys()
+        cfg.setOrderedContacts(ordered_contacts)
+        meeting = self._createMeetingWithItems()
+        item = meeting.getItemsInOrder()[0]
+        item_uid = item.UID()
+        resp = self._getItemInfos(item_uid, showAssembly=False, toBeDeserialized=False)
+        self.assertIsNone(resp.ItemInfo[0]._item_assembly)
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertEqual(resp.ItemInfo[0]._item_assembly,
+                         u'Attendees|Monsieur Person1FirstName Person1LastName, Assembly member 1|'
+                         u'Monsieur Person2FirstName Person2LastName, Assembly member 2|'
+                         u'Monsieur Person3FirstName Person3LastName, Assembly member 3|'
+                         u'Monsieur Person4FirstName Person4LastName, Assembly member 4|'
+                         u'Absents|Excused|itemAssemblyGuests|')
+        # define absent on item
+        meeting.itemAbsents[item_uid] = [item.getAttendees()[0]]
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertEqual(resp.ItemInfo[0]._item_assembly,
+                         u'Attendees|Monsieur Person2FirstName Person2LastName, Assembly member 2|'
+                         u'Monsieur Person3FirstName Person3LastName, Assembly member 3|'
+                         u'Monsieur Person4FirstName Person4LastName, Assembly member 4|'
+                         u'Absents|Monsieur Person1FirstName Person1LastName, Assembly member 1|'
+                         u'Excused|itemAssemblyGuests|')
 
 
 def test_suite():
