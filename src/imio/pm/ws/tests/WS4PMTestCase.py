@@ -1,24 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2013 by Imio.be
-#
-# GNU General Public License (GPL)
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-# 02110-1301, USA.
-#
 
 from imio.pm.ws.soap.soapview import SOAPView
 from imio.pm.ws.testing import WS4PM_PM_TEST_PROFILE_FUNCTIONAL
@@ -81,12 +61,12 @@ class WS4PMTestCase(PloneMeetingTestCase):
         """
           Helper method for adding an annex to a created item
         """
-        #create one annex
+        # create one annex
         AnnexInfo = GTD('http://ws4pm.imio.be', 'AnnexInfo')('').pyclass()
         AnnexInfo._title = data.get('title')
-        #optional
+        # optional
         AnnexInfo._annexTypeId = data.get('annexTypeId', '')
-        #optional
+        # optional
         AnnexInfo._filename = data.get('filename', '')
         if data.get('file'):
             annex_file = open(os.path.join(os.path.dirname(__file__), data.get('file')))
@@ -137,8 +117,6 @@ class WS4PMTestCase(PloneMeetingTestCase):
         responseHolder = searchItemsResponse()
         response = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         return deserialize(response)
-
-
 
 
 def serializeRequest(request):

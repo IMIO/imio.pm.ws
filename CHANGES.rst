@@ -14,6 +14,10 @@ Changelog
   [gbastien]
 - Force catalog query in getItemInfos to use 'sort_on=created'.
   [gbastien]
+- In getItemInfos, added 'showAssembly=False' parameter making it possible to
+  receive the item assembly in the _item_assembly attribute when item is in a
+  meeting.
+  [gbastien]
 
 2.7 (2019-05-16)
 ----------------

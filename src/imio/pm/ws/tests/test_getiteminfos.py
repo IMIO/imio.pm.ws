@@ -410,9 +410,17 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         """When showAssembly=True, assembly is returned in a text form
            when using assembly fields or contacts."""
         self.changeUser('pmManager')
+        # item out of a meeting
+        item = self.create('MeetingItem')
+        item_uid = item.UID()
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertIsNone(resp.ItemInfo[0]._item_assembly)
+
+        # item in a meeting
         meeting = self._createMeetingWithItems()
         item = meeting.getItemsInOrder()[0]
         item_uid = item.UID()
+        # showAssembly=False
         resp = self._getItemInfos(item_uid, showAssembly=False, toBeDeserialized=False)
         self.assertIsNone(resp.ItemInfo[0]._item_assembly)
         # itemAssembly
@@ -431,7 +439,31 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                          'itemAssemblyAbsents|<p>Local assembly absents</p>|'
                          'itemAssemblyGuests|<p>Local assembly guests</p>')
         # contacts
-        pass
+        cfg = self.meetingConfig
+        cfg.setUsedMeetingAttributes(('attendees', 'excused', 'absents', 'signatories', ))
+        ordered_contacts = cfg.getField('orderedContacts').Vocabulary(cfg).keys()
+        cfg.setOrderedContacts(ordered_contacts)
+        meeting = self._createMeetingWithItems()
+        item = meeting.getItemsInOrder()[0]
+        item_uid = item.UID()
+        resp = self._getItemInfos(item_uid, showAssembly=False, toBeDeserialized=False)
+        self.assertIsNone(resp.ItemInfo[0]._item_assembly)
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertEqual(resp.ItemInfo[0]._item_assembly,
+                         u'Attendees|Monsieur Person1FirstName Person1LastName, Assembly member 1|'
+                         u'Monsieur Person2FirstName Person2LastName, Assembly member 2|'
+                         u'Monsieur Person3FirstName Person3LastName, Assembly member 3|'
+                         u'Monsieur Person4FirstName Person4LastName, Assembly member 4|'
+                         u'Absents|Excused|itemAssemblyGuests|')
+        # define absent on item
+        meeting.itemAbsents[item_uid] = [item.getAttendees()[0]]
+        resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
+        self.assertEqual(resp.ItemInfo[0]._item_assembly,
+                         u'Attendees|Monsieur Person2FirstName Person2LastName, Assembly member 2|'
+                         u'Monsieur Person3FirstName Person3LastName, Assembly member 3|'
+                         u'Monsieur Person4FirstName Person4LastName, Assembly member 4|'
+                         u'Absents|Monsieur Person1FirstName Person1LastName, Assembly member 1|'
+                         u'Excused|itemAssemblyGuests|')
 
 
 def test_suite():
