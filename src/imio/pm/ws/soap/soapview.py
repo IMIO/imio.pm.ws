@@ -435,7 +435,10 @@ class SOAPView(BrowserView):
                     # add the creator fullname
                     itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
                 if showAnnexes:
-                    for annex in get_annexes(item, portal_types=['annex']):
+                    for annex in get_annexes(item):
+                        # filter on annexes types
+                        if annexes_types and annex.content_category not in annexes_types:
+                            continue
                         annexInfo = AnnexInfo()
                         annexInfo._title = annex.Title()
                         annexInfo._annexTypeId = annex.content_category
