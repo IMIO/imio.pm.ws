@@ -140,7 +140,7 @@ class SOAPView(BrowserView):
                                                 request.__dict__.get('_showExtraInfos', False),
                                                 request.__dict__.get('_showAnnexes', False),
                                                 request.__dict__.get('_annexes_types', False),
-                                                request.__dict__.get('include_annex_binary', False),
+                                                request.__dict__.get('_include_annex_binary', False),
                                                 request.__dict__.get('_showAssembly', False),
                                                 request.__dict__.get('_showTemplates', False),
                                                 inTheNameOf)
