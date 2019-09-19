@@ -443,7 +443,7 @@ class SOAPView(BrowserView):
                 if showAnnexes:
                     for annex in get_annexes(item):
                         # filter on annexes types
-                        if annexes_types and annex.content_category not in annexes_types:
+                        if annex.content_category not in annexes_types:
                             continue
                         annexInfo = AnnexInfo()
                         annexInfo._title = annex.Title()

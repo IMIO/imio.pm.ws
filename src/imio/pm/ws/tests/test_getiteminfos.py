@@ -422,7 +422,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
         # the returned annex is the one created
         self.assertEqual(resp._itemInfo[0]._annexes[0]._title, 'My annex 1')
-        # no attribute _file on the annex
+        # attribute _file of the annex should be empty
         self.assertFalse(resp._itemInfo[0]._annexes[0]._file)
 
     def test_ws_getItemInfosInTheNameOf(self):
