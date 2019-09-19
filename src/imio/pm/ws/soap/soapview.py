@@ -123,6 +123,10 @@ class SOAPView(BrowserView):
             params.pop('_showExtraInfos')
         if '_showAnnexes' in params:
             params.pop('_showAnnexes')
+        if '_allowed_annexes_types' in params:
+            params.pop('_allowed_annexes_types')
+        if '_include_annex_binary' in params:
+            params.pop('_include_annex_binary')
         if '_showAssembly' in params:
             params.pop('_showAssembly')
         if '_showTemplates' in params:
@@ -135,6 +139,8 @@ class SOAPView(BrowserView):
         response._itemInfo = self._getItemInfos(params,
                                                 request.__dict__.get('_showExtraInfos', False),
                                                 request.__dict__.get('_showAnnexes', False),
+                                                request.__dict__.get('_allowed_annexes_types', []),
+                                                request.__dict__.get('_include_annex_binary', True),
                                                 request.__dict__.get('_showAssembly', False),
                                                 request.__dict__.get('_showTemplates', False),
                                                 inTheNameOf)
@@ -322,11 +328,14 @@ class SOAPView(BrowserView):
                       searchParams,
                       showExtraInfos=False,
                       showAnnexes=False,
+                      allowed_annexes_types=[],
+                      include_annex_binary=True,
                       showAssembly=False,
                       showTemplates=False,
                       inTheNameOf=None):
         '''
-          Get an item with given searchParams dict.  As the user is connected, the security in portal_catalog do the job
+          Get an item with given searchParams dict.
+          As the user is connected, the security in portal_catalog do the job.
         '''
         portal = self.context
 
@@ -432,12 +441,16 @@ class SOAPView(BrowserView):
                     # add the creator fullname
                     itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
                 if showAnnexes:
-                    for annex in get_annexes(item, portal_types=['annex']):
+                    for annex in get_annexes(item):
+                        # filter on annexes types
+                        if allowed_annexes_types and annex.content_category not in allowed_annexes_types:
+                            continue
                         annexInfo = AnnexInfo()
                         annexInfo._title = annex.Title()
                         annexInfo._annexTypeId = annex.content_category
                         annexInfo._filename = annex.file.filename
-                        annexInfo._file = annex.file.data
+                        if include_annex_binary:
+                            annexInfo._file = annex.file.data
                         itemInfo._annexes.append(annexInfo)
                 if showAssembly and meeting:
                     # assembly or attendees?  Return a printed representation

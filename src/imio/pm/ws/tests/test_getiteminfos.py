@@ -49,6 +49,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """<SOAP-ENV:Header></SOAP-ENV:Header>""" \
             """<SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getItemInfosRequest>""" \
             """<UID>%s</UID><showExtraInfos>false</showExtraInfos><showAnnexes>false</showAnnexes>""" \
+            """<include_annex_binary>true</include_annex_binary>""" \
             """<showAssembly>false</showAssembly><showTemplates>false</showTemplates></ns1:getItemInfosRequest>""" \
             """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
         result = """%s""" % request
@@ -352,6 +353,92 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                                                         cfg.podtemplates.itemTemplate.pod_formats[0]))
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateFilename, u'Item.odt')
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
+
+    def test_ws_getItemInfosWithAnnexesTypes(self):
+        """
+          Test that getting an item with an annex_type return only the annexes
+          with the corresponding annexTypeId attribute.
+        """
+        cfg = self.meetingConfig
+        self.changeUser('pmCreator1')
+        self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPma')) == 0)
+        # prepare data for a default item
+        req = self._prepareCreationData()
+        # add one annex
+        data = {'title': 'My annex 1',
+                'filename': 'smallTestFile.pdf',
+                'file': 'smallTestFile.pdf'}
+        req._creationData._annexes = [self._prepareAnnexInfo(**data)]
+        # create the item
+        newItem, reponse = self._createItem(req)
+        financial_annex_type_id = calculate_category_id(
+            cfg.annexes_types.item_annexes.get('financial-analysis'))
+        item_annex_type_id = calculate_category_id(
+            cfg.annexes_types.item_annexes.get('item-annex'))
+        allowed_annexes_types = [financial_annex_type_id, item_annex_type_id]
+        # get informations about the item, by default 'allowed_annexes_types' is empty
+        resp = self._getItemInfos(newItem.UID(),
+                                  showAnnexes=True,
+                                  toBeDeserialized=False)
+        # we have 1 annex
+        self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
+        # the returned annex is the one created
+        self.assertEqual(resp._itemInfo[0]._annexes[0]._title, 'My annex 1')
+        self.assertEqual(resp._itemInfo[0]._annexes[0]._filename, 'smallTestFile.pdf')
+        # filter on 'item_annex_type' annex type
+        allowed_annexes_types = [financial_annex_type_id]
+        resp = self._getItemInfos(newItem.UID(),
+                                  showAnnexes=True,
+                                  allowed_annexes_types=allowed_annexes_types,
+                                  toBeDeserialized=False)
+        # we have 1 annex
+        self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
+        # the returned annex is the one created
+        self.assertEqual(resp._itemInfo[0]._annexes[0]._title, 'My annex 1')
+        self.assertIn(resp._itemInfo[0]._annexes[0]._annexTypeId, allowed_annexes_types)
+        # filter on 'financial_annex_type_id' annex type
+        allowed_annexes_types = [item_annex_type_id]
+        resp = self._getItemInfos(newItem.UID(),
+                                  showAnnexes=True,
+                                  allowed_annexes_types=allowed_annexes_types,
+                                  toBeDeserialized=False)
+        # we have 0 annex
+        self.assertEqual(len(resp._itemInfo[0]._annexes), 0)
+
+    def test_ws_getItemInfosWithBinary(self):
+        """
+          Test that getting an item with include_annex_binary return the annex
+          binary file
+        """
+        self.changeUser('pmCreator1')
+        self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPma')) == 0)
+        # prepare data for a default item
+        req = self._prepareCreationData()
+        # add one annex
+        data = {'title': 'My annex 1', 'filename': 'smallTestFile.pdf', 'file': 'smallTestFile.pdf'}
+        req._creationData._annexes = [self._prepareAnnexInfo(**data)]
+        # create the item
+        newItem, reponse = self._createItem(req)
+        # get informations about the item, by default include_annex_binary is True
+        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, toBeDeserialized=False)
+        # we have 1 annex
+        self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
+        # the returned annex is the one created
+        self.assertEqual(resp._itemInfo[0]._annexes[0]._title, 'My annex 1')
+        # file content is preserved correctly
+        annex_file = open(os.path.join(os.path.dirname(__file__), data.get('file')))
+        self.assertEqual(resp._itemInfo[0]._annexes[0]._file, annex_file.read())
+        # get informations about the item, set include_annex_binary to False
+        resp = self._getItemInfos(newItem.UID(),
+                                  showAnnexes=True,
+                                  include_annex_binary=False,
+                                  toBeDeserialized=False)
+        # we have 1 annex
+        self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
+        # the returned annex is the one created
+        self.assertEqual(resp._itemInfo[0]._annexes[0]._title, 'My annex 1')
+        # attribute _file of the annex should be empty
+        self.assertFalse(resp._itemInfo[0]._annexes[0]._file)
 
     def test_ws_getItemInfosInTheNameOf(self):
         """

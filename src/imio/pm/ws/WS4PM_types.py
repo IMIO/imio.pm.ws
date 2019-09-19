@@ -108,7 +108,7 @@ class ns0:
         type = (schema, "ItemInfosRequest")
         def __init__(self, pname, ofwhat=(), attributes=None, extend=False, restrict=False, **kw):
             ns = ns0.ItemInfosRequest_Def.schema
-            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showExtraInfos", aname="_showExtraInfos", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showAnnexes", aname="_showAnnexes", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showAssembly", aname="_showAssembly", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showTemplates", aname="_showTemplates", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
+            TClist = [ZSI.TC.String(pname="UID", aname="_UID", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showExtraInfos", aname="_showExtraInfos", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showAnnexes", aname="_showAnnexes", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="include_annex_binary", aname="_include_annex_binary", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), GTD("http://ws4pm.imio.be","List",lazy=False)(pname="allowed_annexes_types", aname="_allowed_annexes_types", minOccurs=0, maxOccurs="unbounded", nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showAssembly", aname="_showAssembly", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.Boolean(pname="showTemplates", aname="_showTemplates", minOccurs=1, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded")), ZSI.TC.String(pname="inTheNameOf", aname="_inTheNameOf", minOccurs=0, maxOccurs=1, nillable=False, typed=False, encoded=kw.get("encoded"))]
             self.attribute_typecode_dict = attributes or {}
             if extend: TClist += ofwhat
             if restrict: TClist = ofwhat
@@ -121,6 +121,8 @@ class ns0:
                     self._UID = None
                     self._showExtraInfos = 0
                     self._showAnnexes = 0
+                    self._include_annex_binary = 1
+                    self._allowed_annexes_types = []
                     self._showAssembly = 0
                     self._showTemplates = 0
                     self._inTheNameOf = None

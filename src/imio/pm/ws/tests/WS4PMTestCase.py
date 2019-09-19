@@ -86,6 +86,8 @@ class WS4PMTestCase(PloneMeetingTestCase):
     def _getItemInfos(self,
                       itemUID,
                       showAnnexes=False,
+                      allowed_annexes_types=[],
+                      include_annex_binary=True,
                       showAssembly=False,
                       showExtraInfos=False,
                       showTemplates=False,
@@ -97,6 +99,10 @@ class WS4PMTestCase(PloneMeetingTestCase):
         req._UID = itemUID
         if showAnnexes:
             req._showAnnexes = True
+        if allowed_annexes_types:
+            req._allowed_annexes_types = allowed_annexes_types
+        if not include_annex_binary:
+            req._include_annex_binary = False
         if showExtraInfos:
             req._showExtraInfos = True
         if showAssembly:
