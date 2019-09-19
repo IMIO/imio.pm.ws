@@ -139,8 +139,8 @@ class SOAPView(BrowserView):
         response._itemInfo = self._getItemInfos(params,
                                                 request.__dict__.get('_showExtraInfos', False),
                                                 request.__dict__.get('_showAnnexes', False),
-                                                request.__dict__.get('_annexes_types', False),
-                                                request.__dict__.get('_include_annex_binary', False),
+                                                request.__dict__.get('_annexes_types', []),
+                                                request.__dict__.get('_include_annex_binary', True),
                                                 request.__dict__.get('_showAssembly', False),
                                                 request.__dict__.get('_showTemplates', False),
                                                 inTheNameOf)
@@ -449,7 +449,8 @@ class SOAPView(BrowserView):
                         annexInfo._title = annex.Title()
                         annexInfo._annexTypeId = annex.content_category
                         annexInfo._filename = annex.file.filename
-                        annexInfo._file = annex.file.data
+                        if include_annex_binary:
+                            annexInfo._file = annex.file.data
                         itemInfo._annexes.append(annexInfo)
                 if showAssembly and meeting:
                     # assembly or attendees?  Return a printed representation
