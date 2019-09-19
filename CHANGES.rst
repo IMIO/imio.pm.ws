@@ -21,8 +21,8 @@ Changelog
 - Removed manual handling of currentWSDL.txt.  Now dumpedWSDL.txt is generated
   by calling 'http://portal_url/@@ws4pm.wsdl?dump_wsdl:boolean=True'.
   [gbastien]
-- Added parameter 'annexes_types' and 'include_annex_binary' to getItemInfos()
-  method.
+- Added parameter 'allowed_annexes_types' and 'include_annex_binary' to 
+  getItemInfos() method.
   [sdelcourt]
 
 2.7 (2019-05-16)

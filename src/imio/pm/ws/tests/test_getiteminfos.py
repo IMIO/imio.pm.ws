@@ -371,8 +371,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         newItem, reponse = self._createItem(req)
         financial_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('financial-analysis'))
         item_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('item-annex'))
-        annexes_types = [financial_annex_type_id, item_annex_type_id]
-        # get informations about the item, by default 'annexes_types' is empty
+        allowed_annexes_types = [financial_annex_type_id, item_annex_type_id]
+        # get informations about the item, by default 'allowed_annexes_types' is empty
         resp = self._getItemInfos(newItem.UID(), showAnnexes=True, toBeDeserialized=False)
         # we have 1 annex
         self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
@@ -380,16 +380,16 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertEqual(resp._itemInfo[0]._annexes[0]._title, 'My annex 1')
         self.assertEqual(resp._itemInfo[0]._annexes[0]._filename, 'smallTestFile.pdf')
         # filter on 'item_annex_type' annex type
-        annexes_types = [financial_annex_type_id]
-        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, annexes_types=annexes_types, toBeDeserialized=False)
+        allowed_annexes_types = [financial_annex_type_id]
+        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, allowed_annexes_types=allowed_annexes_types, toBeDeserialized=False)
         # we have 1 annex
         self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
         # the returned annex is the one created
         self.assertEqual(resp._itemInfo[0]._annexes[0]._title, 'My annex 1')
-        self.assertIn(resp._itemInfo[0]._annexes[0]._annexTypeId, annexes_types)
+        self.assertIn(resp._itemInfo[0]._annexes[0]._annexTypeId, allowed_annexes_types)
         # filter on 'financial_annex_type_id' annex type
-        annexes_types = [item_annex_type_id]
-        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, annexes_types=annexes_types, toBeDeserialized=False)
+        allowed_annexes_types = [item_annex_type_id]
+        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, allowed_annexes_types=allowed_annexes_types, toBeDeserialized=False)
         # we have 0 annex
         self.assertEqual(len(resp._itemInfo[0]._annexes), 0)
 

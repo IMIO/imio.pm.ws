@@ -123,8 +123,8 @@ class SOAPView(BrowserView):
             params.pop('_showExtraInfos')
         if '_showAnnexes' in params:
             params.pop('_showAnnexes')
-        if '_annexes_types' in params:
-            params.pop('_annexes_types')
+        if '_allowed_annexes_types' in params:
+            params.pop('_allowed_annexes_types')
         if '_include_annex_binary' in params:
             params.pop('_include_annex_binary')
         if '_showAssembly' in params:
@@ -139,7 +139,7 @@ class SOAPView(BrowserView):
         response._itemInfo = self._getItemInfos(params,
                                                 request.__dict__.get('_showExtraInfos', False),
                                                 request.__dict__.get('_showAnnexes', False),
-                                                request.__dict__.get('_annexes_types', []),
+                                                request.__dict__.get('_allowed_annexes_types', []),
                                                 request.__dict__.get('_include_annex_binary', True),
                                                 request.__dict__.get('_showAssembly', False),
                                                 request.__dict__.get('_showTemplates', False),
@@ -328,7 +328,7 @@ class SOAPView(BrowserView):
                       searchParams,
                       showExtraInfos=False,
                       showAnnexes=False,
-                      annexes_types=[],
+                      allowed_annexes_types=[],
                       include_annex_binary=True,
                       showAssembly=False,
                       showTemplates=False,
@@ -443,7 +443,7 @@ class SOAPView(BrowserView):
                 if showAnnexes:
                     for annex in get_annexes(item):
                         # filter on annexes types
-                        if annex.content_category not in annexes_types:
+                        if allowed_annexes_types and annex.content_category not in allowed_annexes_types:
                             continue
                         annexInfo = AnnexInfo()
                         annexInfo._title = annex.Title()
