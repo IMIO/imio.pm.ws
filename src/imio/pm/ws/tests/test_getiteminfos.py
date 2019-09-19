@@ -365,15 +365,21 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # prepare data for a default item
         req = self._prepareCreationData()
         # add one annex
-        data = {'title': 'My annex 1', 'filename': 'smallTestFile.pdf', 'file': 'smallTestFile.pdf'}
+        data = {'title': 'My annex 1',
+                'filename': 'smallTestFile.pdf',
+                'file': 'smallTestFile.pdf'}
         req._creationData._annexes = [self._prepareAnnexInfo(**data)]
         # create the item
         newItem, reponse = self._createItem(req)
-        financial_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('financial-analysis'))
-        item_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('item-annex'))
+        financial_annex_type_id = calculate_category_id(
+            cfg.annexes_types.item_annexes.get('financial-analysis'))
+        item_annex_type_id = calculate_category_id(
+            cfg.annexes_types.item_annexes.get('item-annex'))
         allowed_annexes_types = [financial_annex_type_id, item_annex_type_id]
         # get informations about the item, by default 'allowed_annexes_types' is empty
-        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, toBeDeserialized=False)
+        resp = self._getItemInfos(newItem.UID(),
+                                  showAnnexes=True,
+                                  toBeDeserialized=False)
         # we have 1 annex
         self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
         # the returned annex is the one created
@@ -381,7 +387,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertEqual(resp._itemInfo[0]._annexes[0]._filename, 'smallTestFile.pdf')
         # filter on 'item_annex_type' annex type
         allowed_annexes_types = [financial_annex_type_id]
-        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, allowed_annexes_types=allowed_annexes_types, toBeDeserialized=False)
+        resp = self._getItemInfos(newItem.UID(),
+                                  showAnnexes=True,
+                                  allowed_annexes_types=allowed_annexes_types,
+                                  toBeDeserialized=False)
         # we have 1 annex
         self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
         # the returned annex is the one created
@@ -389,7 +398,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertIn(resp._itemInfo[0]._annexes[0]._annexTypeId, allowed_annexes_types)
         # filter on 'financial_annex_type_id' annex type
         allowed_annexes_types = [item_annex_type_id]
-        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, allowed_annexes_types=allowed_annexes_types, toBeDeserialized=False)
+        resp = self._getItemInfos(newItem.UID(),
+                                  showAnnexes=True,
+                                  allowed_annexes_types=allowed_annexes_types,
+                                  toBeDeserialized=False)
         # we have 0 annex
         self.assertEqual(len(resp._itemInfo[0]._annexes), 0)
 
@@ -417,7 +429,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         annex_file = open(os.path.join(os.path.dirname(__file__), data.get('file')))
         self.assertEqual(resp._itemInfo[0]._annexes[0]._file, annex_file.read())
         # get informations about the item, set include_annex_binary to False
-        resp = self._getItemInfos(newItem.UID(), showAnnexes=True, include_annex_binary=False, toBeDeserialized=False)
+        resp = self._getItemInfos(newItem.UID(),
+                                  showAnnexes=True,
+                                  include_annex_binary=False,
+                                  toBeDeserialized=False)
         # we have 1 annex
         self.assertEqual(len(resp._itemInfo[0]._annexes), 1)
         # the returned annex is the one created
