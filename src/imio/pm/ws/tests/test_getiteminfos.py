@@ -423,7 +423,6 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # the returned annex is the one created
         self.assertEqual(resp._itemInfo[0]._annexes[0]._title, 'My annex 1')
         # no attribute _file on the annex
-        import ipdb; ipdb.set_trace()
         self.assertFalse(resp._itemInfo[0]._annexes[0]._file)
 
     def test_ws_getItemInfosInTheNameOf(self):
