@@ -446,6 +446,7 @@ class SOAPView(BrowserView):
                         if allowed_annexes_types and annex.content_category not in allowed_annexes_types:
                             continue
                         annexInfo = AnnexInfo()
+                        annexInfo._id = annex.id
                         annexInfo._title = annex.Title()
                         annexInfo._annexTypeId = annex.content_category
                         annexInfo._filename = annex.file.filename
