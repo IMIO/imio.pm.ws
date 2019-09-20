@@ -221,7 +221,7 @@
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="annexTypeId" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="filename" type="xsd:string" minOccurs="0" maxOccurs="1"/>
-                    <xsd:element name="file" type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="file" type="xsd:base64Binary" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:complexType name="TemplateInfo">
