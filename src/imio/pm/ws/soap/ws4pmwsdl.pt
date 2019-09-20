@@ -218,7 +218,7 @@
             </xsd:complexType>
             <xsd:complexType name="AnnexInfo">
                 <xsd:sequence>
-                    <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="id" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="annexTypeId" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="filename" type="xsd:string" minOccurs="0" maxOccurs="1"/>

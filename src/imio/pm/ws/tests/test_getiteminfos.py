@@ -242,6 +242,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <externalIdentifier/>
     <extraInfos/>
     <annexes xsi:type="ns1:AnnexInfo">
+      <id>smalltestfile.pdf</id>
       <title>My annex 1</title>
       <annexTypeId>{5}</annexTypeId>
       <filename>smallTestFile.pdf</filename>
@@ -300,18 +301,20 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <externalIdentifier/>
     <extraInfos/>
     <annexes xsi:type="ns1:AnnexInfo">
+      <id>{5}</id>
       <title>My annex 1</title>
-      <annexTypeId>{5}</annexTypeId>
+      <annexTypeId>{6}</annexTypeId>
       <filename>smallTestFile.pdf</filename>
       <file>
-{6}</file>
+{7}</file>
     </annexes>
     <annexes xsi:type="ns1:AnnexInfo">
+      <id>{8}</id>
       <title>My BeautifulTestFile title</title>
-      <annexTypeId>{7}</annexTypeId>
+      <annexTypeId>{9}</annexTypeId>
       <filename>myBeautifulTestFile.odt</filename>
       <file>
-{8}</file>
+{10}</file>
     </annexes>
   </itemInfo>
 </ns1:getItemInfosResponse>
@@ -320,8 +323,10 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                 gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
                 gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
                 newItem.getId(),
+                get_annexes(newItem)[0].id,
                 financial_annex_type_id,
                 base64.encodestring(get_annexes(newItem)[0].file.data),
+                get_annexes(newItem)[1].id,
                 item_annex_type_id,
                 base64.encodestring(get_annexes(newItem)[1].file.data))
         # 2 annexes are shown
