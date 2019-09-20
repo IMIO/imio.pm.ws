@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
 		    def zServerPort = new Random().nextInt(10000) + 30000
-                    sh "env ZSERVER_PORT=$(zServerPort)  bin/coverage run --source=imio.pm.ws bin/test"
+			sh "env ZSERVER_PORT=${zServerPort}  bin/coverage run --source=imio.pm.ws bin/test"
                     sh 'bin/python bin/coverage xml -i'
                     cobertura coberturaReportFile: '**/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII'
                 }
