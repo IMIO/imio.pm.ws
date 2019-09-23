@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.8 (unreleased)
+2.8 (2019-09-23)
 ----------------
 
 - In createItem, added possibility to define associatedGroups and
