@@ -24,7 +24,7 @@ Changelog
 - Added parameter 'allowed_annexes_types' and 'include_annex_binary' to 
   getItemInfos() method.
   [sdelcourt]
-- Add attribute 'id' the AnnexInfo data type.
+- Add attribute 'id' to the AnnexInfo data type.
   [sdelcourt]
 
 2.7 (2019-05-16)
