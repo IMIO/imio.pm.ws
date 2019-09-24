@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.9 (unreleased)
+2.9 (2019-09-24)
 ----------------
 
 - In 'getItemInfos' when 'showAssembly=True', changed separator between list of
