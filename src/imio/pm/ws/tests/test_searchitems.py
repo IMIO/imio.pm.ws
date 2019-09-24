@@ -326,6 +326,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         self.assertEqual(len(result._itemInfo), 0)
         req._linkedMeetingUID = meeting.UID()
+        result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         # only get items user may view
         self.assertEqual(len(result._itemInfo), 2)
         self.changeUser('pmManager')
