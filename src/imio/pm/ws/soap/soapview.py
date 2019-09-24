@@ -465,18 +465,29 @@ class SOAPView(BrowserView):
                                 assembly_lines.append(field.getAccessor(item)())
                     else:
                         # contacts
+                        # attendees
                         assembly_lines.append('Attendees')
                         attendees = item.getAttendees(theObjects=True)
+                        attendees_lines = []
                         for attendee in attendees:
-                            assembly_lines.append(attendee.get_short_title())
+                            attendees_lines.append(attendee.get_short_title())
+                        assembly_lines.append('\n'.join(attendees_lines))
+
+                        # absents
                         assembly_lines.append('Absents')
                         absents = item.getItemAbsents(theObjects=True)
+                        absents_lines = []
                         for absent in absents:
-                            assembly_lines.append(absent.get_short_title())
+                            absents_lines.append(absent.get_short_title())
+                        assembly_lines.append('\n'.join(absents_lines))
+
+                        # excused
                         assembly_lines.append('Excused')
                         excused = item.getItemExcused(theObjects=True)
+                        excused_lines = []
                         for excused_contact in excused:
-                            assembly_lines.append(excused_contact.get_short_title())
+                            excused_lines.append(excused_contact.get_short_title())
+                        assembly_lines.append('\n'.join(excused_lines))
                     # itemAssemblyGuests used for both
                     field = item.Schema()['itemAssemblyGuests']
                     assembly_lines.append('itemAssemblyGuests')

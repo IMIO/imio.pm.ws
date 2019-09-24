@@ -4,8 +4,10 @@ Changelog
 2.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- In 'getItemInfos' when 'showAssembly=True', changed separator between list of
+  assembly members from '|' to '\n' so it is easier to parse as '|' is already
+  the separator between types of attendees (attendees, absents, excused, ...).
+  [gbastien]
 
 2.8 (2019-09-23)
 ----------------
