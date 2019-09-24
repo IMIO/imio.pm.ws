@@ -58,7 +58,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         newItem.reindexObject()
         newItemUID = newItem.UID()
         # externalIdentifier is actually set
-        self.assertEquals(newItem.externalIdentifier, 'my_external_app_identifier')
+        self.assertEqual(newItem.externalIdentifier, 'my_external_app_identifier')
         # now an item exists, get informations about it
         req = searchItemsRequest()
         req._Title = 'item'
@@ -75,7 +75,7 @@ class testSOAPSearchItems(WS4PMTestCase):
             """<Title>%s</Title><getCategory>%s</getCategory></ns1:searchItemsRequest>""" \
             """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % (req._Title, req._getCategory)
         result = """%s""" % request
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
         # now really use the SOAP method to get informations about the item
         resp = self._searchItems(req)
         # the item is not in a meeting so the meeting date is 1950-01-01
@@ -107,7 +107,7 @@ class testSOAPSearchItems(WS4PMTestCase):
 """.format(newItemUID,
                 gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
                 gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
         # use the 'plonegov-assembly' MeetingConfig that use real categories,
@@ -178,7 +178,7 @@ class testSOAPSearchItems(WS4PMTestCase):
                 gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
                 gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
                 meetingDate)
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # if the search params do not return an existing UID, the response is empty
         req._Title = 'aWrongTitle'
         resp = self._searchItems(req)
@@ -188,13 +188,13 @@ class testSOAPSearchItems(WS4PMTestCase):
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 """
-        self.assertEquals(resp, expected)
+        self.assertEqual(resp, expected)
         # if not search params is pass, a ZSI.Fault is raised
         req._Title = ''
         responseHolder = searchItemsResponse()
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, 'Define at least one search parameter!')
+        self.assertEqual(cm.exception.string, 'Define at least one search parameter!')
         # if a 'meetingConfigId' is passed, items of this meetingConfig are taken into account
         # create an item for 'plonemeeting-assembly' with same data as one created for 'plonegov-assembly' here above
         req = self._prepareCreationData()
@@ -219,7 +219,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         req._meetingConfigId = 'wrongMeetingConfigId'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
+        self.assertEqual(cm.exception.string, "Unknown meetingConfigId : 'wrongMeetingConfigId'!")
 
     def test_ws_searchItemsInTheNameOf(self):
         """
@@ -272,14 +272,14 @@ class testSOAPSearchItems(WS4PMTestCase):
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
+        self.assertEqual(cm.exception.string,
                           "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
         req._inTheNameOf = 'pmCreator2'
         self.changeUser('pmCreator2')
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
+        self.assertEqual(cm.exception.string,
                           "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
         # now working examples with a 'Manager'
         self.changeUser('pmManager')
