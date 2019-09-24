@@ -116,7 +116,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <preferredMeeting/>
     <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>presented</review_state>
-    <meeting_date>{3}</meeting_date>
+    <meeting>{3}</meeting>
+    <meeting_date>{4}</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/item-2</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
@@ -125,6 +126,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
 """.format(itemInMeeting.UID(),
                 gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
                 gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
+                meeting.UID(),
                 meetingDate)
         self.assertEquals(expected, resp)
         # if the item with this UID has not been found (user can not access or item does not exists),

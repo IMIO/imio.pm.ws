@@ -4,8 +4,10 @@ Changelog
 2.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
-
+- 'getItemInfos' returns 'meeting' containing the meeting UID if any.
+  [gbastien]
+- 'searchItems' now accepts an additional search parameter 'linkedMeetingUID'.
+  [gbastien]
 
 2.9 (2019-09-24)
 ----------------

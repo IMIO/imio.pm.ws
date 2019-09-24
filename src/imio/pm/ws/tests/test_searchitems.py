@@ -47,7 +47,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         """
         # by default no item exists
         self.changeUser('pmCreator1')
-        self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPga')) == 0)
+        self.assertEqual(len(self.portal.portal_catalog(portal_type='MeetingItemPga')), 0)
         # prepare data for a default item
         req = self._prepareCreationData()
         req._creationData._externalIdentifier = 'my_external_app_identifier'
@@ -165,7 +165,8 @@ class testSOAPSearchItems(WS4PMTestCase):
     <preferredMeeting/>
     <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
     <review_state>presented</review_state>
-    <meeting_date>{6}</meeting_date>
+    <meeting>{6}</meeting>
+    <meeting_date>{7}</meeting_date>
     <absolute_url>http://nohost/plone/Members/pmManager/mymeetings/plonegov-assembly/item-2</absolute_url>
     <externalIdentifier/>
     <extraInfos/>
@@ -177,6 +178,7 @@ class testSOAPSearchItems(WS4PMTestCase):
                 itemInMeetingUID,
                 gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.created())),
                 gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
+                meeting.UID(),
                 meetingDate)
         self.assertEqual(expected, resp)
         # if the search params do not return an existing UID, the response is empty
@@ -259,54 +261,76 @@ class testSOAPSearchItems(WS4PMTestCase):
         self.changeUser('pmCreator1')
         result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         # only one result and about item1
-        self.assertTrue(result._itemInfo[0].UID == item1.UID() and len(result._itemInfo) == 1)
+        self.assertEqual(result._itemInfo[0].UID, item1.UID())
+        self.assertEqual(len(result._itemInfo), 1)
         # 'pmCreator2' can get infos about item2
         self.changeUser('pmCreator2')
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         # only one result and about item2
-        self.assertTrue(result._itemInfo[0].UID == item2.UID() and len(result._itemInfo) == 1)
+        self.assertEqual(result._itemInfo[0].UID, item2.UID())
+        self.assertEqual(len(result._itemInfo), 1)
         # None of 'pmCreatorx' can searchItems inTheNameOf
         req._inTheNameOf = 'pmCreator1'
         self.changeUser('pmCreator1')
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
-        self.assertEqual(cm.exception.string,
-                          "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+        self.assertEqual(
+            cm.exception.string,
+            "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
         req._inTheNameOf = 'pmCreator2'
         self.changeUser('pmCreator2')
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
-        self.assertEqual(cm.exception.string,
-                          "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+        self.assertEqual(
+            cm.exception.string,
+            "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
         # now working examples with a 'Manager'
         self.changeUser('pmManager')
         req._inTheNameOf = None
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         # both items are returned
-        self.assertTrue(len(result._itemInfo) == 2)
+        self.assertEqual(len(result._itemInfo), 2)
         # returned items are item1 and item2
         createdItemsUids = set((item1.UID(), item2.UID()))
         resultUids = set((result._itemInfo[0].UID, result._itemInfo[1].UID))
-        self.assertTrue(createdItemsUids == resultUids)
+        self.assertEqual(createdItemsUids, resultUids)
         # as we switch user while using inTheNameOf, make sure we have
         # falled back to original user
-        self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
+        self.assertEqual(self.portal.portal_membership.getAuthenticatedMember().getId(), 'pmManager')
         # now searchItems inTheNameOf 'pmCreator1'
         req._inTheNameOf = 'pmCreator1'
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
-        self.assertTrue(len(result._itemInfo) == 1)
-        self.assertTrue(result._itemInfo[0].UID == item1.UID())
+        self.assertEqual(len(result._itemInfo), 1)
+        self.assertEqual(result._itemInfo[0].UID, item1.UID())
         # now searchItems inTheNameOf 'pmCreator2'
         req._inTheNameOf = 'pmCreator2'
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
-        self.assertTrue(len(result._itemInfo) == 1)
-        self.assertTrue(result._itemInfo[0].UID == item2.UID())
+        self.assertEqual(len(result._itemInfo), 1)
+        self.assertEqual(result._itemInfo[0].UID, item2.UID())
+
+    def test_ws_searchItemsLinkedMeetingUID(self):
+        """Test search param linkedMeetingUID."""
+        self.changeUser('pmManager')
+        meeting = self._createMeetingWithItems()
+        req = searchItemsRequest()
+        responseHolder = searchItemsResponse()
+        # unknown meeting UID
+        self.changeUser('pmCreator1')
+        req._linkedMeetingUID = 'unknown_uid'
+        result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        self.assertEqual(len(result._itemInfo), 0)
+        req._linkedMeetingUID = meeting.UID()
+        # only get items user may view
+        self.assertEqual(len(result._itemInfo), 2)
+        self.changeUser('pmManager')
+        result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
+        self.assertEqual(len(result._itemInfo), 5)
 
 
 def test_suite():

@@ -418,6 +418,7 @@ class SOAPView(BrowserView):
                 itemInfo._preferred_meeting_date = localtime(preferredMeeting and preferredMeeting.getDate() or noDate)
                 itemInfo._review_state = wfTool.getInfoFor(item, 'review_state')
                 meeting = item.hasMeeting() and item.getMeeting()
+                itemInfo._meeting = meeting and meeting.UID() or None
                 itemInfo._meeting_date = localtime(meeting and meeting.getDate() or noDate)
                 itemInfo._absolute_url = item.absolute_url()
                 itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
