@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.10 (unreleased)
+2.10 (2019-09-30)
 -----------------
 
 - 'getItemInfos' returns 'meeting' containing the meeting UID if any.
