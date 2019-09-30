@@ -37,4 +37,3 @@ msgstr "No extension available in mimetypes_registry for mimetype '${mime}' for 
 #. Default: "This item has been created using the Webservice."
 msgid "This item has been created using the Webservice."
 msgstr ""
-
