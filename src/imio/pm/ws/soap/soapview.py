@@ -872,7 +872,12 @@ class SOAPView(BrowserView):
             item.setCategory(data['category'])
 
             # add a record to the item workflow_history to specify that item was created thru SOAP WS
-            add_wf_history_action(item, action_name=ITEM_SOAP_CREATED, user_id=memberId)
+            action_name = ITEM_SOAP_CREATED
+            action_label = action_name + '_comments'
+            add_wf_history_action(item,
+                                  action_name=action_name,
+                                  action_label=action_label,
+                                  user_id=memberId)
 
             # processForm calls at_post_create_script too
             # this is necessary before adding annexes

@@ -763,6 +763,31 @@ SOAPAction: /
         self.assertEqual(newItem.queryState(), 'presented')
         self.assertTrue(newItem in meeting.getItems())
 
+    def test_ws_createItemWithAutoAskedAdvices(self):
+        """
+          Test item creation with auto asked advices.
+          Test also the fact that advices are asked on item created from WS or not.
+        """
+        self.changeUser('siteadmin')
+        cfg = self.meetingConfig
+        # will ask advice auto when item created from WS
+        cfg.setCustomAdvisers(
+            [{'row_id': 'unique_id_123',
+              'org': self.vendors_uid,
+              'gives_auto_advice_on':
+                "python: imio_history_utils.getLastWFAction(item, "
+                "transition='create_item_using_imio_pm_ws_soap')",
+              'for_item_created_from': '2016/08/08',
+              'delay': '5',
+              'delay_label': ''}, ])
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+        wsItem, response = self._createItem(req)
+        self.assertTrue(wsItem.getAdviceDataFor(wsItem, self.vendors_uid))
+        # now create an item manually, the auto advice is not asked
+        item = self.create('MeetingItem')
+        self.assertFalse(item.getAdviceDataFor(item, self.vendors_uid))
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite
