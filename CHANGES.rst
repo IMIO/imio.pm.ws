@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.11 (unreleased)
+2.11 (2019-10-01)
 -----------------
 
 - Make it easier to detect if an item was created using the createItem SOAP WS
