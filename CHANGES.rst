@@ -4,8 +4,9 @@ Changelog
 2.12 (unreleased)
 -----------------
 
-- Nothing changed yet.
-
+- Do not fail in 'getItemInfos' when returning POD templates if a POD template
+  is using the odt_file of another POD template.
+  [gbastien]
 
 2.11 (2019-10-01)
 -----------------
