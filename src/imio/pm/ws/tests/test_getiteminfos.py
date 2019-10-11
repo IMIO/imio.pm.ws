@@ -334,7 +334,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # 2 annexes are shown
         self.assertEquals(expected, resp)
 
-    def test_ws_getItemInfosWithTemplatesRequest(self):
+    def test_ws_getItemInfosWithPODTemplatesRequest(self):
         """
           Test that getting an item with a given UID and specifying that we want
           showTemplates returns informations about generatable POD templates
@@ -358,6 +358,32 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateId,
                          POD_TEMPLATE_ID_PATTERN.format(cfg.podtemplates.itemTemplate.getId(),
                                                         cfg.podtemplates.itemTemplate.pod_formats[0]))
+        self.assertEqual(resp._itemInfo[0]._templates[0]._templateFilename, u'Item.odt')
+        self.assertEqual(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
+
+    def test_ws_getItemInfosWithReusedPODTemplates(self):
+        """
+          Test when some returned POD templates are reusing another POD template
+          so do not have an odt_file.
+        """
+        # in the PM test profile, some templates are only defined for the plonemeeting-assembly
+        self.usedMeetingConfigId = "plonegov-assembly"
+        self.changeUser('pmCreator1')
+        item = self.create('MeetingItem')
+        # first check that the only returned template is a template rusing another
+        viewlet = self._get_viewlet(
+            context=item,
+            manager_name='plone.belowcontenttitle',
+            viewlet_name='document-generation-link')
+        templates = viewlet.get_generable_templates()
+        self.assertEqual(len(templates), 1)
+        self.assertTrue(templates[0].pod_template_to_use)
+        self.assertIsNone(templates[0].odt_file)
+        # get the reponse
+        resp = self._getItemInfos(item.UID(), showTemplates=True, toBeDeserialized=False)
+        # we have 1 template
+        self.assertEqual(len(resp._itemInfo[0]._templates), 1)
+        # templateFilename was taken from template to use
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateFilename, u'Item.odt')
         self.assertEqual(resp._itemInfo[0]._templates[0]._templateFormat, 'odt')
 

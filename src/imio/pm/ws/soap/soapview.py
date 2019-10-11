@@ -504,8 +504,11 @@ class SOAPView(BrowserView):
                             templateInfo = TemplateInfo()
                             templateInfo._title = template.Title()
                             templateInfo._templateFormat = pod_format
-                            templateInfo._templateId = POD_TEMPLATE_ID_PATTERN.format(template.getId(), pod_format)
-                            templateInfo._templateFilename = template.odt_file.filename
+                            templateInfo._templateId = POD_TEMPLATE_ID_PATTERN.format(
+                                template.getId(), pod_format)
+                            # in case we are reusing another pod_file,
+                            # use the get_file method that manages that
+                            templateInfo._templateFilename = template.get_file().filename
                             itemInfo._templates.append(templateInfo)
                 logger.info('Item at %s SOAP accessed by "%s".' %
                             (item.absolute_url_path(), memberId))
