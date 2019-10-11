@@ -1,7 +1,21 @@
 Changelog
 =========
 
-2.10 (unreleased)
+2.12 (unreleased)
+-----------------
+
+- Nothing changed yet.
+
+
+2.11 (2019-10-01)
+-----------------
+
+- Make it easier to detect if an item was created using the createItem SOAP WS
+  by adding a specific line to the item workflow_history like it is the case
+  when creating an item from an item template or from a recurring item.
+  [gbastien]
+
+2.10 (2019-09-30)
 -----------------
 
 - 'getItemInfos' returns 'meeting' containing the meeting UID if any.

@@ -33,6 +33,7 @@ from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksView
 from Products.PloneMeeting.config import PMMessageFactory as _
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
 from Products.PloneMeeting.MeetingItem import MeetingItem
+from Products.PloneMeeting.utils import add_wf_history_action
 from Products.PloneMeeting.utils import get_annexes
 from Products.PloneMeeting.utils import org_id_to_uid
 from time import localtime
@@ -56,7 +57,7 @@ NO_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "No extension available in mimetype
 MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "Could not determine an extension to use for mimetype '${mime}', " \
                                                    "too many available, for annex '${annex_path}' of " \
                                                    "item '${item_path}', this annex was not added."
-ITEM_SOAP_CREATED_COMMENT = "This item has been created using the Webservice."
+ITEM_SOAP_CREATED = "create_item_using_imio_pm_ws_soap"
 
 
 class SOAPView(BrowserView):
@@ -872,6 +873,15 @@ class SOAPView(BrowserView):
             itemId = destFolder.invokeFactory(type_name, **data)
             item = getattr(destFolder, itemId)
             item.setCategory(data['category'])
+
+            # add a record to the item workflow_history to specify that item was created thru SOAP WS
+            action_name = ITEM_SOAP_CREATED
+            action_label = action_name + '_comments'
+            add_wf_history_action(item,
+                                  action_name=action_name,
+                                  action_label=action_label,
+                                  user_id=memberId)
+
             # processForm calls at_post_create_script too
             # this is necessary before adding annexes
             item.at_post_create_script()
@@ -992,19 +1002,10 @@ class SOAPView(BrowserView):
                     to_print=False,
                     confidential=False)
 
-            # change the comment in the item's add a line in the item's history
-            wfTool = api.portal.get_tool('portal_workflow')
-            itemWF = wfTool.getWorkflowsFor(item)[0]
-            itemWFId = itemWF.getId()
-            review_history = item.workflow_history[itemWFId]
-            review_history[0]['comments'] = translate(ITEM_SOAP_CREATED_COMMENT,
-                                                      domain='imio.pm.ws',
-                                                      context=portal.REQUEST)
-            item.workflow_history._p_changed = True
-
             # manage wfTransitions
             if wfTransitions:
                 # trigger transitions
+                wfTool = api.portal.get_tool('portal_workflow')
                 wf_comment = _('wf_transition_triggered_by_application')
                 with api.env.adopt_roles(roles=['Manager']):
                     for tr in wfTransitions:

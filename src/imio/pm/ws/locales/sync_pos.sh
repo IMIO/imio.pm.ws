@@ -1,4 +1,4 @@
-files="imio.pm.ws"
+files="imio.pm.ws imio.history plone"
 languages="en fr"
 
 for file in $files; do
