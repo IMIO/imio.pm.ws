@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.12 (unreleased)
+2.12 (2019-10-14)
 -----------------
 
 - Do not fail in 'getItemInfos' when returning POD templates if a POD template
