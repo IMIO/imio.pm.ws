@@ -647,7 +647,7 @@ SOAPAction: /
         # now with correct data
         req._creationData._groupsInCharge = [self.vendors_uid, self.developers_uid]
         newItem, response = self._createItem(req)
-        self.assertEqual(newItem.getGroupsInCharge(), (self.vendors_uid, self.developers_uid))
+        self.assertEqual(newItem.getGroupsInCharge(), [self.vendors_uid, self.developers_uid])
 
     def test_ws_createItemAssociatedGroups(self):
         """
