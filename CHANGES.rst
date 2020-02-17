@@ -6,7 +6,11 @@ Changelog
 
 - Manage field `toDiscuss` while creating new item.
   [gbastien]
-
+- Changed the way `wfTransitions` are managed in `createItem`: if a transition
+  is not available, it is ignored and next transition is tried, this way it is
+  easier to manage cases where item validation WF is different for proposing
+  groups.
+  [gbastien]
 
 2.12 (2019-10-14)
 -----------------

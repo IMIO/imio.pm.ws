@@ -26,7 +26,6 @@ from plone import api
 from plone import namedfile
 from plone.dexterity.utils import createContentInContainer
 from Products.Archetypes.atapi import RichWidget
-from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five import BrowserView
 from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
@@ -1014,16 +1013,18 @@ class SOAPView(BrowserView):
                 wf_comment = _('wf_transition_triggered_by_application')
                 with api.env.adopt_roles(roles=['Manager']):
                     for tr in wfTransitions:
-                        try:
-                            wfTool.doActionFor(item, tr, comment=wf_comment)
-                        except WorkflowException:
-                            msg = "While treating wfTransitions, could not " \
+                        available_transitions = [t['id'] for t in wfTool.getTransitionsFor(item)]
+                        if tr not in available_transitions:
+                            warning_message = "While treating wfTransitions, could not " \
                                 "trigger the '{0}' transition!".format(tr)
                             # additional info if failed to trigger the 'present' transition
                             if tr == 'present':
-                                msg = msg + " Make sure a meeting accepting items " \
+                                warning_message += " Make sure a meeting accepting items " \
                                     "exists in configuration '{0}'!".format(cfg.getId())
-                            raise ZSI.Fault(ZSI.Fault.Client, msg)
+                            warnings.append(warning_message)
+                            continue
+                        # we are sure transition is available, trigger it
+                        wfTool.doActionFor(item, tr, comment=wf_comment)
 
             # log finally
             logger.info('Item at "%s"%s SOAP created by "%s".' %

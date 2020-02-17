@@ -765,37 +765,28 @@ SOAPAction: /
         self.changeUser('pmCreator1')
         req = self._prepareCreationData()
 
-        # while passing no correct data
-        req._wfTransitions = ['unknown_transition']
-        responseHolder = createItemResponse()
-        with self.assertRaises(ZSI.Fault) as cm:
-            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
-        self.assertEqual(
-            cm.exception.string,
-            "While treating wfTransitions, could not trigger the 'unknown_transition' transition!")
-
         # correct wfTransitions
         req._wfTransitions = ['propose', 'validate']
         newItem, response = self._createItem(req)
         self.assertEqual(newItem.queryState(), 'validated')
+        self.assertEqual(response._warnings, [])
 
         # correct and incorrect wfTransitions
         req._wfTransitions = ['propose', 'unknown_transition', 'validate']
-        responseHolder = createItemResponse()
-        with self.assertRaises(ZSI.Fault) as cm:
-            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.queryState(), 'validated')
         self.assertEqual(
-            cm.exception.string,
-            "While treating wfTransitions, could not trigger the 'unknown_transition' transition!")
+            response._warnings,
+            ["While treating wfTransitions, could not trigger the 'unknown_transition' transition!"])
 
         # 'present' with no available meeting
         req._wfTransitions = ['propose', 'validate', 'present']
-        with self.assertRaises(ZSI.Fault) as cm:
-            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        newItem, response = self._createItem(req)
+        self.assertEqual(newItem.queryState(), 'validated')
         self.assertEqual(
-            cm.exception.string,
-            "While treating wfTransitions, could not trigger the 'present' transition! "
-            "Make sure a meeting accepting items exists in configuration 'plonegov-assembly'!")
+            response._warnings,
+            ["While treating wfTransitions, could not trigger the 'present' transition! "
+             "Make sure a meeting accepting items exists in configuration 'plonegov-assembly'!"])
 
         # 'present' with available meeting
         self.changeUser('pmManager')
@@ -803,6 +794,7 @@ SOAPAction: /
         newItem, response = self._createItem(req)
         self.assertEqual(newItem.queryState(), 'presented')
         self.assertTrue(newItem in meeting.getItems())
+        self.assertEqual(response._warnings, [])
 
     def test_ws_createItemWithAutoAskedAdvices(self):
         """
