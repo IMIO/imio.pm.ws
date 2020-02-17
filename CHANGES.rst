@@ -4,7 +4,8 @@ Changelog
 2.13 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Manage field `toDiscuss` while creating new item.
+  [gbastien]
 
 
 2.12 (2019-10-14)

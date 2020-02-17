@@ -198,6 +198,7 @@
                     <xsd:element name="associatedGroups" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="groupsInCharge" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="optionalAdvisers" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="toDiscuss" type="xsd:boolean" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="extraAttrs" type="tns:ExtraAttr" minOccurs="0" maxOccurs="10"/>
                     <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="10"/>
@@ -241,7 +242,7 @@
                     <xsd:element name="preferredMeeting" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="preferred_meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="review_state" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-                    <xsd:element name="meeting" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element name="meeting" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
                     <xsd:element name="item_assembly" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="absolute_url" type="xsd:string" minOccurs="1" maxOccurs="1"/>

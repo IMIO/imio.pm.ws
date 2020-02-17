@@ -707,6 +707,11 @@ class SOAPView(BrowserView):
         if data['category'] is None:
             data['category'] = ''
 
+        # ignore boolean 'toDiscuss' that is None, it means it was not set
+        # or if value is set during item present
+        if data['toDiscuss'] is None:
+            data.pop('toDiscuss')
+
         # raise if we pass an optional attribute that is not activated in this MeetingConfig
         optionalItemFields = cfg.listUsedItemAttributes()
         activatedOptionalItemFields = cfg.getUsedItemAttributes()

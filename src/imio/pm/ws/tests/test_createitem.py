@@ -196,6 +196,47 @@ SOAPAction: /
         newItem, response = self._createItem(req)
         self.assertTrue(newItem.getMotivation() == '<p>Motivation sample text</p>')
 
+    def test_ws_createItemToDiscuss(self):
+        """
+          Test SOAP service behaviour when creating an item using toDiscuss :
+          - optional field so only useable when relevant;
+          - if not set, then default value is used.
+        """
+        cfg = self.meetingConfig
+        # by default no item exists
+        self.changeUser('pmCreator1')
+        req = self._prepareCreationData()
+        responseHolder = createItemResponse()
+        # we can not use an optional field that is not activated in the current MeetingConfig
+        cfg.setUsedItemAttributes(('description', 'detailedDescription',))
+        self.assertFalse('toDiscuss' in cfg.getUsedItemAttributes())
+        # set toDiscuss to True
+        req._creationData._toDiscuss = True
+        with self.assertRaises(ZSI.Fault) as cm:
+            SOAPView(self.portal, req).createItemRequest(req, responseHolder)
+        self.assertEqual(cm.exception.string,
+                         "The optional field \"toDiscuss\" is not activated in this configuration!")
+        # if we activate it, then the resulting item is correct
+        cfg.setUsedItemAttributes(cfg.getUsedItemAttributes() + ('toDiscuss', ))
+
+        # create item first time when default is True, then False
+        # as given in soap request, it is True each time
+        cfg.setToDiscussDefault(False)
+        newItem, response = self._createItem(req)
+        self.assertTrue(newItem.getToDiscuss())
+        cfg.setToDiscussDefault(True)
+        newItem, response = self._createItem(req)
+        self.assertTrue(newItem.getToDiscuss())
+        # if not set in soap request, parameter is ignored, again with default True and False
+        # as not given in soap request, it is the default defined value
+        req._creationData._toDiscuss = None
+        cfg.setToDiscussDefault(False)
+        newItem, response = self._createItem(req)
+        self.assertFalse(newItem.getToDiscuss())
+        cfg.setToDiscussDefault(True)
+        newItem, response = self._createItem(req)
+        self.assertTrue(newItem.getToDiscuss())
+
     def test_ws_createItemWithOneAnnexRequest(self):
         """
           Test SOAP service behaviour when creating items with one annex
