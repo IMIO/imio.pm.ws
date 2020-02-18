@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.13 (unreleased)
+2.13 (2020-02-18)
 -----------------
 
 - Manage field `toDiscuss` while creating new item.
