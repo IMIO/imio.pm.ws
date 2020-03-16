@@ -483,10 +483,11 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         item = self.create('MeetingItem')
         resp = self._getItemInfos(item.UID(), toBeDeserialized=False)
         # empty values are returned
+        self.assertTrue('_decision' in resp._itemInfo[0].__dict__)
         self.assertEqual(resp._itemInfo[0]._decision, '')
         resp = self._getItemInfos(item.UID(), showEmptyValues=False, toBeDeserialized=False)
         # empty values are no more returned
-        self.assertFalse('_decision' in resp._itemInfo[0])
+        self.assertFalse('_decision' in resp._itemInfo[0].__dict__)
         self.assertEqual(
             len(resp._itemInfo[0].__dict__),
             len([k for k, v in resp._itemInfo[0].__dict__.items() if v]))
