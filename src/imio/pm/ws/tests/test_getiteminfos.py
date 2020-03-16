@@ -22,7 +22,8 @@ import ZSI
 
 class testSOAPGetItemInfos(WS4PMTestCase):
     """
-        Tests the soap.getItemInfosRequest method by accessing the real SOAP service
+        Tests the soap.getItemInfosRequest and soap.getItemInfosRequest methods
+        by accessing the real SOAP service
     """
 
     def test_ws_getItemInfosRequest(self):
@@ -50,10 +51,11 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """<SOAP-ENV:Body xmlns:ns1="http://ws4pm.imio.be"><ns1:getItemInfosRequest>""" \
             """<UID>%s</UID><showExtraInfos>false</showExtraInfos><showAnnexes>false</showAnnexes>""" \
             """<include_annex_binary>true</include_annex_binary>""" \
-            """<showAssembly>false</showAssembly><showTemplates>false</showTemplates></ns1:getItemInfosRequest>""" \
+            """<showAssembly>false</showAssembly><showTemplates>false</showTemplates>""" \
+            """<showEmptyValues>true</showEmptyValues></ns1:getItemInfosRequest>""" \
             """</SOAP-ENV:Body></SOAP-ENV:Envelope>""" % newItemUID
         result = """%s""" % request
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
         # now really use the SOAP method to get informations about the item
         resp = self._getItemInfos(newItemUID)
         # the item is not in a meeting so the meeting date is 1950-01-01
@@ -85,7 +87,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
 """.format(newItemUID,
                 gDateTime.get_formatted_content(gDateTime(), localtime(newItem.created())),
                 gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())))
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
         self.changeUser('pmManager')
@@ -128,7 +130,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                 gDateTime.get_formatted_content(gDateTime(), localtime(itemInMeeting.modified())),
                 meeting.UID(),
                 meetingDate)
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # if the item with this UID has not been found (user can not access or item does not exists),
         # an empty response is returned
         # unexisting item UID
@@ -139,11 +141,11 @@ class testSOAPGetItemInfos(WS4PMTestCase):
             """xmlns:ZSI="http://www.zolera.com/schemas/ZSI/" """ \
             """xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 """
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # item UID the logged in user can not access
         self.changeUser('pmReviewer1')
         resp = self._getItemInfos(newItemUID)
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
 
     def test_ws_getItemInfosWithExtraInfosRequest(self):
         """
@@ -215,7 +217,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                 gDateTime.get_formatted_content(gDateTime(), localtime(newItem.modified())),
                 newItem.getId())
         # annexes are not shown by default
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # now with 'showAnnexes=True'
         financial_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('financial-analysis'))
         item_annex_type_id = calculate_category_id(cfg.annexes_types.item_annexes.get('item-annex'))
@@ -261,7 +263,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                 financial_annex_type_id,
                 base64.encodestring(get_annexes(newItem)[0].file.data))
         # one annex is shown
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
         # now check with several (2) annexes...
         afile = open(os.path.join(os.path.dirname(__file__),
                                   'mediumTestFile.odt'))
@@ -332,7 +334,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                 item_annex_type_id,
                 base64.encodestring(get_annexes(newItem)[1].file.data))
         # 2 annexes are shown
-        self.assertEquals(expected, resp)
+        self.assertEqual(expected, resp)
 
     def test_ws_getItemInfosWithPODTemplatesRequest(self):
         """
@@ -441,7 +443,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     def test_ws_getItemInfosWithBinary(self):
         """
           Test that getting an item with include_annex_binary return the annex
-          binary file
+          binary file.
         """
         self.changeUser('pmCreator1')
         self.failUnless(len(self.portal.portal_catalog(portal_type='MeetingItemPma')) == 0)
@@ -473,6 +475,22 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # attribute _file of the annex should be empty
         self.assertFalse(resp._itemInfo[0]._annexes[0]._file)
 
+    def test_ws_getItemInfosShowEmptyValues(self):
+        """
+          Parameter showEmptyValues=False will remove empty values from returned result.
+        """
+        self.changeUser('pmCreator1')
+        item = self.create('MeetingItem')
+        resp = self._getItemInfos(item.UID(), toBeDeserialized=False)
+        # empty values are returned
+        self.assertEqual(resp._itemInfo[0]._decision, '')
+        resp = self._getItemInfos(item.UID(), showEmptyValues=False, toBeDeserialized=False)
+        # empty values are no more returned
+        self.assertFalse('_decision' in resp._itemInfo[0])
+        self.assertEqual(
+            len(resp._itemInfo[0].__dict__),
+            len([k for k, v in resp._itemInfo[0].__dict__.items() if v]))
+
     def test_ws_getItemInfosInTheNameOf(self):
         """
           Test that getting an item inTheNameOf antother user works
@@ -501,8 +519,9 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
+        self.assertEqual(
+            cm.exception.string,
+            "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
         # now has a 'MeetingManager'
         self.changeUser('pmManager')
         # a MeetingManager can get informations inTheNameOf 'pmCreator1'
@@ -523,8 +542,9 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         cleanRamCacheFor('Products.PloneMeeting.ToolPloneMeeting.userIsAmong')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
-        self.assertEquals(cm.exception.string,
-                          "Trying to get item informations 'inTheNameOf' an unexisting user 'unexistingUserId'!")
+        self.assertEqual(
+            cm.exception.string,
+            "Trying to get item informations 'inTheNameOf' an unexisting user 'unexistingUserId'!")
 
     def test_ws_getItemInfosWithShowAssembly(self):
         """When showAssembly=True, assembly is returned in a text form
@@ -584,6 +604,29 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                          u'Absents|Monsieur Person1FirstName Person1LastName, Assembly member 1\n'
                          u'Monsieur Person3FirstName Person3LastName, Assembly member 3|'
                          u'Excused||itemAssemblyGuests|')
+
+    def test_ws_getSingleItemInfos(self):
+        """The getSingleItemInfos method behaves like getItemInfos
+            but returns one single item infos instead list of ItemInfo instances."""
+        self.changeUser('pmManager')
+        # item out of a meeting
+        item = self.create('MeetingItem')
+        item_uid = item.UID()
+        # informations returned by getItemInfos and getSingleItemInfos are equal
+        resp_getiteminfos = self._getItemInfos(item_uid, toBeDeserialized=False)
+        resp_getsimpleiteminfos = self._getItemInfos(item_uid, toBeDeserialized=False, useSingleItemInfos=True)
+        self.assertEqual(resp_getiteminfos._itemInfo[0].__dict__,
+                         resp_getsimpleiteminfos.__dict__)
+        # as well when using showEmptyValues=False
+        resp_getnotemptyiteminfos = self._getItemInfos(item_uid,
+                                                       showEmptyValues=False,
+                                                       toBeDeserialized=False)
+        resp_getnotemptysimpleiteminfos = self._getItemInfos(item_uid,
+                                                             showEmptyValues=False,
+                                                             toBeDeserialized=False,
+                                                             useSingleItemInfos=True)
+        self.assertEqual(resp_getnotemptyiteminfos._itemInfo[0].__dict__,
+                         resp_getnotemptysimpleiteminfos.__dict__)
 
 
 def test_suite():

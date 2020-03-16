@@ -32,6 +32,10 @@ getItemInfosRequest = GED("http://ws4pm.imio.be", "getItemInfosRequest").pyclass
 
 getItemInfosResponse = GED("http://ws4pm.imio.be", "getItemInfosResponse").pyclass
 
+getSingleItemInfosRequest = GED("http://ws4pm.imio.be", "getSingleItemInfosRequest").pyclass
+
+getSingleItemInfosResponse = GED("http://ws4pm.imio.be", "getSingleItemInfosResponse").pyclass
+
 getItemTemplateRequest = GED("http://ws4pm.imio.be", "getItemTemplateRequest").pyclass
 
 getItemTemplateResponse = GED("http://ws4pm.imio.be", "getItemTemplateResponse").pyclass
@@ -91,6 +95,13 @@ class WS4PM(ServiceSOAPBinding):
 
     soapAction['http://ws4pm.imio.be/getItemInfos'] = 'soap_getItemInfos'
     root[(getItemInfosRequest.typecode.nspname,getItemInfosRequest.typecode.pname)] = 'soap_getItemInfos'
+
+    def soap_getSingleItemInfos(self, ps, **kw):
+        request = ps.Parse(getSingleItemInfosRequest.typecode)
+        return request,getSingleItemInfosResponse()
+
+    soapAction['http://ws4pm.imio.be/getSingleItemInfos'] = 'soap_getSingleItemInfos'
+    root[(getSingleItemInfosRequest.typecode.nspname,getSingleItemInfosRequest.typecode.pname)] = 'soap_getSingleItemInfos'
 
     def soap_getItemTemplate(self, ps, **kw):
         request = ps.Parse(getItemTemplateRequest.typecode)

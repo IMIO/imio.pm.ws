@@ -41,6 +41,12 @@ class IItemInfosRequest(Interface):
     """
 
 
+class ISingleItemInfosRequest(Interface):
+    """
+    Marker interface for change request
+    """
+
+
 class IItemTemplateRequest(Interface):
     """
     Marker interface for change request

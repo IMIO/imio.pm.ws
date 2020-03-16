@@ -53,6 +53,10 @@
     <implements interface=".interfaces.IItemInfosRequest" />
   </class>
 
+  <class class=".WS4PM_server.getSingleItemInfosRequest">
+    <implements interface=".interfaces.ISingleItemInfosRequest" />
+  </class>
+
   <class class=".WS4PM_server.getItemTemplateRequest">
     <implements interface=".interfaces.IItemTemplateRequest" />
   </class>
@@ -76,6 +80,7 @@
              getConfigInfosRequest
              getUserInfosRequest
              getItemInfosRequest
+             getSingleItemInfosRequest
              getItemTemplateRequest
              searchItemsRequest
              meetingsAcceptingItemsRequest
@@ -150,6 +155,18 @@
   <utility
     factory=".WS4PM_server.getItemInfosResponse"
     name="getItemInfosRequest"
+    provides="z3c.soap.interfaces.IZSIResponseType"
+  />
+
+  <utility
+    factory=".WS4PM_server.getSingleItemInfosRequest"
+    name="getSingleItemInfosRequest"
+    provides="z3c.soap.interfaces.IZSIRequestType"
+  />
+
+  <utility
+    factory=".WS4PM_server.getSingleItemInfosResponse"
+    name="getSingleItemInfosRequest"
     provides="z3c.soap.interfaces.IZSIResponseType"
   />
 

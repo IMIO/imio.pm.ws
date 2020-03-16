@@ -91,6 +91,46 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element name="getSingleItemInfosRequest" type="tns:SingleItemInfosRequest"/>
+            <xsd:complexType name="SingleItemInfosRequest">
+                <xsd:sequence>
+                    <xsd:element name="UID" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                    <xsd:element name="showExtraInfos" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="showAnnexes" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="include_annex_binary" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="1"/>
+                    <xsd:element name="allowed_annexes_types" type="tns:List" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="showAssembly" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="showTemplates" type="xsd:boolean" maxOccurs="1" minOccurs="1" default="0"/>
+                    <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getSingleItemInfosResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="UID" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="creator" type="xsd:string" maxOccurs="1" minOccurs="1"/>
+                        <xsd:element name="creation_date" type="xsd:dateTime" maxOccurs="1" minOccurs="0"/>
+                        <xsd:element name="modification_date" type="xsd:dateTime" maxOccurs="1" minOccurs="0"/>
+                        <xsd:element name="category" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="detailedDescription" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="decision" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="preferredMeeting" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="preferred_meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="review_state" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="meeting" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="meeting_date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="item_assembly" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="absolute_url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="extraInfos" type="xsd:anyType"/>
+                        <xsd:element name="annexes" type="tns:AnnexInfo" minOccurs="0" maxOccurs="unbounded"/>
+                        <xsd:element name="templates" type="tns:TemplateInfo" minOccurs="0" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="getItemTemplateRequest" type="tns:ItemTemplateRequest"/>
             <xsd:complexType name="ItemTemplateRequest">
                 <xsd:sequence>
@@ -298,6 +338,12 @@
     <wsdl:message name="getItemInfosResponse">
         <wsdl:part name="return" element="tns:getItemInfosResponse"/>
     </wsdl:message>
+    <wsdl:message name="getSingleItemInfosRequest">
+        <wsdl:part name="parameters" element="tns:getSingleItemInfosRequest"/>
+    </wsdl:message>
+    <wsdl:message name="getSingleItemInfosResponse">
+        <wsdl:part name="return" element="tns:getSingleItemInfosResponse"/>
+    </wsdl:message>
     <wsdl:message name="getItemTemplateRequest">
         <wsdl:part name="parameters" element="tns:getItemTemplateRequest"/>
     </wsdl:message>
@@ -342,6 +388,10 @@
         <wsdl:operation name="getItemInfos">
             <wsdl:input message="tns:getItemInfosRequest"/>
             <wsdl:output message="tns:getItemInfosResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getSingleItemInfos">
+            <wsdl:input message="tns:getSingleItemInfosRequest"/>
+            <wsdl:output message="tns:getSingleItemInfosResponse"/>
         </wsdl:operation>
         <wsdl:operation name="getItemTemplate">
             <wsdl:input message="tns:getItemTemplateRequest"/>
@@ -415,6 +465,18 @@
                 <xsd:documentation> Method for getting informations about a precise item you know the UID of </xsd:documentation>
             </xsd:annotation>
             <soap:operation tal:attributes="soapAction string:${portal_url}/getItemInfos" soapAction="http://portal_url/getItemInfos"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSingleItemInfos">
+            <xsd:annotation>
+                <xsd:documentation> Method for getting informations about a precise item you know the UID of and that return the infos, not an ItemInfo instance </xsd:documentation>
+            </xsd:annotation>
+            <soap:operation tal:attributes="soapAction string:${portal_url}/getSingleItemInfos" soapAction="http://portal_url/getSingleItemInfos"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>

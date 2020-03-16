@@ -6,6 +6,8 @@ from imio.pm.ws.WS4PM_client import createItemRequest
 from imio.pm.ws.WS4PM_client import createItemResponse
 from imio.pm.ws.WS4PM_client import getItemInfosRequest
 from imio.pm.ws.WS4PM_client import getItemInfosResponse
+from imio.pm.ws.WS4PM_client import getSingleItemInfosRequest
+from imio.pm.ws.WS4PM_client import getSingleItemInfosResponse
 from imio.pm.ws.WS4PM_client import searchItemsResponse
 from lxml import etree
 from Products.PloneMeeting.tests.PloneMeetingTestCase import PloneMeetingTestCase
@@ -91,11 +93,16 @@ class WS4PMTestCase(PloneMeetingTestCase):
                       showAssembly=False,
                       showExtraInfos=False,
                       showTemplates=False,
-                      toBeDeserialized=True):
+                      showEmptyValues=True,
+                      toBeDeserialized=True,
+                      useSingleItemInfos=False):
         """
           Call getItemInfos SOAP method with given itemUID parameter
         """
-        req = getItemInfosRequest()
+        if useSingleItemInfos:
+            req = getSingleItemInfosRequest()
+        else:
+            req = getItemInfosRequest()
         req._UID = itemUID
         if showAnnexes:
             req._showAnnexes = True
@@ -109,8 +116,15 @@ class WS4PMTestCase(PloneMeetingTestCase):
             req._showAssembly = True
         if showTemplates:
             req._showTemplates = True
-        responseHolder = getItemInfosResponse()
-        response = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+        req._showEmptyValues = showEmptyValues
+
+        if useSingleItemInfos:
+            responseHolder = getSingleItemInfosResponse()
+            response = SOAPView(self.portal, req).getSingleItemInfosRequest(req, responseHolder)
+        else:
+            responseHolder = getItemInfosResponse()
+            response = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
+
         if toBeDeserialized:
             return deserialize(response)
         else:

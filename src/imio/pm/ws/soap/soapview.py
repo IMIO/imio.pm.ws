@@ -131,19 +131,72 @@ class SOAPView(BrowserView):
             params.pop('_showAssembly')
         if '_showTemplates' in params:
             params.pop('_showTemplates')
+        showEmptyValues = True
+        if '_showEmptyValues' in params:
+            showEmptyValues = params.pop('_showEmptyValues')
         inTheNameOf = None
         if '_inTheNameOf' in params:
-            inTheNameOf = params['_inTheNameOf']
-            params.pop('_inTheNameOf')
+            inTheNameOf = params.pop('_inTheNameOf')
 
-        response._itemInfo = self._getItemInfos(params,
-                                                request.__dict__.get('_showExtraInfos', False),
-                                                request.__dict__.get('_showAnnexes', False),
-                                                request.__dict__.get('_allowed_annexes_types', []),
-                                                request.__dict__.get('_include_annex_binary', True),
-                                                request.__dict__.get('_showAssembly', False),
-                                                request.__dict__.get('_showTemplates', False),
-                                                inTheNameOf)
+        infos = self._getItemInfos(
+            params,
+            request.__dict__.get('_showExtraInfos', False),
+            request.__dict__.get('_showAnnexes', False),
+            request.__dict__.get('_allowed_annexes_types', []),
+            request.__dict__.get('_include_annex_binary', True),
+            request.__dict__.get('_showAssembly', False),
+            request.__dict__.get('_showTemplates', False),
+            inTheNameOf)
+        if not showEmptyValues:
+            # remove empty data
+            for k, v in infos[0].__dict__.items():
+                if not v:
+                    delattr(infos[0], k)
+        response._itemInfo = infos
+        return response
+
+    def getSingleItemInfosRequest(self, request, response):
+        '''
+          This is the accessed SOAP method for getting informations about an existing item
+          This is an helper method when you just need to access an item you know the UID of
+        '''
+        params = dict(request.__dict__)
+
+        # remove params that are not search parameter
+        if '_showExtraInfos' in params:
+            params.pop('_showExtraInfos')
+        if '_showAnnexes' in params:
+            params.pop('_showAnnexes')
+        if '_allowed_annexes_types' in params:
+            params.pop('_allowed_annexes_types')
+        if '_include_annex_binary' in params:
+            params.pop('_include_annex_binary')
+        if '_showAssembly' in params:
+            params.pop('_showAssembly')
+        if '_showTemplates' in params:
+            params.pop('_showTemplates')
+        showEmptyValues = True
+        if '_showEmptyValues' in params:
+            showEmptyValues = params.pop('_showEmptyValues')
+        inTheNameOf = None
+        if '_inTheNameOf' in params:
+            inTheNameOf = params.pop('_inTheNameOf')
+
+        infos = self._getItemInfos(
+            params,
+            request.__dict__.get('_showExtraInfos', False),
+            request.__dict__.get('_showAnnexes', False),
+            request.__dict__.get('_allowed_annexes_types', []),
+            request.__dict__.get('_include_annex_binary', True),
+            request.__dict__.get('_showAssembly', False),
+            request.__dict__.get('_showTemplates', False),
+            inTheNameOf)
+        if not showEmptyValues:
+            # remove empty data
+            for k, v in infos[0].__dict__.items():
+                if not v:
+                    delattr(infos[0], k)
+        response.__dict__ = infos[0].__dict__
         return response
 
     def getItemTemplateRequest(self, request, response):

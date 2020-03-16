@@ -4,8 +4,10 @@ Changelog
 2.14 (unreleased)
 -----------------
 
-- Nothing changed yet.
-
+- Added method `getSingleItemInfos` that return a single item informations,
+  not a list of `ItemInfo` instances.
+  Result and paramaters are exactly same as `getItemInfos`.
+  [gbastien]
 
 2.13 (2020-02-18)
 -----------------
