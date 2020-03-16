@@ -191,7 +191,6 @@ class SOAPView(BrowserView):
             request.__dict__.get('_showAssembly', False),
             request.__dict__.get('_showTemplates', False),
             inTheNameOf)
-        import ipdb; ipdb.set_trace()
         if not showEmptyValues:
             # remove empty data
             for k, v in infos[0].__dict__.items():
