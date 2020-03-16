@@ -8,6 +8,11 @@ Changelog
   not a list of `ItemInfo` instances.
   Result and paramaters are exactly same as `getItemInfos`.
   [gbastien]
+- Make most most of data returned by `getItemInfos` nillable.
+  [gbastien]
+- Added parameter `showEmptyValues=1` by default to `getItemInfos`,
+  making it possible to remove empty values from returned result.
+  [gbastien]
 
 2.13 (2020-02-18)
 -----------------
