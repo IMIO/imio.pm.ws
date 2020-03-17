@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.14 (unreleased)
+2.14 (2020-03-17)
 -----------------
 
 - Added method `getSingleItemInfos` that return a single item informations,
