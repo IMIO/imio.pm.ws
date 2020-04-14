@@ -594,14 +594,14 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                          u'Attendees|Monsieur Person1FirstName Person1LastName, Assembly member 1\n'
                          u'Monsieur Person2FirstName Person2LastName, Assembly member 2\n'
                          u'Monsieur Person3FirstName Person3LastName, Assembly member 3\n'
-                         u'Monsieur Person4FirstName Person4LastName, Assembly member 4|'
+                         u'Monsieur Person4FirstName Person4LastName, Assembly member 4 & 5|'
                          u'Absents||Excused||itemAssemblyGuests|')
         # define absent on item
         meeting.itemAbsents[item_uid] = [item.getAttendees()[0], item.getAttendees()[2]]
         resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
         self.assertEqual(resp.ItemInfo[0]._item_assembly,
                          u'Attendees|Monsieur Person2FirstName Person2LastName, Assembly member 2\n'
-                         u'Monsieur Person4FirstName Person4LastName, Assembly member 4|'
+                         u'Monsieur Person4FirstName Person4LastName, Assembly member 4 & 5|'
                          u'Absents|Monsieur Person1FirstName Person1LastName, Assembly member 1\n'
                          u'Monsieur Person3FirstName Person3LastName, Assembly member 3|'
                          u'Excused||itemAssemblyGuests|')

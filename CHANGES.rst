@@ -4,8 +4,10 @@ Changelog
 2.15 (unreleased)
 -----------------
 
-- Nothing changed yet.
-
+- Fixed `test_ws_getItemInfosWithShowAssembly` as default value in
+  `PloneMeeting` testing profile changed to test held position having a
+  `&` character (non XHTML character).
+  [gbastien]
 
 2.14 (2020-03-17)
 -----------------
