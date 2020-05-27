@@ -8,6 +8,11 @@ Changelog
   `PloneMeeting` testing profile changed to test held position having a
   `&` character (non XHTML character).
   [gbastien]
+- When library `chardet` is available, it wrongly detect utf-8 passed string to
+  `BeautifulSoup` as being `iso-8859-1` leading to incorrect special characters.
+  `chardet` is now availabe because a dependency of `collective.zamqp`.
+  So pass `unicode` string to `BeautifulSoup` to avoid this.
+  [gbastien]
 
 2.14 (2020-03-17)
 -----------------
