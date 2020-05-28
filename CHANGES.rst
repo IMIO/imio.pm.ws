@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.15 (unreleased)
+2.15 (2020-05-28)
 -----------------
 
 - Fixed `test_ws_getItemInfosWithShowAssembly` as default value in
