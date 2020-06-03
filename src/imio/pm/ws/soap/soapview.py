@@ -1063,7 +1063,7 @@ class SOAPView(BrowserView):
             if wfTransitions:
                 # trigger transitions
                 wfTool = api.portal.get_tool('portal_workflow')
-                wf_comment = _('wf_transition_triggered_by_application')
+                wf_comment = 'wf_transition_triggered_by_application'
                 with api.env.adopt_roles(roles=['Manager']):
                     for tr in wfTransitions:
                         available_transitions = [t['id'] for t in wfTool.getTransitionsFor(item)]

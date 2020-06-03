@@ -4,8 +4,11 @@ Changelog
 2.16 (unreleased)
 -----------------
 
-- Nothing changed yet.
-
+- When adding `wf_transition_triggered_by_application` comment to
+  `workflow_history`, do not use a `zope.i18nmessageid.message.Message` or
+  it is stored this way in workflow_history, use a simple string and
+  it will be translated by `imio.history`.
+  [gbastien]
 
 2.15 (2020-05-28)
 -----------------
