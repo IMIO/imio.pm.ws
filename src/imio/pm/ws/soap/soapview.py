@@ -29,7 +29,6 @@ from Products.Archetypes.atapi import RichWidget
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five import BrowserView
 from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
-from Products.PloneMeeting.config import PMMessageFactory as _
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
 from Products.PloneMeeting.MeetingItem import MeetingItem
 from Products.PloneMeeting.utils import add_wf_history_action
