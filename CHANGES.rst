@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.16 (unreleased)
+2.16 (2020-06-11)
 -----------------
 
 - When adding `wf_transition_triggered_by_application` comment to
