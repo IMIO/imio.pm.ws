@@ -143,7 +143,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
 """
         self.assertEqual(expected, resp)
         # item UID the logged in user can not access
-        self.changeUser('pmReviewer1')
+        self.changeUser('pmReviewer2')
         resp = self._getItemInfos(newItemUID)
         self.assertEqual(expected, resp)
 

@@ -4,8 +4,12 @@ Changelog
 2.17 (unreleased)
 -----------------
 
-- Nothing changed yet.
-
+- Fixed `test_ws_getItemInfosRequest` now that observers may access item since
+  WF initial state, make sure we use a member that does not have access to item
+  at all and fixed `test_ws_getConfigInfosItemPositiveDecidedStates`, field
+  `MeetingConfig.itemPositiveDecidedStates` was removed and is now managed by
+  `MeetingConfig.getItemPositiveDecidedStates` method.
+  [gbastien]
 
 2.16 (2020-06-11)
 -----------------

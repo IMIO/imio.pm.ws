@@ -120,7 +120,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
                          cfg.getItemPositiveDecidedStates())
         self.assertTrue(deserialize(response))
         # works if no itemPositiveDecidedStates defined
-        cfg.setItemPositiveDecidedStates(())
+        cfg.getItemPositiveDecidedStates = lambda: ()
         response = SOAPView(self.portal, req).getConfigInfosRequest(req, responseHolder)
         self.assertEqual(response._configInfo[0]._itemPositiveDecidedStates, ())
         self.assertTrue(deserialize(response))
