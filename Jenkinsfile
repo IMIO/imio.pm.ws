@@ -51,7 +51,7 @@ pipeline {
 					CAUSE = get_cause()
 					commitMessageSkip = sh(script: "git log --oneline -1 | grep '${SKIP_PATTERN}'", returnStatus: true)
 					echo "commitMessageSkip = ${commitMessageSkip}"
-					skip = CAUSE != "UPSTREAM" && commitmessage == 0
+					skip = CAUSE != "UPSTREAM" && commitMessageSkip == 0
 					echo "skip = ${skip}"
 					if (skip == true) {
 						currentBuild.result = 'NOT_BUILT'
