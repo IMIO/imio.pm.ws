@@ -1,3 +1,34 @@
+def SKIP_PATTERN = ".*?ci.skip.*"
+def CAUSE = 'default'
+
+def skip = false
+
+def get_cause(){
+    node {
+        def UpstreamCause = currentBuild.rawBuild.getCause(hudson.model.Cause$UpstreamCause)
+        def UserIdCause = currentBuild.rawBuild.getCause(hudson.model.Cause$UserIdCause)
+        def RemoteCause = currentBuild.rawBuild.getCause(hudson.model.Cause$RemoteCause)
+        def TimerTriggerCause = currentBuild.rawBuild.getCause(hudson.triggers.TimerTrigger$TimerTriggerCause)
+        def SCMTriggerCause = currentBuild.rawBuild.getCause(hudson.triggers.SCMTrigger$SCMTriggerCause)
+        def GitHubPushCause = currentBuild.rawBuild.getCause(GitHubPushCause)
+        def BranchEventCause = currentBuild.rawBuild.getCause(jenkins.branch.BranchEventCause)
+
+        if (UpstreamCause != null) {
+          return 'UPSTREAM'
+        } else if (SCMTriggerCause != null || GitHubPushCause != null || BranchEventCause != null) {
+          return 'SCM'
+        } else if (UserIdCause != null) {
+          return 'USER'
+        } else if (RemoteCause != null) {
+          return 'REMOTE'
+        } else if (TimerTriggerCause != null) {
+          return 'TIMER'
+        }
+
+        return 'UNKNOWN'
+    }
+}
+
 pipeline {
     agent any
 
@@ -11,7 +42,20 @@ pipeline {
     }
 
     stages {
+		stage('Initialize') {
+			steps {
+				CAUSE = get_cause()
+				commitmessage =  = sh(script: "git log -1", returnStatus: true) 
+				skip = CAUSE != "UPSTREAM" && commitmessage ==~ SKIP_PATTERN
+				if (skip) {
+					manager.build.result = hudson.model.Result.NOT_BUILT
+				}
+			}
+		}
         stage('Build') {
+			when {
+			  not { expression { skip == true } }
+			}
             steps {
                 cache(maxCacheSize: 850, caches: [[$class: 'ArbitraryFileCache', excludes: '', path: "${WORKSPACE}/eggs"]]){
                     script {
@@ -22,6 +66,9 @@ pipeline {
             }
         }
         stage('Code Analysis') {
+            when {
+			  not { expression { skip == true } }
+			}
             steps {
 		        script {
 		            sh "bin/python bin/code-analysis"
@@ -30,6 +77,9 @@ pipeline {
             }
         }
         stage('Test Coverage') {
+            when {
+			  not { expression { skip == true } }
+			}
             steps {
                 script {
 		    def zServerPort = new Random().nextInt(10000) + 30000
@@ -40,6 +90,9 @@ pipeline {
         }
 	    
 	stage('Publish Coverage') {
+            when {
+			  not { expression { skip == true } }
+			}
             steps {
                 catchError(buildResult: null, stageResult: 'FAILURE') {
                     cobertura (
@@ -58,6 +111,9 @@ pipeline {
     post{
         always{
             chuckNorris()
+			if (skip) {
+				manager.build.result = hudson.model.Result.NOT_BUILT
+			}
         }
         aborted{
             mail to: 'pm-interne@imio.be',
