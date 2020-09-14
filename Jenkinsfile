@@ -48,7 +48,6 @@ pipeline {
 		stage('Initialize') {
 			steps {
 				script {
-					echo "getting cause"
 					CAUSE = get_cause()
 					commitMessageSkip = sh(script: "git log --oneline -1 | grep '${SKIP_PATTERN}'", returnStatus: true)
 					echo "commitMessageSkip = ${commitMessageSkip}"
