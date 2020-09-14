@@ -49,6 +49,7 @@ pipeline {
 			steps {
 				script {
 					CAUSE = get_cause()
+					echo "CAUSE = ${CAUSE}"
 					commitMessage = sh(script: "git log --oneline -1", returnStdout: true)
 					echo "commitMessage = ${commitMessage}"
 					skip = CAUSE != "UPSTREAM" && commitMessage ==~ SKIP_PATTERN
