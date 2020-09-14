@@ -45,7 +45,7 @@ pipeline {
 		stage('Initialize') {
 			steps {
 				CAUSE = get_cause()
-				commitmessage =  = sh(script: "git log -1", returnStatus: true) 
+				commitmessage =  = sh(script: "git log -1") 
 				skip = CAUSE != "UPSTREAM" && commitmessage ==~ SKIP_PATTERN
 				if (skip) {
 					manager.build.result = hudson.model.Result.NOT_BUILT
