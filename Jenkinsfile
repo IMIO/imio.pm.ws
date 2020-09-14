@@ -44,17 +44,19 @@ pipeline {
     stages {
 		stage('Initialize') {
 			steps {
-				CAUSE = get_cause()
-				commitmessage =  = sh(script: "git log -1") 
-				skip = CAUSE != "UPSTREAM" && commitmessage ==~ SKIP_PATTERN
-				if (skip) {
-					manager.build.result = hudson.model.Result.NOT_BUILT
+				script {
+					CAUSE = get_cause()
+					sh(script: "git log -1")
+					skip = CAUSE != "UPSTREAM" && commitmessage ==~ SKIP_PATTERN
+					if (skip == true) {
+						manager.build.result = hudson.model.Result.NOT_BUILT
+					}
 				}
 			}
 		}
         stage('Build') {
 			when {
-			  not { expression { skip == true } }
+				expression { skip == false }
 			}
             steps {
                 cache(maxCacheSize: 850, caches: [[$class: 'ArbitraryFileCache', excludes: '', path: "${WORKSPACE}/eggs"]]){
@@ -67,7 +69,7 @@ pipeline {
         }
         stage('Code Analysis') {
             when {
-			  not { expression { skip == true } }
+				expression { skip == false }
 			}
             steps {
 		        script {
@@ -78,12 +80,12 @@ pipeline {
         }
         stage('Test Coverage') {
             when {
-			  not { expression { skip == true } }
+				expression { skip == false }
 			}
             steps {
                 script {
-		    def zServerPort = new Random().nextInt(10000) + 30000
-		    sh "env ZSERVER_PORT=${zServerPort}  bin/coverage run --source=imio.pm.ws bin/test"
+					def zServerPort = new Random().nextInt(10000) + 30000
+					sh "env ZSERVER_PORT=${zServerPort}  bin/coverage run --source=imio.pm.ws bin/test"
                     sh 'bin/python bin/coverage xml -i'
                 }
             }
@@ -91,7 +93,7 @@ pipeline {
 	    
 	stage('Publish Coverage') {
             when {
-			  not { expression { skip == true } }
+				expression { skip == false }
 			}
             steps {
                 catchError(buildResult: null, stageResult: 'FAILURE') {
@@ -111,9 +113,6 @@ pipeline {
     post{
         always{
             chuckNorris()
-			if (skip) {
-				manager.build.result = hudson.model.Result.NOT_BUILT
-			}
         }
         aborted{
             mail to: 'pm-interne@imio.be',
