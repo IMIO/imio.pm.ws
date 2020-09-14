@@ -50,7 +50,8 @@ pipeline {
 				script {
 					CAUSE = get_cause()
 					commitMessage = sh(script: "git log --oneline -1", returnStdout: true)
-					echo "CAUSE = ${CAUSE} - commitMessage = ${commitMessage}"
+					commitMessage = commitMessage.trim()
+					echo "CAUSE = ${CAUSE} - commitMessage = '${commitMessage}'"
 					skip = CAUSE != "UPSTREAM"
 					echo "CAUSE != 'UPSTREAM = ${skip}"
 					skip = commitMessage ==~ SKIP_PATTERN
