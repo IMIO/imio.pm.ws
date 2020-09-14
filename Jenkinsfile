@@ -1,3 +1,6 @@
+import com.cloudbees.jenkins.GitHubRepositoryName
+import com.cloudbees.jenkins.GitHubPushCause
+
 def SKIP_PATTERN = ".*?ci.skip.*"
 def CAUSE = 'default'
 
@@ -45,11 +48,14 @@ pipeline {
 		stage('Initialize') {
 			steps {
 				script {
+					echo "getting cause"
 					CAUSE = get_cause()
-					sh(script: "git log -1")
-					skip = CAUSE != "UPSTREAM" && commitmessage ==~ SKIP_PATTERN
+					commitMessageSkip = sh(script: "git log --oneline -1 | grep '${SKIP_PATTERN}'", returnStatus: true)
+					echo "commitMessageSkip = ${commitMessageSkip}"
+					skip = CAUSE != "UPSTREAM" && commitmessage == 0
+					echo "skip = ${skip}"
 					if (skip == true) {
-						manager.build.result = hudson.model.Result.NOT_BUILT
+						currentBuild.result = 'NOT_BUILT'
 					}
 				}
 			}
