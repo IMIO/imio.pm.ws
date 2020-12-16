@@ -11,6 +11,9 @@ Changelog
   `MeetingConfig.itemPositiveDecidedStates` was removed and is now managed by
   `MeetingConfig.getItemPositiveDecidedStates` method.
   [gbastien]
+- Fixed `getItemInfosRequest/getSingleItemInfosRequest` that was breaking when
+  no result and `showEmptyValues=0`.
+  [gbastien]
 
 2.16 (2020-06-11)
 -----------------

@@ -146,7 +146,7 @@ class SOAPView(BrowserView):
             request.__dict__.get('_showAssembly', False),
             request.__dict__.get('_showTemplates', False),
             inTheNameOf)
-        if not showEmptyValues:
+        if infos and not showEmptyValues:
             # remove empty data
             for k, v in infos[0].__dict__.items():
                 if not v:
@@ -190,12 +190,15 @@ class SOAPView(BrowserView):
             request.__dict__.get('_showAssembly', False),
             request.__dict__.get('_showTemplates', False),
             inTheNameOf)
-        if not showEmptyValues:
-            # remove empty data
-            for k, v in infos[0].__dict__.items():
-                if not v:
-                    delattr(infos[0], k)
-        response.__dict__ = infos[0].__dict__
+        if infos:
+            if not showEmptyValues:
+                # remove empty data
+                for k, v in infos[0].__dict__.items():
+                    if not v:
+                        delattr(infos[0], k)
+            response.__dict__ = infos[0].__dict__
+        else:
+            response.__dict__ = {}
         return response
 
     def getItemTemplateRequest(self, request, response):
