@@ -14,6 +14,12 @@ Changelog
 - Fixed `getItemInfosRequest/getSingleItemInfosRequest` that was breaking when
   no result and `showEmptyValues=0`.
   [gbastien]
+- Adapted tests and code regarding fact that Meeting was moved from AT to DX
+  (`linkedMeetingUID` index is renamed to `meeting_uid`, `Meeting.date` attribute
+  holds a `datetime` instead a `DateTime`, `attendees` related methods use
+  snake_case instead camelCase on both `Meeting` and `MeetingItem`,
+  every methods on Meeting use snake_case).
+  [gbastien]
 
 2.16 (2020-06-11)
 -----------------

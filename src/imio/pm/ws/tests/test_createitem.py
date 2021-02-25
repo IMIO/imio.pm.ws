@@ -2,27 +2,9 @@
 #
 # File: test_createitem.py
 #
-# Copyright (c) 2013 by Imio.be
-#
 # GNU General Public License (GPL)
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-# 02110-1301, USA.
-#
 
-from DateTime import DateTime
 from imio.helpers.cache import cleanRamCacheFor
 from imio.pm.ws.soap.soapview import MIMETYPE_NOT_FOUND_OF_ANNEX_WARNING
 from imio.pm.ws.soap.soapview import MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING
@@ -571,7 +553,7 @@ SOAPAction: /
         """
         self.changeUser('pmManager')
         # create a fresh meeting that will accept items
-        meeting = self.create('Meeting', date='2015/01/01')
+        meeting = self.create('Meeting')
         req = self._prepareCreationData()
         req._creationData._preferredMeeting = 'unexisting_meeting_UID'
         responseHolder = createItemResponse()
@@ -768,13 +750,13 @@ SOAPAction: /
         # correct wfTransitions
         req._wfTransitions = ['propose', 'validate']
         newItem, response = self._createItem(req)
-        self.assertEqual(newItem.queryState(), 'validated')
+        self.assertEqual(newItem.query_state(), 'validated')
         self.assertEqual(response._warnings, [])
 
         # correct and incorrect wfTransitions
         req._wfTransitions = ['propose', 'unknown_transition', 'validate']
         newItem, response = self._createItem(req)
-        self.assertEqual(newItem.queryState(), 'validated')
+        self.assertEqual(newItem.query_state(), 'validated')
         self.assertEqual(
             response._warnings,
             ["While treating wfTransitions, could not trigger the 'unknown_transition' transition!"])
@@ -782,7 +764,7 @@ SOAPAction: /
         # 'present' with no available meeting
         req._wfTransitions = ['propose', 'validate', 'present']
         newItem, response = self._createItem(req)
-        self.assertEqual(newItem.queryState(), 'validated')
+        self.assertEqual(newItem.query_state(), 'validated')
         self.assertEqual(
             response._warnings,
             ["While treating wfTransitions, could not trigger the 'present' transition! "
@@ -790,10 +772,10 @@ SOAPAction: /
 
         # 'present' with available meeting
         self.changeUser('pmManager')
-        meeting = self.create('Meeting', date=DateTime('2019/08/27'))
+        meeting = self.create('Meeting')
         newItem, response = self._createItem(req)
-        self.assertEqual(newItem.queryState(), 'presented')
-        self.assertTrue(newItem in meeting.getItems())
+        self.assertEqual(newItem.query_state(), 'presented')
+        self.assertTrue(newItem in meeting.get_items())
         self.assertEqual(response._warnings, [])
 
     def test_ws_createItemWithAutoAskedAdvices(self):

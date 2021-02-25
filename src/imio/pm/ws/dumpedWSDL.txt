@@ -153,7 +153,7 @@
                     <xsd:element name="getProposingGroup" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="portal_type" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="review_state" type="xsd:string" maxOccurs="1" minOccurs="0"/>
-                    <xsd:element name="linkedMeetingUID" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+                    <xsd:element name="meeting_uid" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="meetingConfigId" type="xsd:string" maxOccurs="1" minOccurs="0"/>
                     <xsd:element name="externalIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="inTheNameOf" type="xsd:string" maxOccurs="1" minOccurs="0"/>

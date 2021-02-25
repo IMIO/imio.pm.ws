@@ -470,11 +470,12 @@ class SOAPView(BrowserView):
                 itemInfo._preferredMeeting = not preferred == ITEM_NO_PREFERRED_MEETING_VALUE and preferred or ''
                 preferredMeeting_brains = uid_catalog.searchResults(UID=preferred)
                 preferredMeeting = preferredMeeting_brains and preferredMeeting_brains[0].getObject() or None
-                itemInfo._preferred_meeting_date = localtime(preferredMeeting and preferredMeeting.getDate() or noDate)
+                itemInfo._preferred_meeting_date = \
+                    preferredMeeting and preferredMeeting.date.utctimetuple() or localtime(noDate)
                 itemInfo._review_state = wfTool.getInfoFor(item, 'review_state')
                 meeting = item.hasMeeting() and item.getMeeting()
                 itemInfo._meeting = meeting and meeting.UID() or None
-                itemInfo._meeting_date = localtime(meeting and meeting.getDate() or noDate)
+                itemInfo._meeting_date = meeting and meeting.date.utctimetuple() or localtime(noDate)
                 itemInfo._absolute_url = item.absolute_url()
                 itemInfo._externalIdentifier = item.getField('externalIdentifier').getAccessor(item)()
                 itemInfo._extraInfos = {}
@@ -523,7 +524,7 @@ class SOAPView(BrowserView):
                         # contacts
                         # attendees
                         assembly_lines.append('Attendees')
-                        attendees = item.getAttendees(theObjects=True)
+                        attendees = item.get_attendees(the_objects=True)
                         attendees_lines = []
                         for attendee in attendees:
                             attendees_lines.append(attendee.get_short_title())
@@ -531,7 +532,7 @@ class SOAPView(BrowserView):
 
                         # absents
                         assembly_lines.append('Absents')
-                        absents = item.getItemAbsents(theObjects=True)
+                        absents = item.get_item_absents(the_objects=True)
                         absents_lines = []
                         for absent in absents:
                             absents_lines.append(absent.get_short_title())
@@ -539,7 +540,7 @@ class SOAPView(BrowserView):
 
                         # excused
                         assembly_lines.append('Excused')
-                        excused = item.getItemExcused(theObjects=True)
+                        excused = item.get_item_excused(the_objects=True)
                         excused_lines = []
                         for excused_contact in excused:
                             excused_lines.append(excused_contact.get_short_title())
@@ -687,7 +688,7 @@ class SOAPView(BrowserView):
                 meeting = brain.getObject()
                 meetingInfo = MeetingInfo()
                 meetingInfo._UID = meeting.UID()
-                meetingInfo._date = localtime(meeting.getDate())
+                meetingInfo._date = meeting.date.utctimetuple()
 
                 logger.info('MeetingConfig at %s SOAP accessed by "%s" to get meetings accepting items.' %
                             (cfg.absolute_url_path(), memberId))

@@ -114,7 +114,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         # not useGroupsAsCategories
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
-        itemInMeeting = meeting.getItemsInOrder()[0]
+        itemInMeeting = meeting.get_items(ordered=True)[0]
         # by default, PloneMeeting creates item without title/description/decision...
         itemInMeeting.setTitle('My new item title')
         itemInMeeting.setDescription('<p>Description</p>', mimetype='text/x-html-safe')
@@ -124,7 +124,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         req._getCategory = ''
         resp = self._searchItems(req)
         itemInMeetingUID = itemInMeeting.UID()
-        meetingDate = gDateTime.get_formatted_content(gDateTime(), localtime(meeting.getDate()))
+        meetingDate = gDateTime.get_formatted_content(gDateTime(), meeting.date.utctimetuple())
         # searching for items can returns several items
         # for example here, searching for 'item title' in existing items title will returns 2 items...
         expected = """<ns1:searchItemsResponse xmlns:ns1="http://ws4pm.imio.be" """ \
@@ -314,18 +314,18 @@ class testSOAPSearchItems(WS4PMTestCase):
         self.assertEqual(len(result._itemInfo), 1)
         self.assertEqual(result._itemInfo[0].UID, item2.UID())
 
-    def test_ws_searchItemsLinkedMeetingUID(self):
-        """Test search param linkedMeetingUID."""
+    def test_ws_searchItemsMeetingUID(self):
+        """Test search param meeting_uid."""
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
         req = searchItemsRequest()
         responseHolder = searchItemsResponse()
         # unknown meeting UID
         self.changeUser('pmCreator1')
-        req._linkedMeetingUID = 'unknown_uid'
+        req._meeting_uid = 'unknown_uid'
         result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         self.assertEqual(len(result._itemInfo), 0)
-        req._linkedMeetingUID = meeting.UID()
+        req._meeting_uid = meeting.UID()
         result = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         # only get items user may view
         self.assertEqual(len(result._itemInfo), 2)

@@ -92,13 +92,13 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # we have valid informations about the meeting_date
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
-        itemInMeeting = meeting.getItemsInOrder()[0]
+        itemInMeeting = meeting.get_items(ordered=True)[0]
         # by default, PloneMeeting creates item without title/description/decision...
         itemInMeeting.setTitle('My new item title')
         itemInMeeting.setDescription('<p>Description</p>', mimetype='text/x-html-safe')
         itemInMeeting.setDecision('<p>Décision</p>', mimetype='text/x-html-safe')
         resp = self._getItemInfos(itemInMeeting.UID())
-        meetingDate = gDateTime.get_formatted_content(gDateTime(), localtime(meeting.getDate()))
+        meetingDate = gDateTime.get_formatted_content(gDateTime(), meeting.date.utctimetuple())
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
             """xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" """ \
             """xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" """ \
@@ -559,7 +559,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
 
         # item in a meeting
         meeting = self._createMeetingWithItems()
-        item = meeting.getItemsInOrder()[0]
+        item = meeting.get_items(ordered=True)[0]
         item_uid = item.UID()
         # showAssembly=False
         resp = self._getItemInfos(item_uid, showAssembly=False, toBeDeserialized=False)
@@ -585,7 +585,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         ordered_contacts = cfg.getField('orderedContacts').Vocabulary(cfg).keys()
         cfg.setOrderedContacts(ordered_contacts)
         meeting = self._createMeetingWithItems()
-        item = meeting.getItemsInOrder()[0]
+        item = meeting.get_items(ordered=True)[0]
         item_uid = item.UID()
         resp = self._getItemInfos(item_uid, showAssembly=False, toBeDeserialized=False)
         self.assertIsNone(resp.ItemInfo[0]._item_assembly)
@@ -597,7 +597,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
                          u'Monsieur Person4FirstName Person4LastName, Assembly member 4 & 5|'
                          u'Absents||Excused||itemAssemblyGuests|')
         # define absent on item
-        meeting.itemAbsents[item_uid] = [item.getAttendees()[0], item.getAttendees()[2]]
+        item_attendees = item.get_attendees()
+        meeting.item_absents[item_uid] = [item_attendees[0], item_attendees[2]]
         resp = self._getItemInfos(item_uid, showAssembly=True, toBeDeserialized=False)
         self.assertEqual(resp.ItemInfo[0]._item_assembly,
                          u'Attendees|Monsieur Person2FirstName Person2LastName, Assembly member 2\n'
