@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from archetypes.schemaextender.field import ExtensionField
 from archetypes.schemaextender.interfaces import IBrowserLayerAwareExtender
 from archetypes.schemaextender.interfaces import ISchemaExtender
@@ -19,7 +21,7 @@ class ExternalIdentifierExtender(object):
 
     implements(ISchemaExtender, IBrowserLayerAwareExtender)
 
-    #adapts elements that provide the IExternalIdentifierable marker interface
+    # adapts elements that provide the IExternalIdentifierable marker interface
     adapts(IExternalIdentifierable)
 
     layer = IWS4PMLayer

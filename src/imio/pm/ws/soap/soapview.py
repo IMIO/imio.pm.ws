@@ -884,7 +884,7 @@ class SOAPView(BrowserView):
             for field in MeetingItem.schema.fields():
                 fieldName = field.getName()
                 if fieldName in managedFieldIds and field.widget.getName() in ['RichWidget', 'VisualWidget', ]:
-                        htmlFieldIds.append(fieldName)
+                    htmlFieldIds.append(fieldName)
             warnWrongHTML = False
             if cleanHtml:
                 cleaner = Cleaner()

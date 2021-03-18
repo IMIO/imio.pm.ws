@@ -2,14 +2,8 @@
 #
 # File: setuphandlers.py
 #
-# Copyright (c) 2013 by Imio
-#
 # GNU General Public License (GPL)
 #
-
-__author__ = """Gauthier Bastien <gauthier@imio.be>"""
-__docformat__ = 'plaintext'
-
 
 from Products.CMFCore.utils import getToolByName
 
@@ -30,7 +24,8 @@ def postInstall(context):
         return
 
     portal = context.getSite()
-    #Update schema of existing MeetingItems to take new fields added by schemaextender
+    # Update schema of existing MeetingItems to take
+    # new fields added by schemaextender
     _updateMeetingItemsSchema(portal)
 
 
