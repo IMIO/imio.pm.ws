@@ -2,8 +2,8 @@ Changelog
 =========
 
 
-2.17 (unreleased)
------------------
+3.0 (unreleased)
+----------------
 
 - Fixed `test_ws_getItemInfosRequest` now that observers may access item since
   WF initial state, make sure we use a member that does not have access to item
