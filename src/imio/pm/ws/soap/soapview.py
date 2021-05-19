@@ -462,7 +462,10 @@ class SOAPView(BrowserView):
                 itemInfo._creator = item.Creator()
                 itemInfo._creation_date = localtime(item.created())
                 itemInfo._modification_date = localtime(item.modified())
-                itemInfo._category = item.getCategory()
+                # keep the original category/proposingGroup magic
+                category_or_proposing_group = item.getCategory() and \
+                    item.getCategory(theObject=True) or item.getProposingGroup(theObject=True)
+                itemInfo._category = category_or_proposing_group.getId()
                 itemInfo._description = item.getRawDescription()
                 itemInfo._detailedDescription = item.getRawDetailedDescription()
                 itemInfo._decision = item.getRawDecision(keepWithNext=False)
@@ -494,7 +497,7 @@ class SOAPView(BrowserView):
                                                                                 domain='plone',
                                                                                 context=portal.REQUEST)
                     # add the category title
-                    itemInfo._extraInfos['category_title'] = item.getCategory(theObject=True).Title()
+                    itemInfo._extraInfos['category_title'] = category_or_proposing_group.Title()
                     # add the creator fullname
                     itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
                 if showAnnexes:

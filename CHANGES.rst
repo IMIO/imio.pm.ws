@@ -20,6 +20,9 @@ Changelog
   snake_case instead camelCase on both `Meeting` and `MeetingItem`,
   every methods on Meeting use snake_case).
   [gbastien]
+- Adapted code now that `MeetingItem.getCategory` does only return the real
+  category and not the `proposingGroup` when category not used.
+  [gbastien]
 
 2.16 (2020-06-11)
 -----------------
