@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.0 (unreleased)
+3.0 (2021-07-16)
 ----------------
 
 - Fixed `test_ws_getItemInfosRequest` now that observers may access item since
