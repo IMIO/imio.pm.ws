@@ -692,14 +692,13 @@ class SOAPView(BrowserView):
                 meetingInfo = MeetingInfo()
                 meetingInfo._UID = meeting.UID()
                 meetingInfo._date = meeting.date.utctimetuple()
-
-                logger.info('MeetingConfig at %s SOAP accessed by "%s" to get meetings accepting items.' %
-                            (cfg.absolute_url_path(), memberId))
                 res.append(meetingInfo,)
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
                 setSecurityManager(oldsm)
+        logger.info('MeetingConfig at %s SOAP accessed by "%s" to get meetings accepting items.' %
+                    (cfg.absolute_url_path(), memberId))
         return res
 
     def _createItem(self,

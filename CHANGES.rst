@@ -5,8 +5,9 @@ Changelog
 3.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- In `_meetingsAcceptingItems`, log only one time in the Zope log at the end or
+  we have the impression that the method was called many times.
+  [gbastien]
 
 3.0 (2021-07-16)
 ----------------
