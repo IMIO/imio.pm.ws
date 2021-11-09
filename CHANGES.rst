@@ -11,6 +11,9 @@ Changelog
   `MeetingConfig.itemPositiveDecidedStates` was removed and is now managed by
   `MeetingConfig.getItemPositiveDecidedStates` method.
   [gbastien]
+- In `_meetingsAcceptingItems`, log only one time in the Zope log at the end or
+  we have the impression that the method was called many times.
+  [gbastien]
 
 2.16 (2020-06-11)
 -----------------
