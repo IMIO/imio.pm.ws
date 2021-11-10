@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.1 (unreleased)
+3.1 (2021-11-10)
 ----------------
 
 - In `_meetingsAcceptingItems`, log only one time in the Zope log at the end or
