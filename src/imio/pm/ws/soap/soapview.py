@@ -366,7 +366,7 @@ class SOAPView(BrowserView):
             # returns only groups the user is member of with the defined
             # suffix, either it will returns every groups the user is member of
             tool = api.portal.get_tool('portal_plonemeeting')
-            # backward compatibility, get_orgs_for_user received 'suffix' before but 'suffixes' now
+            # backward compatibility,   _user received 'suffix' before but 'suffixes' now
             suffixes = suffix and [suffix] or []
             orgs = tool.get_orgs_for_user(user_id=userId, suffixes=suffixes, the_objects=True)
             for org in orgs:
@@ -723,13 +723,15 @@ class SOAPView(BrowserView):
         # - the user we want to create an item for exists
         if inTheNameOf:
             if not self._mayAccessAdvancedFunctionnalities():
-                raise ZSI.Fault(ZSI.Fault.Client,
-                                "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
-                raise ZSI.Fault(ZSI.Fault.Client,
-                                "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
+                raise ZSI.Fault(
+                    ZSI.Fault.Client,
+                    "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
         memberId = member.getId()
 
         # check that the given meetingConfigId exists
@@ -743,10 +745,12 @@ class SOAPView(BrowserView):
         proposingGroupUID = org_id_to_uid(proposingGroupId, raise_on_error=False)
         if not proposingGroupUID:
             proposingGroupUID = proposingGroupId
-        userOrgUids = tool.get_orgs_for_user(user_id=memberId, suffixes=['creators'], the_ojects=False)
+        userOrgUids = tool.get_orgs_for_user(
+            user_id=memberId, suffixes=['creators'], the_objects=False)
         if proposingGroupUID not in userOrgUids:
-            raise ZSI.Fault(ZSI.Fault.Client,
-                            "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
+            raise ZSI.Fault(
+                ZSI.Fault.Client,
+                "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
 
         # title is mandatory!
         if not creationData.__dict__['_title']:
