@@ -368,7 +368,7 @@ class SOAPView(BrowserView):
             tool = api.portal.get_tool('portal_plonemeeting')
             # backward compatibility, get_orgs_for_user received 'suffix' before but 'suffixes' now
             suffixes = suffix and [suffix] or []
-            orgs = tool.get_orgs_for_user(user_id=userId, suffixes=suffixes)
+            orgs = tool.get_orgs_for_user(user_id=userId, suffixes=suffixes, the_objects=True)
             for org in orgs:
                 basicInfo = BasicInfo()
                 basicInfo._UID = org.UID()
@@ -743,7 +743,7 @@ class SOAPView(BrowserView):
         proposingGroupUID = org_id_to_uid(proposingGroupId, raise_on_error=False)
         if not proposingGroupUID:
             proposingGroupUID = proposingGroupId
-        userOrgUids = tool.get_orgs_for_user(user_id=memberId, suffixes=['creators'], the_objects=False)
+        userOrgUids = tool.get_orgs_for_user(user_id=memberId, suffixes=['creators'], the_ojects=False)
         if proposingGroupUID not in userOrgUids:
             raise ZSI.Fault(ZSI.Fault.Client,
                             "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))

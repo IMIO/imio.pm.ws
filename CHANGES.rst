@@ -5,8 +5,9 @@ Changelog
 3.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Call `ToolPloneMeeting.get_orgs_for_user` with `the_objects=True/False`
+  when relevant as default value changed in `Products.PloneMeeting`.
+  [gbastien]
 
 3.1 (2021-11-10)
 ----------------
