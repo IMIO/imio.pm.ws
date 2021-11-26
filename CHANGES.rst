@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.2 (unreleased)
+3.2 (2021-11-26)
 ----------------
 
 - Call `ToolPloneMeeting.get_orgs_for_user` with `the_objects=True/False`
