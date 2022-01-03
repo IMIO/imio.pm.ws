@@ -5,8 +5,10 @@ Changelog
 3.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Fixed `SOAPView._mayAccessAdvancedFunctionnalities`, call
+  `ToolPloneMeeting.isManager` with `ToolPloneMeeting` instance as first arg,
+  required now for caching reasons.
+  [gbastien]
 
 3.2 (2021-11-26)
 ----------------
