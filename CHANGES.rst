@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.3 (unreleased)
+3.3 (2022-01-04)
 ----------------
 
 - Fixed `SOAPView._mayAccessAdvancedFunctionnalities`, call
