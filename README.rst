@@ -3,6 +3,8 @@ Introduction
 
 SOAP webservices for Products.PloneMeeting.
 
+Version 2.x is for Products.PloneMeeting 4.1 and version 3.x is for Products.PloneMeeting 4.2.
+
 WS4PM files
 ===========
 

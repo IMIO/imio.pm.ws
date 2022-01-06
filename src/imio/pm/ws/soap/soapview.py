@@ -438,6 +438,11 @@ class SOAPView(BrowserView):
         # if we are getting item informations inTheNameOf, use this user for the rest of the process
         res = []
         try:
+            # remove AUTHENTICATED_USER during adopt_user to avoid
+            # breaking utils.get_current_user_id
+            auth_user = self.request.get("AUTHENTICATED_USER")
+            if auth_user:
+                self.request["AUTHENTICATED_USER"] = None
             if inTheNameOf:
                 oldsm = getSecurityManager()
                 newSecurityManager(portal.REQUEST, member)
@@ -576,6 +581,8 @@ class SOAPView(BrowserView):
             # fallback to original user calling the SOAP method
             if inTheNameOf:
                 setSecurityManager(oldsm)
+            if auth_user:
+                self.request["AUTHENTICATED_USER"] = auth_user
         return res
 
     def _getItemTemplate(self, itemUID, templateId, inTheNameOf):
@@ -1107,7 +1114,7 @@ class SOAPView(BrowserView):
           MeetingConfig to be able to use 'inTheNameOf' or a 'Manager'.
         '''
         tool = api.portal.get_tool('portal_plonemeeting')
-        if tool.userIsAmong(['meetingmanagers']) or tool.isManager(tool, realManagers=True):
+        if tool.userIsAmong(['meetingmanagers']) or tool.isManager(realManagers=True):
             return True
 
         return False

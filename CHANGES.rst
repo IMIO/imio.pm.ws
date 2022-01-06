@@ -5,8 +5,8 @@ Changelog
 3.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Fixed call to `tool.isManager` and handle `utils.get_current_user_id`.
+  [gbastien]
 
 3.3 (2022-01-04)
 ----------------
