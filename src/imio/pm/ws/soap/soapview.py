@@ -440,9 +440,9 @@ class SOAPView(BrowserView):
         try:
             # remove AUTHENTICATED_USER during adopt_user to avoid
             # breaking utils.get_current_user_id
-            auth_user = self.request.get("AUTHENTICATED_USER")
+            auth_user = portal.REQUEST.get("AUTHENTICATED_USER")
             if auth_user:
-                self.request["AUTHENTICATED_USER"] = None
+                portal.REQUEST["AUTHENTICATED_USER"] = None
             if inTheNameOf:
                 oldsm = getSecurityManager()
                 newSecurityManager(portal.REQUEST, member)
@@ -582,7 +582,7 @@ class SOAPView(BrowserView):
             if inTheNameOf:
                 setSecurityManager(oldsm)
             if auth_user:
-                self.request["AUTHENTICATED_USER"] = auth_user
+                portal.REQUEST["AUTHENTICATED_USER"] = auth_user
         return res
 
     def _getItemTemplate(self, itemUID, templateId, inTheNameOf):
