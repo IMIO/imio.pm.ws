@@ -608,6 +608,11 @@ class SOAPView(BrowserView):
 
         # if we are creating an item inTheNameOf, use this user for the rest of the process
         try:
+            # remove AUTHENTICATED_USER during adopt_user to avoid
+            # breaking utils.get_current_user_id
+            auth_user = portal.REQUEST.get("AUTHENTICATED_USER")
+            if auth_user:
+                portal.REQUEST["AUTHENTICATED_USER"] = None
             if inTheNameOf:
                 oldsm = getSecurityManager()
                 newSecurityManager(portal.REQUEST, member)
@@ -644,6 +649,8 @@ class SOAPView(BrowserView):
             # fallback to original user calling the SOAP method
             if inTheNameOf:
                 setSecurityManager(oldsm)
+            if auth_user:
+                portal.REQUEST["AUTHENTICATED_USER"] = auth_user
         return res
 
     def _getExtraInfosFields(self, item):
