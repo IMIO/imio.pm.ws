@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.4 (unreleased)
+3.4 (2022-01-07)
 ----------------
 
 - Fixed call to `tool.isManager` and handle `utils.get_current_user_id`.
