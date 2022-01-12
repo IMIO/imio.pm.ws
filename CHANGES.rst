@@ -5,8 +5,13 @@ Changelog
 3.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Fixed bug in `_createItem` where it could happen that user used `inTheNameOf`
+  had cached `_listAllowedRolesAndUsers` resulting in seeing too much or not
+  enough in the dashboard.  Accessing an item that should not be displayed ended
+  in an Unauthorized though.
+  Every method using inTheName of now use
+  `setup_user_in_the_name_of`/`teardown_user_in_the_name_of` to handle it correctly.
+  [gbastien]
 
 3.4 (2022-01-07)
 ----------------

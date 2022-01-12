@@ -58,6 +58,25 @@ MULTIPLE_EXTENSION_FOR_MIMETYPE_OF_ANNEX_WARNING = "Could not determine an exten
 ITEM_SOAP_CREATED = "create_item_using_imio_pm_ws_soap"
 
 
+def setup_user_in_the_name_of(portal, member):
+    """ """
+    # remove AUTHENTICATED_USER during adopt_user to avoid
+    # breaking utils.get_current_user_id
+    original_auth_user = portal.REQUEST.get("AUTHENTICATED_USER")
+    if original_auth_user:
+        portal.REQUEST["AUTHENTICATED_USER"] = None
+
+    oldsm = getSecurityManager()
+    newSecurityManager(portal.REQUEST, member)
+    return oldsm, original_auth_user
+
+
+def teardown_user_in_the_name_of(portal, oldsm, original_auth_user):
+    """ """
+    setSecurityManager(oldsm)
+    portal.REQUEST["AUTHENTICATED_USER"] = original_auth_user
+
+
 class SOAPView(BrowserView):
     """
       class delivering SOAP methods for Products.PloneMeeting
@@ -438,14 +457,8 @@ class SOAPView(BrowserView):
         # if we are getting item informations inTheNameOf, use this user for the rest of the process
         res = []
         try:
-            # remove AUTHENTICATED_USER during adopt_user to avoid
-            # breaking utils.get_current_user_id
-            auth_user = portal.REQUEST.get("AUTHENTICATED_USER")
-            if auth_user:
-                portal.REQUEST["AUTHENTICATED_USER"] = None
             if inTheNameOf:
-                oldsm = getSecurityManager()
-                newSecurityManager(portal.REQUEST, member)
+                oldsm, original_auth_user = setup_user_in_the_name_of(portal, member)
 
             # force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
             params['meta_type'] = 'MeetingItem'
@@ -580,9 +593,7 @@ class SOAPView(BrowserView):
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
-                setSecurityManager(oldsm)
-            if auth_user:
-                portal.REQUEST["AUTHENTICATED_USER"] = auth_user
+                teardown_user_in_the_name_of(portal, oldsm, original_auth_user)
         return res
 
     def _getItemTemplate(self, itemUID, templateId, inTheNameOf):
@@ -608,14 +619,8 @@ class SOAPView(BrowserView):
 
         # if we are creating an item inTheNameOf, use this user for the rest of the process
         try:
-            # remove AUTHENTICATED_USER during adopt_user to avoid
-            # breaking utils.get_current_user_id
-            auth_user = portal.REQUEST.get("AUTHENTICATED_USER")
-            if auth_user:
-                portal.REQUEST["AUTHENTICATED_USER"] = None
             if inTheNameOf:
-                oldsm = getSecurityManager()
-                newSecurityManager(portal.REQUEST, member)
+                oldsm, original_auth_user = setup_user_in_the_name_of(portal, member)
 
             # search for the item, this will also check if the user can actually access it
             catalog = api.portal.get_tool('portal_catalog')
@@ -648,9 +653,7 @@ class SOAPView(BrowserView):
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
-                setSecurityManager(oldsm)
-            if auth_user:
-                portal.REQUEST["AUTHENTICATED_USER"] = auth_user
+                teardown_user_in_the_name_of(portal, oldsm, original_auth_user)
         return res
 
     def _getExtraInfosFields(self, item):
@@ -694,8 +697,7 @@ class SOAPView(BrowserView):
         res = []
         try:
             if inTheNameOf:
-                oldsm = getSecurityManager()
-                newSecurityManager(portal.REQUEST, member)
+                oldsm, original_auth_user = setup_user_in_the_name_of(portal, member)
 
             brains = cfg.getMeetingsAcceptingItems()
             for brain in brains:
@@ -710,7 +712,8 @@ class SOAPView(BrowserView):
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
-                setSecurityManager(oldsm)
+                teardown_user_in_the_name_of(portal, oldsm, original_auth_user)
+
         logger.info('MeetingConfig at %s SOAP accessed by "%s" to get meetings accepting items.' %
                     (cfg.absolute_url_path(), memberId))
         return res
@@ -881,8 +884,7 @@ class SOAPView(BrowserView):
         try:
             # if we are creating an item inTheNameOf, use this user for the rest of the process
             if inTheNameOf:
-                oldsm = getSecurityManager()
-                newSecurityManager(portal.REQUEST, member)
+                oldsm, original_auth_user = setup_user_in_the_name_of(portal, member)
 
             # get or create the meetingFolder the item will be created in
             # if the user does not have a memberArea
@@ -1110,7 +1112,7 @@ class SOAPView(BrowserView):
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
-                setSecurityManager(oldsm)
+                teardown_user_in_the_name_of(portal, oldsm, original_auth_user)
         return item.UID(), warnings
 
     def _mayAccessAdvancedFunctionnalities(self):
