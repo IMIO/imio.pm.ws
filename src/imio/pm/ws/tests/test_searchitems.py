@@ -313,6 +313,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         result = SOAPView(self.portal, req).getItemInfosRequest(req, responseHolder)
         self.assertEqual(len(result._itemInfo), 1)
         self.assertEqual(result._itemInfo[0].UID, item2.UID())
+        self._check_after_inTheNameOf()
 
     def test_ws_searchItemsMeetingUID(self):
         """Test search param meeting_uid."""

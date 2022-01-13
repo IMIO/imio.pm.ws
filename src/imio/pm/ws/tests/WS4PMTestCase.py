@@ -138,6 +138,22 @@ class WS4PMTestCase(PloneMeetingTestCase):
         response = SOAPView(self.portal, req).searchItemsRequest(req, responseHolder)
         return deserialize(response)
 
+    def _check_after_inTheNameOf(self):
+        """
+          After a call using inTheNameOf, check that _listAllowedRolesAndUsers
+          is still correct. This check a bug that was making
+          ToolPloneMeeting.get_plone_groups_for_user caching wrong.
+          This happened before because ToolPloneMeeting.get_plone_groups_for_user
+          had a different value between request.AUTHENTICATED_USER and
+          api.user.get_current
+        """
+        for user_id in ('pmCreator1', 'pmCreator2', 'pmManager'):
+            self.changeUser(user_id)
+            # 2 extra values, the user_id and role "Anonymous"
+            self.assertEqual(
+                len(self.catalog._listAllowedRolesAndUsers(self.member)),
+                len(self.member.getGroups()) + len(self.member.getRoles()) + 2)
+
 
 def serializeRequest(request):
     tc = getattr(request, 'typecode', None)

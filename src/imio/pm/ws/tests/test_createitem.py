@@ -493,17 +493,22 @@ SOAPAction: /
           - the calling user must be 'Manager' or 'MeetingManager'
           - the created item is finally like if created by the inTheNameOf user
         """
+        self.meetingConfig.setUseGroupsAsCategories(False)
         # check first a working example the degrades it...
         # and every related informations (creator, ownership, ...) are corretly linked to inTheNameOf user
         self.changeUser('pmManager')
         req = self._prepareCreationData()
         req._inTheNameOf = 'pmCreator2'
         req._proposingGroupId = 'vendors'
+        req._creationData._category = 'development'
+        data = {'title': 'My annex 1', 'filename': 'smallTestFile.pdf', 'file': 'smallTestFile.pdf'}
+        req._creationData._annexes = [self._prepareAnnexInfo(**data)]
         responseHolder = createItemResponse()
         response = SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         # as we switch user while using inTheNameOf, make sure we have
         # falled back to original user
         self.assertTrue(self.portal.portal_membership.getAuthenticatedMember().getId() == 'pmManager')
+        # make also sure that cached methods using user_id are correct as well
         newItem = self.portal.uid_catalog(UID=response._UID)[0].getObject()
         # as the item is really created by the inTheNameOf user, everything is correct
         self.assertEqual(newItem.Creator(), 'pmCreator2')
@@ -545,6 +550,10 @@ SOAPAction: /
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEqual(cm.exception.string, "No member area for 'pmCreator2'.  Never connected to PloneMeeting?")
+        # test that _listAllowedRolesAndUsers is not messed up
+        # this happened before because ToolPloneMeeting.get_plone_groups_for_user
+        # had a different value between request.AUTHENTICATED_USER and api.user.get_current
+        self._check_after_inTheNameOf()
 
     def test_ws_createItemWithPreferredMeeting(self):
         """

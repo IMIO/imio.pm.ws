@@ -546,6 +546,7 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         self.assertEqual(
             cm.exception.string,
             "Trying to get item informations 'inTheNameOf' an unexisting user 'unexistingUserId'!")
+        self._check_after_inTheNameOf()
 
     def test_ws_getItemInfosWithShowAssembly(self):
         """When showAssembly=True, assembly is returned in a text form
