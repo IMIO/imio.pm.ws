@@ -146,6 +146,7 @@ class testSOAPGetItemTemplate(WS4PMTestCase):
             SOAPView(self.portal, req).getItemTemplateRequest(req, responseHolder)
         self.assertEquals(cm.exception.string,
                           "Trying to create an item 'inTheNameOf' an unexisting user 'unexistingUserId'!")
+        self._check_after_inTheNameOf()
 
     def _isCorrectlyRenderedTemplate(self, renderedTemplate, item):
         """ """

@@ -554,12 +554,7 @@ SOAPAction: /
         # test that _listAllowedRolesAndUsers is not messed up
         # this happened before because ToolPloneMeeting.get_plone_groups_for_user
         # had a different value between request.AUTHENTICATED_USER and api.user.get_current
-        for user_id in ('pmCreator1', 'pmCreator2', 'pmManager'):
-            self.changeUser(user_id)
-            # 2 extra values, the user_id and role "Anonymous"
-            self.assertEqual(
-                len(self.catalog._listAllowedRolesAndUsers(self.member)),
-                len(self.member.getGroups()) + len(self.member.getRoles()) + 2)
+        self._check_after_inTheNameOf()
 
     def test_ws_createItemWithPreferredMeeting(self):
         """
