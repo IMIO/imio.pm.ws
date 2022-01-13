@@ -16,7 +16,6 @@ from imio.pm.ws.tests.WS4PMTestCase import WS4PMTestCase
 from imio.pm.ws.WS4PM_client import createItemResponse
 from magic import MagicException
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
-from Products.PloneMeeting.config import MEETINGMANAGERS_GROUP_SUFFIX
 from Products.PloneMeeting.utils import get_annexes
 from zope.i18n import translate
 from ZSI.schema import GTD
