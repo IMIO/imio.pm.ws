@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.5 (unreleased)
+3.5 (2022-01-14)
 ----------------
 
 - Fixed bug in `_createItem` where it could happen that user used `inTheNameOf`
