@@ -5,8 +5,9 @@ Changelog
 2.18 (unreleased)
 -----------------
 
-- Nothing changed yet.
-
+- Whenever a `ZSI.Fault` error is raised, display also the message in the log manually
+  because `z3c.soap` will not display the error string, only the traceback...
+  [gbastien]
 
 2.17 (2021-11-09)
 -----------------
