@@ -77,17 +77,6 @@ pipeline {
                 }
             }
         }
-        stage('Code Analysis') {
-            when {
-				expression { skip == false }
-			}
-            steps {
-		        script {
-		            sh "bin/python bin/code-analysis"
-		            warnings canComputeNew: false, canResolveRelativePaths: false, parserConfigurations: [[parserName: 'Pep8', pattern: '**/parts/code-analysis/flake8.log']]
-                }
-            }
-        }
         stage('Test Coverage') {
             when {
 				expression { skip == false }
