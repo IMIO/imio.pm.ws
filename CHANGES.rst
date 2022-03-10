@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.6 (unreleased)
+3.6 (2022-03-10)
 ----------------
 
 - Whenever a `ZSI.Fault` error is raised, display also the message in the log manually

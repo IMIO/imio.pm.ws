@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '3.6.dev0'
+version = '3.6'
 
 setup(name='imio.pm.ws',
       version=version,
