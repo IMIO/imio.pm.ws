@@ -77,6 +77,12 @@ def teardown_user_in_the_name_of(portal, oldsm, original_auth_user):
     portal.REQUEST["AUTHENTICATED_USER"] = original_auth_user
 
 
+def raiseMsg(msg):
+    """ """
+    logger.error(msg)
+    raise ZSI.Fault(ZSI.Fault.Client, msg)
+
+
 class SOAPView(BrowserView):
     """
       class delivering SOAP methods for Products.PloneMeeting
@@ -271,9 +277,8 @@ class SOAPView(BrowserView):
 
         # this is only available to 'Manager' and 'MeetingManager'
         if not self._mayAccessAdvancedFunctionnalities():
-            msg = "You need to be 'Manager' or 'MeetingManager' to check if an element is linked to an item!"
-            logger.error(msg)
-            raise ZSI.Fault(ZSI.Fault.Client, msg)
+            raiseMsg(
+                "You need to be 'Manager' or 'MeetingManager' to check if an element is linked to an item!")
 
         # perform the unrestrictedSearchResult
         tool = api.portal.get_tool('portal_plonemeeting')
@@ -282,9 +287,7 @@ class SOAPView(BrowserView):
         if meetingConfigId:
             mc = getattr(tool, meetingConfigId, None)
             if not mc or not mc.meta_type == 'MeetingConfig':
-                msg = "Unknown meetingConfigId : '%s'!" % meetingConfigId
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("Unknown meetingConfigId : '%s'!" % meetingConfigId)
             query['portal_type'] = mc.getItemTypeName()
         query['externalIdentifier'] = externalIdentifier
         catalog = api.portal.get_tool('portal_catalog')
@@ -310,15 +313,11 @@ class SOAPView(BrowserView):
         # passing a userToShowCategoriesFor is only available to 'Manager' and 'MeetingManager'
         if userToShowCategoriesFor:
             if not self._mayAccessAdvancedFunctionnalities():
-                msg = "You need to be 'Manager' or 'MeetingManager' to get available categories for a user!"
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("You need to be 'Manager' or 'MeetingManager' to get available categories for a user!")
             # check that the passed userId exists...
             user = portal.acl_users.getUserById(userToShowCategoriesFor)
             if not user:
-                msg = "Trying to get avaialble categories for an unexisting user '%s'!" % userToShowCategoriesFor
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("Trying to get avaialble categories for an unexisting user '%s'!" % userToShowCategoriesFor)
 
         # MeetingConfigs
         config_infos = []
@@ -368,19 +367,15 @@ class SOAPView(BrowserView):
         # must have the 'MeetingManager' or 'Manager' role
         if not memberId == userId:
             if not self._mayAccessAdvancedFunctionnalities():
-                msg = "You need to be 'Manager' or 'MeetingManager' to get " \
-                    "user informations for another user than '%s'!" % memberId
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("You need to be 'Manager' or 'MeetingManager' to get "
+                         "user informations for another user than '%s'!" % memberId)
 
         # if getting user informations about the currently connected user
         # or the connected user is MeetingManager/Manager, proceed!
         user = api.user.get(userId)
 
         if not user:
-            msg = "Trying to get user informations for an unexisting user '%s'!" % userId
-            logger.error(msg)
-            raise ZSI.Fault(ZSI.Fault.Client, msg)
+            raiseMsg("Trying to get user informations for an unexisting user '%s'!" % userId)
 
         # show groups the user is member of if specified
         userGroups = []
@@ -429,9 +424,7 @@ class SOAPView(BrowserView):
         # check if we received at least one search parameter because calling the portal_catalog without search parameter
         # will return the entire catalog (even if we subforce using 'MeetingItem' meta_type here above)
         if not params:
-            msg = "Define at least one search parameter!"
-            logger.error(msg)
-            raise ZSI.Fault(ZSI.Fault.Client, msg)
+            raiseMsg("Define at least one search parameter!")
 
         # if we specify in the request that we want to get infos about an item
         # for another user, we need to check that :
@@ -439,15 +432,11 @@ class SOAPView(BrowserView):
         # - the user we want to get informations for exists
         if inTheNameOf:
             if not self._mayAccessAdvancedFunctionnalities():
-                msg = "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!"
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
-                msg = "Trying to get item informations 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("Trying to get item informations 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
         memberId = member.getId()
 
         tool = api.portal.get_tool('portal_plonemeeting')
@@ -457,9 +446,7 @@ class SOAPView(BrowserView):
             meetingConfigId = params['meetingConfigId']
             mc = getattr(tool, meetingConfigId, None)
             if not mc or not mc.meta_type == 'MeetingConfig':
-                msg = "Unknown meetingConfigId : '%s'!" % meetingConfigId
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("Unknown meetingConfigId : '%s'!" % meetingConfigId)
             params['portal_type'] = mc.getItemTypeName()
 
         # if we are getting item informations inTheNameOf, use this user for the rest of the process
@@ -616,15 +603,11 @@ class SOAPView(BrowserView):
         # - the user we want to get informations for exists
         if inTheNameOf:
             if not self._mayAccessAdvancedFunctionnalities():
-                msg = "You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!"
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("You need to be 'Manager' or 'MeetingManager' to get a template for an item 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
-                msg = "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
 
         # if we are creating an item inTheNameOf, use this user for the rest of the process
         try:
@@ -635,9 +618,7 @@ class SOAPView(BrowserView):
             catalog = api.portal.get_tool('portal_catalog')
             brains = catalog(UID=itemUID)
             if not brains:
-                msg = "You can not access this item!"
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("You can not access this item!")
 
             # check that the template is available to the member
             item = brains[0].getObject()
@@ -648,9 +629,7 @@ class SOAPView(BrowserView):
                     theTemplate = template
                     break
             if not theTemplate:
-                msg = "You can not access this template!"
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("You can not access this template!")
 
             # we can access the item and the template, proceed!
             # generate the template and return the result
@@ -662,9 +641,7 @@ class SOAPView(BrowserView):
                 item.REQUEST.set('output_format', templateId.split(POD_TEMPLATE_ID_PATTERN.format('', ''))[1])
                 res = view()
             except Exception, e:
-                msg = "Exception : %s" % e.message
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("Exception : %s" % e.message)
         finally:
             # fallback to original user calling the SOAP method
             if inTheNameOf:
@@ -694,22 +671,16 @@ class SOAPView(BrowserView):
         # - the user we want to get informations for exists
         if inTheNameOf:
             if not self._mayAccessAdvancedFunctionnalities():
-                msg = "You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!"
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("You need to be 'Manager' or 'MeetingManager' to get item informations 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
-                msg = "Trying to get meetings accepting items 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("Trying to get meetings accepting items 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
         memberId = member.getId()
 
         cfg = getattr(tool, meetingConfigId or '', None)
         if not cfg or not cfg.meta_type == 'MeetingConfig':
-            msg = "Unknown meetingConfigId : '%s'!" % meetingConfigId
-            logger.error(msg)
-            raise ZSI.Fault(ZSI.Fault.Client, msg)
+            raiseMsg("Unknown meetingConfigId : '%s'!" % meetingConfigId)
 
         # if we are getting item informations inTheNameOf, use this user for the rest of the process
         res = []
@@ -758,23 +729,17 @@ class SOAPView(BrowserView):
         # - the user we want to create an item for exists
         if inTheNameOf:
             if not self._mayAccessAdvancedFunctionnalities():
-                msg = "You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!"
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("You need to be 'Manager' or 'MeetingManager' to create an item 'inTheNameOf'!")
             # change considered member to inTheNameOf given userid
             member = portal.acl_users.getUserById(inTheNameOf)
             if not member:
-                msg = "Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("Trying to create an item 'inTheNameOf' an unexisting user '%s'!" % inTheNameOf)
         memberId = member.getId()
 
         # check that the given meetingConfigId exists
         cfg = getattr(tool, meetingConfigId, None)
         if not cfg or not cfg.meta_type == 'MeetingConfig':
-            msg = "Unknown meetingConfigId : '%s'!" % meetingConfigId
-            logger.error(msg)
-            raise ZSI.Fault(ZSI.Fault.Client, msg)
+            raiseMsg("Unknown meetingConfigId : '%s'!" % meetingConfigId)
 
         # check that the user is a creator for given proposingGroupId
         # proposingGroupId may be an organization id (backward compatibility) or an organization UID
@@ -785,15 +750,11 @@ class SOAPView(BrowserView):
         userOrgUids = tool.get_orgs_for_user(
             user_id=memberId, suffixes=['creators'], the_objects=False)
         if proposingGroupUID not in userOrgUids:
-            msg = "'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId)
-            logger.error(msg)
-            raise ZSI.Fault(ZSI.Fault.Client, msg)
+            raiseMsg("'%s' can not create items for the '%s' group!" % (memberId, proposingGroupId))
 
         # title is mandatory!
         if not creationData.__dict__['_title']:
-            msg = "A 'title' is mandatory!"
-            logger.error(msg)
-            raise ZSI.Fault(ZSI.Fault.Client, msg)
+            raiseMsg("A 'title' is mandatory!")
 
         # build creationData
         # creationData keys begin with an '_' (_title, _description, ...) so tranform them
@@ -820,9 +781,7 @@ class SOAPView(BrowserView):
             if field in optionalItemFields and \
                field not in activatedOptionalItemFields and \
                data[field]:
-                msg = "The optional field \"%s\" is not activated in this configuration!" % field
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("The optional field \"%s\" is not activated in this configuration!" % field)
 
         # raise if we pass a preferredMeeting that is not a meeting accepting items
         if not data['preferredMeeting']:
@@ -830,10 +789,8 @@ class SOAPView(BrowserView):
         if not data['preferredMeeting'] == ITEM_NO_PREFERRED_MEETING_VALUE and \
            not data['preferredMeeting'] in \
            [meetingBrain.UID for meetingBrain in cfg.getMeetingsAcceptingItems()]:
-            msg = "The given preferred meeting UID ({0}) is not a meeting accepting items!".format(
-                data['preferredMeeting'])
-            logger.error(msg)
-            raise ZSI.Fault(ZSI.Fault.Client, msg)
+            raiseMsg("The given preferred meeting UID ({0}) is not a meeting accepting items!".format(
+                data['preferredMeeting']))
 
         # validate passed associatedGroups
         associatedGroups = data['associatedGroups']
@@ -842,10 +799,8 @@ class SOAPView(BrowserView):
             ag_term_keys = vocab.by_token.keys()
             difference = tuple(set(associatedGroups).difference(ag_term_keys))
             if difference:
-                msg = "The \"associatedGroups\" data contains wrong values: \"{0}\"!".format(
-                    ', '.join(difference))
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("The \"associatedGroups\" data contains wrong values: \"{0}\"!".format(
+                    ', '.join(difference)))
 
         # validate passed groupsInCharge
         groupsInCharge = data['groupsInCharge']
@@ -854,18 +809,14 @@ class SOAPView(BrowserView):
             gic_term_keys = vocab.by_token.keys()
             difference = tuple(set(groupsInCharge).difference(gic_term_keys))
             if difference:
-                msg = "The \"groupsInCharge\" data contains wrong values: \"{0}\"!".format(
-                    ', '.join(difference))
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("The \"groupsInCharge\" data contains wrong values: \"{0}\"!".format(
+                    ', '.join(difference)))
 
         # validate passed optionalAdvisers
         optionalAdvisers = data['optionalAdvisers']
         if optionalAdvisers:
             if not cfg.getUseAdvices():
-                msg = "The advices functionnality is not enabled for this configuration!"
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("The advices functionnality is not enabled for this configuration!")
 
             # advices are enabled, check if given values are correct
             vocab = get_vocab(cfg, 'Products.PloneMeeting.vocabularies.itemoptionaladvicesvocabulary',
@@ -873,10 +824,8 @@ class SOAPView(BrowserView):
             oa_term_keys = vocab.by_token.keys()
             difference = tuple(set(optionalAdvisers).difference(oa_term_keys))
             if difference:
-                msg = "The \"optionalAdvisers\" data contains wrong values: \"{0}\"!".format(
-                    ', '.join(difference))
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("The \"optionalAdvisers\" data contains wrong values: \"{0}\"!".format(
+                    ', '.join(difference)))
 
         # externalIdentifier is indexed, it can not be None
         if not data['externalIdentifier']:
@@ -889,17 +838,13 @@ class SOAPView(BrowserView):
             value = extraAttr._value
             # the given extraAttr must be in the item schema
             if key not in MeetingItem.schema:
-                msg = "The extraAttr '%s' was not found the the MeetingItem schema!" % key
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("The extraAttr '%s' was not found the the MeetingItem schema!" % key)
             field = MeetingItem.schema[key]
             # only support XHTML TextField at the moment, aka field using RichWidget
             # others will need validation
             if not isinstance(field.widget, RichWidget):
-                msg = "The extraAttr '%s' must correspond to a field using a 'RichWidget' " \
-                    "in the MeetingItem schema!" % key
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("The extraAttr '%s' must correspond to a field using a "
+                         "'RichWidget' in the MeetingItem schema!" % key)
             # avoid overriding a value
             if key not in data:
                 data[key] = value
@@ -914,9 +859,7 @@ class SOAPView(BrowserView):
             # (never connected, then we raise an error)
             destFolder = tool.getPloneMeetingFolder(meetingConfigId, memberId)
             if destFolder.meta_type == 'Plone Site':
-                msg = "No member area for '%s'.  Never connected to PloneMeeting?" % memberId
-                logger.error(msg)
-                raise ZSI.Fault(ZSI.Fault.Client, msg)
+                raiseMsg("No member area for '%s'.  Never connected to PloneMeeting?" % memberId)
 
             type_name = cfg.getItemTypeName()
             data.update({'proposingGroup': proposingGroupUID,
@@ -966,19 +909,14 @@ class SOAPView(BrowserView):
             if not data['category'] in availableCategories:
                 # special message if category mandatory and not given
                 if not cfg.getUseGroupsAsCategories() and not data['category']:
-                    msg = "In this config, category is mandatory!"
-                    logger.error(msg)
-                    raise ZSI.Fault(ZSI.Fault.Client, msg)
+                    raiseMsg("In this config, category is mandatory!")
                 elif cfg.getUseGroupsAsCategories() and data['category']:
-                    msg = "This config does not use categories, the given '%s' category " \
-                        "can not be used!" % data['category']
-                    logger.error(msg)
-                    raise ZSI.Fault(ZSI.Fault.Client, msg)
+                    raiseMsg("This config does not use categories, the given '%s' "
+                             "category can not be used!" % data['category'])
                 # we are using categories but the given one is not in availableCategories
                 elif not cfg.getUseGroupsAsCategories():
-                    msg = "'%s' is not available for the '%s' group!" % (data['category'], proposingGroupId)
-                    logger.error(msg)
-                    raise ZSI.Fault(ZSI.Fault.Client, msg)
+                    raiseMsg("'%s' is not available for the '%s' group!" % (
+                        data['category'], proposingGroupId))
 
             # we create the item to be able to check the category here above...
             itemId = destFolder.invokeFactory(type_name, **data)
