@@ -3,6 +3,8 @@ import com.cloudbees.jenkins.GitHubPushCause
 
 def SKIP_PATTERN = ".*?ci.skip.*"
 def CAUSE = 'default'
+def DOCKER_IMG = ''
+def COMPOSE_PROJECT = ''
 
 def skip = false
 
@@ -61,50 +63,79 @@ pipeline {
 					if (skip == true) {
 						currentBuild.result = 'NOT_BUILT'
 					}
+					branch = BRANCH_NAME.replace("_", "-")
+                    branch = branch.replace(".", "-")
+                    branch = branch.toLowerCase()
+					base_docker_image = "docker-staging.imio.be/iadelib/pm-ws:${branch}"
+					DOCKER_IMG = "${base_docker_image}-${BUILD_ID}"
+					echo "Docker image is ${DOCKER_IMG}"
+                    COMPOSE_PROJECT = "docker-compose-pm-ws-${branch}"
+                    echo "docker compose project is ${COMPOSE_PROJECT}"
+					sh "wget -O docker-compose.yml https://raw.githubusercontent.com/IMIO/buildout.pm/master/docker/docker-compose-jenkins.yml"
 				}
 			}
 		}
-        stage('Build') {
+        stage('Docker build') {
 			when {
 				expression { skip == false }
 			}
             steps {
-                cache(maxCacheSize: 850, caches: [[$class: 'ArbitraryFileCache', excludes: '', path: "${WORKSPACE}/eggs"]]){
-                    script {
-                        sh "make bootstrap"
-                        sh "bin/python bin/buildout -c jenkins.cfg"
-                    }
-                }
+                sh "docker build -t ${DOCKER_IMG} --no-cache --force-rm --pull ."
             }
         }
-        stage('Test Coverage') {
-            when {
+        stage('Push test image') {
+			when {
 				expression { skip == false }
 			}
             steps {
                 script {
-					def zServerPort = new Random().nextInt(10000) + 30000
-					sh "env ZSERVER_PORT=${zServerPort}  bin/coverage run --source=imio.pm.ws bin/test"
-                    sh 'bin/python bin/coverage xml -i'
+                    sh "docker push ${DOCKER_IMG}"
                 }
             }
         }
-	    
-	stage('Publish Coverage') {
-            when {
+        stage('Set up tests') {
+			when {
 				expression { skip == false }
 			}
             steps {
-                catchError(buildResult: null, stageResult: 'FAILURE') {
-                    cobertura (
-                        coberturaReportFile: '**/coverage.xml',
-                        conditionalCoverageTargets: '70, 50, 20',
-                        lineCoverageTargets: '80, 50, 20',
-                        maxNumberOfBuilds: 1,
-                        methodCoverageTargets: '80, 50, 20',
-                        onlyStable: false,
-                        sourceEncoding: 'ASCII'
-                    )
+                script {
+					escapedDockerImage = DOCKER_IMG.replace("/", "\\/")
+					sh "sed -ie 's/imiobe\\/iadelib:dev/${escapedDockerImage}/g' docker-compose.yml"
+                    sh "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml down --remove-orphans"
+                    sh "echo Docker compose project : cleaned"
+                    sh "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml pull"
+                    sh "echo Docker compose project : image pulled"
+                    sh "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml up --no-start"
+                    sh "echo Docker compose project : network recreated"
+                    sh "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml start loffice"
+                    sh "echo Docker compose project : LibreOffice started"
+                }
+            }
+        }
+        stage('Run tests') {
+            parallel{
+                stage('Test') {
+                    when {
+                        expression { skip == false }
+                    }
+                    steps {
+                        script {
+                            sh("docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run instance bin/test")
+                        }
+                    }
+                }
+                stage('Test Coverage') {
+                    when {
+                        expression { skip == false }
+                    }
+                    steps {
+                        withCredentials([string(credentialsId: 'COVERALLS_REPO_TOKEN', variable: 'COVERALLS_REPO_TOKEN')]) {
+                            script {
+                                command = "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run"
+                                sh(command + ' -e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} --entrypoint bash instance bin/test-coverage.sh')
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -117,37 +148,21 @@ pipeline {
             mail to: 'pm-interne@imio.be',
                  subject: "Aborted Pipeline: ${currentBuild.fullDisplayName}",
                  body: "The pipeline ${env.JOB_NAME} ${env.BUILD_NUMBER} was aborted (${env.BUILD_URL})"
-
-            slackSend channel: "#jenkins",
-                      color: "#C0C0C0",
-                      message: "Aborted ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         regression{
             mail to: 'pm-interne@imio.be',
                  subject: "Broken Pipeline: ${currentBuild.fullDisplayName}",
                  body: "The pipeline ${env.JOB_NAME} ${env.BUILD_NUMBER} is broken (${env.BUILD_URL})"
-
-            slackSend channel: "#jenkins",
-                      color: "#ff0000",
-                      message: "Broken ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         fixed{
             mail to: 'pm-interne@imio.be',
                  subject: "Fixed Pipeline: ${currentBuild.fullDisplayName}",
                  body: "The pipeline ${env.JOB_NAME} ${env.BUILD_NUMBER} is back to normal (${env.BUILD_URL})"
-
-            slackSend channel: "#jenkins",
-                      color: "#00cc44",
-                      message: "Fixed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         failure{
             mail to: 'pm-interne@imio.be',
                  subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
                  body: "The pipeline${env.JOB_NAME} ${env.BUILD_NUMBER} failed (${env.BUILD_URL})"
-
-            slackSend channel: "#jenkins",
-                      color: "#ff0000",
-                      message: "Failed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         cleanup{
             deleteDir()
