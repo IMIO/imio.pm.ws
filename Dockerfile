@@ -8,10 +8,11 @@ COPY --chown=imio src/ /plone/src/
 COPY --chown=imio .git/ /plone/.git/
 USER imio
 ENV PATH="/home/imio/.local/bin:${PATH}"
-RUN su -c "virtualenv -p python2 ." -s /bin/sh imio \
-  && su -c "bin/pip uninstall coverage -y" -s /bin/sh imio \
-  && su -c "bin/pip install -U coverage==5.3.1 -r requirements.txt" -s /bin/sh imio \
-  && su -c "pip3 install -U coverage==5.3.1 'coveralls>=3.0.0'" -s /bin/sh imio \
-  && su -c "bin/buildout -c jenkins.cfg" -s /bin/sh imio
+RUN virtualenv -p python2 . \
+# ensure bin/coverage exists and not just un dist-packages
+  && bin/pip install --force-reinstall coverage==5.3.1 \
+  && bin/pip install -r requirements.txt \
+  && pip3 install -U coverage==5.3.1 "coveralls>=3.0.0" \
+  && bin/buildout -c jenkins.cfg
 WORKDIR /plone
 ENTRYPOINT ["/plone/bin/python"]
