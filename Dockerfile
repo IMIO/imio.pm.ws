@@ -4,6 +4,8 @@ USER root
 RUN rm -Rf *.sh *.cfg* *.txt *.conf Makefile bin include lib local share develop-eggs downloads parts .git var
 COPY --chown=imio *.cfg *.rst Makefile setup.py requirements.txt /plone/
 COPY --chown=imio src/ /plone/src/
+# important for coveralls
+COPY --chown=imio .git/ /plone/.git/
 RUN su -c "virtualenv -p python2 ." -s /bin/sh imio \
   && su -c "bin/pip install -U coverage==5.3.1  -r requirements.txt" -s /bin/sh imio \
   && su -c "pip3 install -U coverage==5.3.1 'coveralls>=3.0.0'" -s /bin/sh imio \
