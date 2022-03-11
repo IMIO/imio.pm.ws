@@ -1,4 +1,4 @@
-FROM imiobe/iadelib:dev
+FROM imiobe/iadelib:4.1-dev
 WORKDIR /plone
 USER root
 RUN rm -Rf *.sh *.cfg* *.txt *.conf Makefile bin include lib local share develop-eggs downloads parts .git var
