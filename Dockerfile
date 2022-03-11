@@ -7,7 +7,6 @@ COPY --chown=imio buildout.cfg jenkins.cfg versions-base.cfg versions-dev.cfg *.
 COPY --chown=imio src/ /plone/src/
 # important for coveralls
 COPY --chown=imio .git/ /plone/.git/
-COPY --chown=imio .git/ /plone/.git/
 USER imio
 ENV PATH="/home/imio/.local/bin:${PATH}"
 RUN virtualenv -p python2 . \
