@@ -138,6 +138,8 @@ pipeline {
                     }
                 }
             }
+        }
+    }
     post{
         always{
             chuckNorris()
