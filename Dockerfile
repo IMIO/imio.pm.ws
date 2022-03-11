@@ -1,10 +1,12 @@
 FROM imiobe/iadelib:4.1-dev
 WORKDIR /plone
 USER root
-RUN rm -Rf *.sh *.cfg* *.txt *.conf Makefile bin include lib local share develop-eggs downloads parts .git var
-COPY --chown=imio *.cfg *.rst Makefile setup.py requirements.txt /plone/
+RUN rm -Rfv !\(eggs\) \
+  && rm .*.cfg
+COPY --chown=imio buildout.cfg jenkins.cfg versions-base.cfg versions-dev.cfg *.rst Makefile setup.py requirements.txt /plone/
 COPY --chown=imio src/ /plone/src/
 # important for coveralls
+COPY --chown=imio .git/ /plone/.git/
 COPY --chown=imio .git/ /plone/.git/
 USER imio
 ENV PATH="/home/imio/.local/bin:${PATH}"
