@@ -120,7 +120,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            sh("docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run bin/test")
+                            sh("docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run instance bin/test")
                         }
                     }
                 }
