@@ -114,7 +114,7 @@ pipeline {
         }
         stage('Run tests') {
             parallel{
-                stage('Test Coverage') {
+                stage('Test') {
                     when {
                         expression { skip == false }
                     }
