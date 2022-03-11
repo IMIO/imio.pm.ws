@@ -1,3 +1,6 @@
-# using buildout.pm
-#setuptools == 38.2.4
-#zc.buildout == 2.13.1
+-c https://raw.githubusercontent.com/IMIO/buildout.pm/master/requirements.txt
+pip
+setuptools
+zc.buildout
+wheel
+mccabe
