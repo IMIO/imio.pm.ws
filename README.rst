@@ -1,3 +1,6 @@
+.. image:: https://coveralls.io/repos/github/IMIO/imio.pm.ws/badge.svg?branch=master
+:target: https://coveralls.io/github/IMIO/imio.pm.ws?branch=master
+
 Introduction
 ============
 
