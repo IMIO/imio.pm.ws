@@ -71,7 +71,7 @@ pipeline {
 					echo "Docker image is ${DOCKER_IMG}"
                     COMPOSE_PROJECT = "docker-compose-pm-ws-${branch}"
                     echo "docker compose project is ${COMPOSE_PROJECT}"
-					sh "wget -O docker-compose.yml https://raw.githubusercontent.com/IMIO/buildout.pm/master/docker-compose.yml"
+					sh "wget -O docker-compose.yml https://raw.githubusercontent.com/IMIO/buildout.pm/master/docker/docker-compose-jenkins.yml"
 				}
 			}
 		}
