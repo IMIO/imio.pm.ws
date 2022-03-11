@@ -120,7 +120,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            sh("docker-compose -p ${COMPOSE_PROJECT} -f docker/docker-compose-jenkins.yml run bin/test")
+                            sh("docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run bin/test")
                         }
                     }
                 }
@@ -131,7 +131,7 @@ pipeline {
                     steps {
                         withCredentials([string(credentialsId: 'COVERALLS_REPO_TOKEN', variable: 'COVERALLS_REPO_TOKEN')]) {
                             script {
-                                command = "docker-compose -p ${COMPOSE_PROJECT} -f docker/docker-compose-jenkins.yml run"
+                                command = "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run"
                                 sh(command + ' -e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} --entrypoint bash instance bin/test-coverage.sh')
                             }
                         }
