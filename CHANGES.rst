@@ -5,8 +5,9 @@ Changelog
 3.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Fixed `test_ws_getItemInfosWithShowAssembly` regarding changes in default
+  contacts gender in PloneMeeting testing profile `import_data`.
+  [gbastien]
 
 3.6 (2022-03-10)
 ----------------
