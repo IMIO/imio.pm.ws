@@ -8,6 +8,9 @@ Changelog
 - Fixed `test_ws_getItemInfosWithShowAssembly` regarding changes in default
   contacts gender in PloneMeeting testing profile `import_data`.
   [gbastien]
+- Completed `test_ws_meetingAcceptingItems` to check that is works when using
+  `inTheNameOf` (was actually not working before `Products.PloneMeeting==4.2rc30`).
+  [gbastien]
 
 3.6 (2022-03-10)
 ----------------
