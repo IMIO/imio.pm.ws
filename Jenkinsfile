@@ -101,13 +101,13 @@ pipeline {
                 script {
 					escapedDockerImage = DOCKER_IMG.replace("/", "\\/")
 					sh "sed -ie 's/imiobe\\/iadelib:dev/${escapedDockerImage}/g' docker-compose.yml"
-                    sh "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml down --remove-orphans"
+                    sh "docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml down --remove-orphans"
                     sh "echo Docker compose project : cleaned"
-                    sh "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml pull"
+                    sh "docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml pull"
                     sh "echo Docker compose project : image pulled"
-                    sh "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml up --no-start"
+                    sh "docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml up --no-start"
                     sh "echo Docker compose project : network recreated"
-                    sh "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml start loffice"
+                    sh "docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml start loffice"
                     sh "echo Docker compose project : LibreOffice started"
                 }
             }
@@ -120,7 +120,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            sh("docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run instance bin/test")
+                            sh("docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run instance bin/test")
                         }
                     }
                 }
@@ -131,7 +131,7 @@ pipeline {
                     steps {
                         withCredentials([string(credentialsId: 'COVERALLS_REPO_TOKEN', variable: 'COVERALLS_REPO_TOKEN')]) {
                             script {
-                                command = "docker-compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run"
+                                command = "docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml run"
                                 sh(command + ' -e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} --entrypoint bash instance bin/test-coverage.sh')
                             }
                         }
