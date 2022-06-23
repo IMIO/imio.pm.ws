@@ -101,7 +101,7 @@ pipeline {
                 script {
 					escapedDockerImage = DOCKER_IMG.replace("/", "\\/")
 					sh "sed -ie 's/imiobe\\/iadelib:dev/${escapedDockerImage}/g' docker-compose.yml"
-                    sh "docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml down --remove-orphans"
+                    sh "docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml down -v --remove-orphans || exit 0"
                     sh "echo Docker compose project : cleaned"
                     sh "docker compose -p ${COMPOSE_PROJECT} -f docker-compose.yml pull"
                     sh "echo Docker compose project : image pulled"
