@@ -22,7 +22,8 @@ lib/
 parts/
 dist/
 var/
-src/
+src/*
 !src/imio
 pip-selfcheck.json
-
+.plone.versioncheck.tracked.json
+pyvenv.cfg
