@@ -11,6 +11,8 @@ Changelog
 - Completed `test_ws_meetingAcceptingItems` to check that it works when using
   `inTheNameOf` (was actually not working before `Products.PloneMeeting==4.2rc30`).
   [gbastien]
+- Adapted code regarding removal of `MeetingConfig.useGroupsAsCategories`.
+  [gbastien]
 
 3.6 (2022-03-10)
 ----------------

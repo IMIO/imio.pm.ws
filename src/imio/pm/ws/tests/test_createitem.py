@@ -106,7 +106,7 @@ SOAPAction: /
         """
         # by default no item exists
         self.changeUser('pmCreator1')
-        req = self._prepareCreationData()
+        req = self._prepareCreationData(with_category=False)
         responseHolder = createItemResponse()
         # the title is mandatory
         req._creationData._title = None
@@ -129,21 +129,20 @@ SOAPAction: /
         # set back correct proposingGroup
         req._proposingGroupId = 'developers'
         # if category is mandatory and empty, it raises ZSI.Fault
-        self.meetingConfig.setUseGroupsAsCategories(False)
+        self._enableField('category')
         req._creationData._category = None
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEqual(cm.exception.string, "In this config, category is mandatory!")
-        # wrong category and useGroupsAsCategories, ZSI.Fault
-        self.meetingConfig.setUseGroupsAsCategories(True)
+        # wrong category and category not used, ZSI.Fault
+        self._enableField('category', enable=False)
         req._creationData._category = 'wrong-category-id'
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEqual(cm.exception.string,
-                         "This config does not use categories, the given 'wrong-category-id' "
-                         "category can not be used!")
-        # wrong category and actually accepting categories, aka useGroupsAsCategories to False
-        self.meetingConfig.setUseGroupsAsCategories(False)
+                         'The optional field "category" is not activated in this configuration!')
+        # wrong category and using category
+        self._enableField('category')
         with self.assertRaises(ZSI.Fault) as cm:
             SOAPView(self.portal, req).createItemRequest(req, responseHolder)
         self.assertEqual(cm.exception.string,
@@ -190,7 +189,7 @@ SOAPAction: /
         req = self._prepareCreationData()
         responseHolder = createItemResponse()
         # we can not use an optional field that is not activated in the current MeetingConfig
-        cfg.setUsedItemAttributes(('description', 'detailedDescription',))
+        cfg.setUsedItemAttributes(('category', 'description', 'detailedDescription',))
         self.assertFalse('toDiscuss' in cfg.getUsedItemAttributes())
         # set toDiscuss to True
         req._creationData._toDiscuss = True
@@ -493,7 +492,7 @@ SOAPAction: /
           - the calling user must be 'Manager' or 'MeetingManager'
           - the created item is finally like if created by the inTheNameOf user
         """
-        self.meetingConfig.setUseGroupsAsCategories(False)
+        self._enableField('category')
         # check first a working example the degrades it...
         # and every related informations (creator, ownership, ...) are corretly linked to inTheNameOf user
         self.changeUser('pmManager')
@@ -653,7 +652,7 @@ SOAPAction: /
           Test when passing groupsInCharge while creating the item.
         """
         cfg = self.meetingConfig
-        cfg.setUsedItemAttributes(['description', 'detailedDescription'])
+        cfg.setUsedItemAttributes(['category', 'description', 'detailedDescription'])
         # by default no item exists
         self.changeUser('pmCreator1')
         req = self._prepareCreationData()
@@ -686,7 +685,7 @@ SOAPAction: /
           Test when passing associatedGroups while creating the item.
         """
         cfg = self.meetingConfig
-        cfg.setUsedItemAttributes(['description', 'detailedDescription'])
+        cfg.setUsedItemAttributes(['category', 'description', 'detailedDescription'])
         # by default no item exists
         self.changeUser('pmCreator1')
         req = self._prepareCreationData()
@@ -718,7 +717,7 @@ SOAPAction: /
           Test when passing associatedGroups while creating the item.
         """
         cfg = self.meetingConfig
-        cfg.setUsedItemAttributes(['description', 'detailedDescription'])
+        cfg.setUsedItemAttributes(['category', 'description', 'detailedDescription'])
 
         # by default no item exists
         self.changeUser('pmCreator1')
