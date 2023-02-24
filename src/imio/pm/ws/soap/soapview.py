@@ -321,16 +321,16 @@ class SOAPView(BrowserView):
 
         # MeetingConfigs
         config_infos = []
-        for config in tool.getActiveConfigs():
+        for cfg in tool.getActiveConfigs():
             configInfo = ConfigInfo()
-            configInfo._UID = config.UID()
-            configInfo._id = config.getId()
-            configInfo._title = config.Title()
-            configInfo._description = config.Description()
-            configInfo._itemPositiveDecidedStates = config.getItemPositiveDecidedStates()
+            configInfo._UID = cfg.UID()
+            configInfo._id = cfg.getId()
+            configInfo._title = cfg.Title()
+            configInfo._description = cfg.Description()
+            configInfo._itemPositiveDecidedStates = cfg.getItemPositiveDecidedStates()
             # only return categories if the meetingConfig uses it
-            if showCategories and not config.getUseGroupsAsCategories():
-                for category in config.getCategories(userId=userToShowCategoriesFor):
+            if showCategories and 'category' in cfg.getUsedItemAttributes():
+                for category in cfg.getCategories(userId=userToShowCategoriesFor):
                     basicInfo = BasicInfo()
                     basicInfo._UID = category.UID()
                     basicInfo._id = category.getId()
@@ -775,11 +775,11 @@ class SOAPView(BrowserView):
 
         # raise if we pass an optional attribute that is not activated in this MeetingConfig
         optionalItemFields = cfg.listUsedItemAttributes()
-        activatedOptionalItemFields = cfg.getUsedItemAttributes()
+        usedItemAttrs = cfg.getUsedItemAttributes()
         for field in data:
             # if the field is an optional field that is not used and that has a value (contains data), we raise
             if field in optionalItemFields and \
-               field not in activatedOptionalItemFields and \
+               field not in usedItemAttrs and \
                data[field]:
                 raiseMsg("The optional field \"%s\" is not activated in this configuration!" % field)
 
@@ -901,22 +901,17 @@ class SOAPView(BrowserView):
                         warnWrongHTML = True
                         data[htmlFieldId] = renderedSoupContents
 
-            # check that if category is mandatory (getUseGroupsAsCategories is False), it is given
-            # and that given category is available
-            # if we are not using categories, just ensure that we received an empty category
-            availableCategories = not cfg.getUseGroupsAsCategories() and \
-                [cat.getId() for cat in cfg.getCategories()] or ['', ]
-            if not data['category'] in availableCategories:
-                # special message if category mandatory and not given
-                if not cfg.getUseGroupsAsCategories() and not data['category']:
-                    raiseMsg("In this config, category is mandatory!")
-                elif cfg.getUseGroupsAsCategories() and data['category']:
-                    raiseMsg("This config does not use categories, the given '%s' "
-                             "category can not be used!" % data['category'])
-                # we are using categories but the given one is not in availableCategories
-                elif not cfg.getUseGroupsAsCategories():
-                    raiseMsg("'%s' is not available for the '%s' group!" % (
-                        data['category'], proposingGroupId))
+            # check that if category is mandatory, it is given and that given category is available
+            if 'category' in usedItemAttrs:
+                availableCategories = [cat.getId() for cat in cfg.getCategories()] or ['', ]
+                if data['category'] not in availableCategories:
+                    # special message if category used not given
+                    if not data['category']:
+                        raiseMsg("In this config, category is mandatory!")
+                    # we are using categories but the given one is not in availableCategories
+                    else:
+                        raiseMsg("'%s' is not available for the '%s' group!" % (
+                            data['category'], proposingGroupId))
 
             # we create the item to be able to check the category here above...
             itemId = destFolder.invokeFactory(type_name, **data)

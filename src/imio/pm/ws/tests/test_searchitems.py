@@ -110,8 +110,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         self.assertEqual(expected, resp)
         # if the item is in a meeting, the result is a bit different because
         # we have valid informations about the meeting_date
-        # use the 'plonegov-assembly' MeetingConfig that use real categories,
-        # not useGroupsAsCategories
+        # use the 'plonegov-assembly' MeetingConfig that use category
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
         itemInMeeting = meeting.get_items(ordered=True)[0]
@@ -201,7 +200,7 @@ class testSOAPSearchItems(WS4PMTestCase):
         # create an item for 'plonemeeting-assembly' with same data as one created for 'plonegov-assembly' here above
         req = self._prepareCreationData()
         req._meetingConfigId = 'plonemeeting-assembly'
-        # in 'plonemeeting-assembly', the category is not used, useGroupsAsCategories is True
+        # in 'plonemeeting-assembly', the category is not used
         req._creationData._category = ''
         newItem, response = self._createItem(req)
         pmItem = self.portal.portal_catalog(UID=response._UID)[0].getObject()

@@ -217,7 +217,7 @@ class testSOAPGetConfigInfos(WS4PMTestCase):
           Helper method for generating result displayed about categories of a MeetingConfig
         """
         # if not using categories, return empty categories list
-        if not config.meta_type == 'MeetingConfig' or config.getUseGroupsAsCategories():
+        if not config.meta_type == 'MeetingConfig' or 'category' not in config.getUsedItemAttributes():
             return ''
 
         result = ""

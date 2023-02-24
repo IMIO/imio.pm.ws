@@ -35,12 +35,11 @@ class WS4PMTestCase(PloneMeetingTestCase):
         self.meetingConfig.setUsedItemAttributes(itemAttrs + ('detailedDescription', ))
         itemAttrs = self.meetingConfig2.getUsedItemAttributes()
         self.meetingConfig2.setUsedItemAttributes(itemAttrs + ('detailedDescription', ))
-        # use the 'plonegov-assembly' MeetingConfig that use real categories,
-        # not useGroupsAsCategories, even if it could be changed during a test
+        # use the 'plonegov-assembly' MeetingConfig that use category
         self.meetingConfig = self.meetingConfig2
         self.usedMeetingConfigId = 'plonegov-assembly'
 
-    def _prepareCreationData(self):
+    def _prepareCreationData(self, with_category=True):
         """
           Helper method for creating an item using the SOAP method createItem
         """
@@ -52,7 +51,8 @@ class WS4PMTestCase(PloneMeetingTestCase):
         req._proposingGroupId = 'developers'
         CreationData = GTD('http://ws4pm.imio.be', 'CreationData')('').pyclass()
         CreationData._title = 'My new item title'
-        CreationData._category = 'development'
+        if with_category:
+            CreationData._category = 'development'
         CreationData._description = '<p>Description</p>'
         CreationData._detailedDescription = '<p>Detailed description</p>'
         CreationData._decision = '<p>Décision</p>'
