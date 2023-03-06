@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.7 (unreleased)
+3.7 (2023-03-06)
 ----------------
 
 - Fixed `test_ws_getItemInfosWithShowAssembly` regarding changes in default
