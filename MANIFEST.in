@@ -4,6 +4,7 @@ include *.cfg *.rst *.in *.txt
 include *.py
 include .coveragerc
 include .travis.yml
+include Dockerfile
 include Makefile
 exclude *.ignore
 exclude .installed.cfg
