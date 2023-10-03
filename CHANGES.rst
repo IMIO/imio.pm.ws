@@ -5,8 +5,9 @@ Changelog
 3.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Make sure `createItemRequest` returns a response status of `200` or
+  it raises a `SOAPException` (even if item is created anyway?!).
+  [gbastien]
 
 3.7 (2023-03-06)
 ----------------

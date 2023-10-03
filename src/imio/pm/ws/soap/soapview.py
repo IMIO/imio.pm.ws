@@ -1075,6 +1075,10 @@ class SOAPView(BrowserView):
             # fallback to original user calling the SOAP method
             if inTheNameOf:
                 teardown_user_in_the_name_of(portal, oldsm, original_auth_user)
+            # if response status is 302, turn it back to 200 or the query fails
+            # this happens when transitions are triggered and some code does a "redirect"
+            if portal.REQUEST.RESPONSE.status == 302:
+                portal.REQUEST.RESPONSE.status = 200
         return item.UID(), warnings
 
     def _mayAccessAdvancedFunctionnalities(self):

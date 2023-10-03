@@ -805,8 +805,12 @@ SOAPAction: /
               'delay_label': ''}, ])
         self.changeUser('pmCreator1')
         req = self._prepareCreationData()
+        # check here that when response status is set to 302, it does not break
+        # request and it is set back to 200 after creation
+        self.request.RESPONSE.status = 302
         wsItem, response = self._createItem(req)
         self.assertTrue(wsItem.getAdviceDataFor(wsItem, self.vendors_uid))
+        self.assertEqual(self.request.RESPONSE.status, 200)
         # now create an item manually, the auto advice is not asked
         item = self.create('MeetingItem')
         self.assertFalse(item.getAdviceDataFor(item, self.vendors_uid))
