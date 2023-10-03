@@ -1,5 +1,5 @@
-.. image:: https://coveralls.io/repos/github/IMIO/imio.pm.ws/badge.svg?branch=master
-    :target: https://coveralls.io/github/IMIO/imio.pm.ws?branch=master
+.. image:: https://coveralls.io/repos/github/IMIO/imio.pm.ws/badge.svg?branch=HEAD
+    :target: https://coveralls.io/github/IMIO/imio.pm.ws?branch=HEAD
 
 Introduction
 ============
