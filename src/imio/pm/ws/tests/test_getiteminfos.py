@@ -92,11 +92,14 @@ class testSOAPGetItemInfos(WS4PMTestCase):
         # we have valid informations about the meeting_date
         self.changeUser('pmManager')
         meeting = self._createMeetingWithItems()
+        meeting_uid = meeting.UID()
         itemInMeeting = meeting.get_items(ordered=True)[0]
         # by default, PloneMeeting creates item without title/description/decision...
         itemInMeeting.setTitle('My new item title')
         itemInMeeting.setDescription('<p>Description</p>', mimetype='text/x-html-safe')
         itemInMeeting.setDecision('<p>Décision</p>', mimetype='text/x-html-safe')
+        itemInMeeting.setPreferredMeeting(meeting_uid)
+        itemInMeeting.reindexObject()
         resp = self._getItemInfos(itemInMeeting.UID())
         meetingDate = gDateTime.get_formatted_content(gDateTime(), meeting.date.utctimetuple())
         expected = """<ns1:getItemInfosResponse xmlns:ns1="http://ws4pm.imio.be" """ \
@@ -115,8 +118,8 @@ class testSOAPGetItemInfos(WS4PMTestCase):
     <description>&lt;p&gt;Description&lt;/p&gt;</description>
     <detailedDescription/>
     <decision>&lt;p&gt;Décision&lt;/p&gt;</decision>
-    <preferredMeeting/>
-    <preferred_meeting_date>1950-01-01T00:00:00.006Z</preferred_meeting_date>
+    <preferredMeeting>{3}</preferredMeeting>
+    <preferred_meeting_date>{4}</preferred_meeting_date>
     <review_state>presented</review_state>
     <meeting>{3}</meeting>
     <meeting_date>{4}</meeting_date>

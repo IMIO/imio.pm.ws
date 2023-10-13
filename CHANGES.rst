@@ -8,6 +8,9 @@ Changelog
 - Make sure `createItemRequest` returns a response status of `200` or
   it raises a `SOAPException` (even if item is created anyway?!).
   [gbastien]
+- Fixed `SOAPView._getItemInfos` when computing `preferred_meeting_date`, it was
+  always `None` because using the `uid_catalog` and Meeting is a DX content type.
+  [gbastien]
 
 3.7 (2023-03-06)
 ----------------

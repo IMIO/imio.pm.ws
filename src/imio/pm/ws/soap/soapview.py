@@ -10,6 +10,7 @@ from collective.iconifiedcategory.utils import calculate_category_id
 from DateTime import DateTime
 from HTMLParser import HTMLParser
 from imio.helpers.content import get_vocab
+from imio.helpers.content import uuidToObject
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
 from imio.pm.ws.config import MAIN_DATA_FROM_ITEM_SCHEMA
 from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
@@ -458,7 +459,6 @@ class SOAPView(BrowserView):
             # force to use the 'MeetingItem' meta_type to be sure that attributes here above exist on found elements
             params['meta_type'] = 'MeetingItem'
             catalog = api.portal.get_tool('portal_catalog')
-            uid_catalog = api.portal.get_tool('uid_catalog')
             params['sort_on'] = 'created'
             brains = catalog(**params)
             noDate = DateTime('1950/01/01 00:00:00 UTC')
@@ -484,8 +484,9 @@ class SOAPView(BrowserView):
                 itemInfo._decision = item.getRawDecision(keepWithNext=False)
                 preferred = item.getPreferredMeeting()
                 itemInfo._preferredMeeting = not preferred == ITEM_NO_PREFERRED_MEETING_VALUE and preferred or ''
-                preferredMeeting_brains = uid_catalog.searchResults(UID=preferred)
-                preferredMeeting = preferredMeeting_brains and preferredMeeting_brains[0].getObject() or None
+                preferredMeeting = None
+                if itemInfo._preferredMeeting:
+                    preferredMeeting = uuidToObject(preferred)
                 itemInfo._preferred_meeting_date = \
                     preferredMeeting and preferredMeeting.date.utctimetuple() or localtime(noDate)
                 itemInfo._review_state = wfTool.getInfoFor(item, 'review_state')
