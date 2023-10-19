@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.8 (unreleased)
+3.8 (2023-10-19)
 ----------------
 
 - Make sure `createItemRequest` returns a response status of `200` or
