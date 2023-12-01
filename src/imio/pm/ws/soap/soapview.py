@@ -11,6 +11,7 @@ from DateTime import DateTime
 from HTMLParser import HTMLParser
 from imio.helpers.content import get_vocab
 from imio.helpers.content import uuidToObject
+from imio.history.utils import add_event_to_wf_history
 from imio.pm.ws.config import EXTERNAL_IDENTIFIER_FIELD_NAME
 from imio.pm.ws.config import MAIN_DATA_FROM_ITEM_SCHEMA
 from imio.pm.ws.config import POD_TEMPLATE_ID_PATTERN
@@ -32,7 +33,6 @@ from Products.Five import BrowserView
 from Products.PloneMeeting.browser.overrides import PMDocumentGeneratorLinksViewlet
 from Products.PloneMeeting.config import ITEM_NO_PREFERRED_MEETING_VALUE
 from Products.PloneMeeting.MeetingItem import MeetingItem
-from Products.PloneMeeting.utils import add_wf_history_action
 from Products.PloneMeeting.utils import get_annexes
 from Products.PloneMeeting.utils import org_id_to_uid
 from time import localtime
@@ -920,12 +920,10 @@ class SOAPView(BrowserView):
             item.setCategory(data['category'])
 
             # add a record to the item workflow_history to specify that item was created thru SOAP WS
-            action_name = ITEM_SOAP_CREATED
-            action_label = action_name + '_comments'
-            add_wf_history_action(item,
-                                  action_name=action_name,
-                                  action_label=action_label,
-                                  user_id=memberId)
+            add_event_to_wf_history(item,
+                                    action=ITEM_SOAP_CREATED,
+                                    actor=memberId,
+                                    comments=ITEM_SOAP_CREATED + '_comments')
 
             # processForm calls at_post_create_script too
             # this is necessary before adding annexes

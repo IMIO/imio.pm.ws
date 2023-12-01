@@ -5,8 +5,9 @@ Changelog
 3.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Adapted code as `Products.PloneMeeting.utils.add_wf_history_action` was moved
+  to `imio.history.utils.add_event_to_wf_history`.
+  [gbastien]
 
 3.8 (2023-10-19)
 ----------------
