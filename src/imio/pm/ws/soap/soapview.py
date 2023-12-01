@@ -9,6 +9,7 @@ from collective.contact.plonegroup.utils import get_organizations
 from collective.iconifiedcategory.utils import calculate_category_id
 from DateTime import DateTime
 from HTMLParser import HTMLParser
+from imio.helpers.content import get_user_fullname
 from imio.helpers.content import get_vocab
 from imio.helpers.content import uuidToObject
 from imio.history.utils import add_event_to_wf_history
@@ -513,7 +514,7 @@ class SOAPView(BrowserView):
                     # add the category title
                     itemInfo._extraInfos['category_title'] = category_or_proposing_group.Title()
                     # add the creator fullname
-                    itemInfo._extraInfos['creator_fullname'] = tool.getUserName(itemInfo._creator)
+                    itemInfo._extraInfos['creator_fullname'] = get_user_fullname(itemInfo._creator)
                 if showAnnexes:
                     for annex in get_annexes(item):
                         # filter on annexes types

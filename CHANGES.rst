@@ -6,7 +6,8 @@ Changelog
 ----------------
 
 - Adapted code as `Products.PloneMeeting.utils.add_wf_history_action` was moved
-  to `imio.history.utils.add_event_to_wf_history`.
+  to `imio.history.utils.add_event_to_wf_history` and `ToolPloneMeeting.getUserName`
+  is removed, we use `imio.helpers.content.get_user_fullname` instead.
   [gbastien]
 
 3.8 (2023-10-19)
