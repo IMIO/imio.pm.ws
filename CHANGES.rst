@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.9 (unreleased)
+3.9 (2023-12-11)
 ----------------
 
 - Adapted code as `Products.PloneMeeting.utils.add_wf_history_action` was moved
