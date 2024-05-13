@@ -34,7 +34,7 @@ class WS4PMSOAPBindingSOAP:
     # op: testConnection
     def testConnection(self, request, **kw):
         if isinstance(request, testConnectionRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/testConnection", **kw)
         # no output wsaction
@@ -44,7 +44,7 @@ class WS4PMSOAPBindingSOAP:
     # op: checkIsLinked
     def checkIsLinked(self, request, **kw):
         if isinstance(request, checkIsLinkedRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/checkIsLinked", **kw)
         # no output wsaction
@@ -54,7 +54,7 @@ class WS4PMSOAPBindingSOAP:
     # op: getConfigInfos
     def getConfigInfos(self, request, **kw):
         if isinstance(request, getConfigInfosRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getConfigInfos", **kw)
         # no output wsaction
@@ -64,7 +64,7 @@ class WS4PMSOAPBindingSOAP:
     # op: getUserInfos
     def getUserInfos(self, request, **kw):
         if isinstance(request, getUserInfosRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getUserInfos", **kw)
         # no output wsaction
@@ -74,7 +74,7 @@ class WS4PMSOAPBindingSOAP:
     # op: getItemInfos
     def getItemInfos(self, request, **kw):
         if isinstance(request, getItemInfosRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getItemInfos", **kw)
         # no output wsaction
@@ -84,7 +84,7 @@ class WS4PMSOAPBindingSOAP:
     # op: getSingleItemInfos
     def getSingleItemInfos(self, request, **kw):
         if isinstance(request, getSingleItemInfosRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getSingleItemInfos", **kw)
         # no output wsaction
@@ -94,7 +94,7 @@ class WS4PMSOAPBindingSOAP:
     # op: getItemTemplate
     def getItemTemplate(self, request, **kw):
         if isinstance(request, getItemTemplateRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/getItemTemplate", **kw)
         # no output wsaction
@@ -104,7 +104,7 @@ class WS4PMSOAPBindingSOAP:
     # op: searchItems
     def searchItems(self, request, **kw):
         if isinstance(request, searchItemsRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/searchItems", **kw)
         # no output wsaction
@@ -114,7 +114,7 @@ class WS4PMSOAPBindingSOAP:
     # op: meetingsAcceptingItems
     def meetingsAcceptingItems(self, request, **kw):
         if isinstance(request, meetingsAcceptingItemsRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/meetingsAcceptingItems", **kw)
         # no output wsaction
@@ -124,7 +124,7 @@ class WS4PMSOAPBindingSOAP:
     # op: createItem
     def createItem(self, request, **kw):
         if isinstance(request, createItemRequest) is False:
-            raise TypeError, "%s incorrect request type" % (request.__class__)
+            raise TypeError("%s incorrect request type" % (request.__class__))
         # no input wsaction
         self.binding.Send(None, None, request, soapaction="http://ws4pm.imio.be/createItem", **kw)
         # no output wsaction

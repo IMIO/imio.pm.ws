@@ -5,8 +5,8 @@ Changelog
 3.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
-
+- `Python 3` compatibility (coveralls).
+  [gbastien]
 
 3.9 (2023-12-11)
 ----------------
