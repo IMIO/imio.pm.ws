@@ -642,7 +642,7 @@ class SOAPView(BrowserView):
                 item.REQUEST.set('template_uid', theTemplate.UID())
                 item.REQUEST.set('output_format', templateId.split(POD_TEMPLATE_ID_PATTERN.format('', ''))[1])
                 res = view()
-            except Exception, e:
+            except Exception as e:
                 raiseMsg("Exception : %s" % e.message)
         finally:
             # fallback to original user calling the SOAP method
